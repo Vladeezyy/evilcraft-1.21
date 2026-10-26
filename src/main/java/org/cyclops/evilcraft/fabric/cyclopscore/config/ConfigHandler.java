@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.cyclops.cyclopscore.config.ConfigHandlerFabric;
 import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigRegistry;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.configurabletypeaction.BlockActionFabric;
 import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfig;
 import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
@@ -47,27 +48,38 @@ public class ConfigHandler extends ConfigHandlerFabric {
         for (ResourceLocation first : List.of(Registries.ATTRIBUTE.location(), Registries.DATA_COMPONENT_TYPE.location(), Registries.ARMOR_MATERIAL.location())) {
             ranks.put(first, rank++);
         }
-        for (ResourceLocation registry : BuiltInRegistries.REGISTRY.keySet()) {
-            if (!ranks.containsKey(registry)) {
-                ranks.put(registry, rank++);
+        // In the order in which the registries were created (the key set of the root registry is not ordered)
+        for (Registry<?> registry : BuiltInRegistries.REGISTRY) {
+            ResourceLocation id = registry.key().location();
+            if (!ranks.containsKey(id)) {
+                ranks.put(id, rank++);
             }
         }
         int last = rank;
         List<ExtendedConfigCommon<?, ?, ?>> sorted = Lists.newArrayList(getConfigurables());
-        sorted.sort(Comparator.comparingInt(config -> {
-            if (config instanceof FluidConfig) {
-                return ranks.get(Registries.FLUID.location());
-            }
-            if (config instanceof ExtendedConfigRegistry<?, ?, ?> registryConfig) {
-                Registry<?> registry = registryConfig.getRegistry();
-                if (registry != null) {
-                    return ranks.getOrDefault(registry.key().location(), last);
-                }
-            }
-            return last;
-        }));
+        sorted.sort(Comparator.comparingInt(config -> rank(config, ranks, last)));
+        int itemRank = ranks.get(Registries.ITEM.location());
+        boolean blockItemsRegistered = false;
         for (ExtendedConfigCommon<?, ?, ?> eConfig : sorted) {
+            if (!blockItemsRegistered && rank(eConfig, ranks, last) >= itemRank) {
+                BlockActionFabric.registerPendingItems();
+                blockItemsRegistered = true;
+            }
             eConfig.getConfigurableType().getConfigurableTypeAction().onRegisterForgeFilled(eConfig);
         }
+        BlockActionFabric.registerPendingItems();
+    }
+
+    private static int rank(ExtendedConfigCommon<?, ?, ?> config, Map<ResourceLocation, Integer> ranks, int last) {
+        if (config instanceof FluidConfig) {
+            return ranks.get(Registries.FLUID.location());
+        }
+        if (config instanceof ExtendedConfigRegistry<?, ?, ?> registryConfig) {
+            Registry<?> registry = registryConfig.getRegistry();
+            if (registry != null) {
+                return ranks.getOrDefault(registry.key().location(), last);
+            }
+        }
+        return last;
     }
 }

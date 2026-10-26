@@ -5,8 +5,10 @@
       "item": "minecraft:creeper_head"
     },
     {
-      "type": "neoforge:components",
-      "items": "evilcraft:broom_part",
+      "fabric:type": "fabric:components",
+      "base": {
+        "item": "evilcraft:broom_part"
+      },
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"

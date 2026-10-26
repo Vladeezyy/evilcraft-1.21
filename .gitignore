@@ -28,3 +28,6 @@ logs/
 secrets.properties
 build_number.properties
 changelog.txt
+/run-server
+/run-prod
+/run-prod-server

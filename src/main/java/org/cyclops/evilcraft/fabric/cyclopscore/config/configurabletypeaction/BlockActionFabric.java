@@ -13,7 +13,9 @@ import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 
 import javax.annotation.Nullable;
+import com.google.common.collect.Lists;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.BiFunction;
@@ -24,9 +26,21 @@ import java.util.function.BiFunction;
  */
 public class BlockActionFabric extends ConfigurableTypeActionRegistry<BlockConfig, Block, ModBase<?>> {
 
+    /**
+     * Block items, registered once all blocks are (like the item registration event of NeoForge): block items can
+     * depend on other blocks (wall torches).
+     */
+    private static final List<Runnable> PENDING_ITEMS = Lists.newArrayList();
+
+    public static void registerPendingItems() {
+        List<Runnable> pending = Lists.newArrayList(PENDING_ITEMS);
+        PENDING_ITEMS.clear();
+        pending.forEach(Runnable::run);
+    }
+
     public static void register(@Nullable BiFunction<BlockConfig, Block, ? extends Item> itemBlockConstructor, BlockConfig config, @Nullable Callable<?> callback) {
         register(config, itemBlockConstructor == null ? callback : null); // Delay the callback until the item has been registered if there is one
-        if (itemBlockConstructor != null) {
+        if (itemBlockConstructor != null) PENDING_ITEMS.add(() -> {
             ItemConfig itemConfig = new ItemConfig(config.getMod(), config.getNamedId(), (iConfig) -> {
                 Item itemBlock = itemBlockConstructor.apply(config, config.getInstance());
                 Objects.requireNonNull(itemBlock, "Received a null item for the item block constructor of " + config.getNamedId());
@@ -39,7 +53,7 @@ public class BlockActionFabric extends ConfigurableTypeActionRegistry<BlockConfi
                 }
                 return null;
             });
-        }
+        });
     }
 
     @Override

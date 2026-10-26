@@ -88,6 +88,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
+// Strip the lambdas of client-only methods on servers too (see buildSrc/ClientLambdaStripping)
+tasks.named('compileJava') {
+    doLast {
+        int changed = ClientLambdaStripping.process(destinationDirectory.get().asFile)
+        logger.info("Marked client lambdas in ${changed} classes")
+    }
+}
+
 processResources {
     def props = [
             mod_id: mod_id, mod_name: mod_name, mod_version: mod_version, mod_author: mod_author,

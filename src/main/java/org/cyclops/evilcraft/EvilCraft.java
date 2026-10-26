@@ -1,5 +1,11 @@
 package org.cyclops.evilcraft;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.metadata.RegistryExportableRegistry;
+import org.cyclops.evilcraft.fabric.cyclopscore.metadata.IRegistryExportableRegistry;
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
+import org.cyclops.evilcraft.fabric.world.NeoForgeBiomeModifiers;
+import org.cyclops.evilcraft.fabric.extensions.ItemExtensions;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.PersistentData;
 import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentInventoryConfig;
@@ -103,13 +109,18 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         getRegistryManager().addRegistry(IBroomModifierRegistry.class, new BroomModifierRegistry());
         getRegistryManager().addRegistry(IInfoBookRegistry.class, new InfoBookRegistry());
         getRegistryManager().addRegistry(IPurifierActionRegistry.class, new PurifierActionRegistry());
+        // Cyclops Core's metadata exporters, which it only has on NeoForge
+        getRegistryManager().addRegistry(IRegistryExportableRegistry.class, RegistryExportableRegistry.getInstance());
 
         BroomParts.init();
         BroomModifiers.init();
 
-        // Fabric: capability lookups and entity data attachments
+        // Fabric: capability lookups, entity data attachments, item hooks, world generation and composting
         Capabilities.load();
         PersistentData.load();
+        ItemExtensions.register();
+        NeoForgeBiomeModifiers.register(Reference.MOD_ID);
+        ModLifecycle.afterRegistries(() -> CompostingChanceRegistry.INSTANCE.add(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 0.3F));
     }
 
     @Override

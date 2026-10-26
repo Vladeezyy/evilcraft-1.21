@@ -2,8 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "type": "neoforge:components",
-      "items": "evilcraft:weather_container",
+      "fabric:type": "fabric:components",
+      "base": {
+        "item": "evilcraft:weather_container"
+      },
       "components": {
         "evilcraft:weather_container_type": "CLEAR"
       }
