@@ -3,12 +3,12 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.Collection;
  */
 public class ItemWeatherContainerConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "general", comment = "If shapeless crafting of the higher tiers of weather containers should be enabled.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "general", comment = "If shapeless crafting of the higher tiers of weather containers should be enabled.", requiresMcRestart = true)
     public static boolean shapelessRecipes = true;
 
     public ItemWeatherContainerConfig() {
@@ -31,11 +31,11 @@ public class ItemWeatherContainerConfig extends ItemConfig {
                         )
         );
         if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
+            RegisterColorHandlersEvent.Item.addListener(this::registerColors);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerColors(RegisterColorHandlersEvent.Item event) {
         event.register(new ItemWeatherContainer.ItemColor(), getInstance());
     }

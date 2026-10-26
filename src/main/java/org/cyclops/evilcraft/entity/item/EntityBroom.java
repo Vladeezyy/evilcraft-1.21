@@ -21,11 +21,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.api.broom.BroomModifiers;
@@ -99,7 +98,7 @@ public class EntityBroom extends Entity {
      * that was set by this broom during its last
      * update.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private double oldHoverOffset;
 
     private Map<BroomModifier, Float> cachedModifiers = null;
@@ -342,7 +341,7 @@ public class EntityBroom extends Entity {
         super.removePassenger(passenger);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void showParticles(EntityBroom broom) {
         Level world = broom.level();
         if (world.isClientSide() && broom.lastMounted.zza != 0) {
@@ -543,10 +542,6 @@ public class EntityBroom extends Entity {
         return false;
     }
 
-    @Override
-    public boolean canBeRiddenUnderFluidType(FluidType type, Entity rider) {
-        return getModifier(BroomModifiers.SWIMMING) > 0;
-    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

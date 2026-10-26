@@ -11,10 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -34,7 +34,7 @@ public class BlockEntitySpiritPortal extends CyclopsBlockEntity {
         super(RegistryEntries.BLOCK_ENTITY_SPIRIT_PORTAL.get(), blockPos, blockState);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void showNewBlurParticle() {
         RandomSource rand = level.random;
         float scale = 0.6F - rand.nextFloat() * 0.3F;

@@ -1,10 +1,11 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import com.google.common.collect.Sets;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockEntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockEntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDarkTankConfig;
@@ -24,11 +25,11 @@ public class BlockEntityDarkTankConfig extends BlockEntityConfig<BlockEntityDark
                 (eConfig) -> new BlockEntityType<>(BlockEntityDarkTank::new,
                         Sets.newHashSet(RegistryEntries.BLOCK_DARK_TANK.get()), null)
         );
-        EvilCraft._instance.getModEventBus().addListener(new BlockEntityDarkTank.CapabilityRegistrar<>(this::getInstance)::register);
+        RegisterCapabilitiesEvent.addListener(new BlockEntityDarkTank.CapabilityRegistrar<>(this::getInstance)::register);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void onRegistered() {
         super.onRegistered();
         if(!BlockDarkTankConfig.staticBlockRendering) {

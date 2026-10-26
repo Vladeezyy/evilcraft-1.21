@@ -13,8 +13,7 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.MonsterRoomFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import net.neoforged.neoforge.common.MonsterRoomHooks;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 
@@ -24,6 +23,11 @@ import org.cyclops.evilcraft.RegistryEntries;
  *
  */
 public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
+
+    // The mobs of vanilla's monster rooms
+    private static final net.minecraft.world.entity.EntityType<?>[] MONSTER_ROOM_MOBS = new net.minecraft.world.entity.EntityType<?>[]{
+            net.minecraft.world.entity.EntityType.SKELETON, net.minecraft.world.entity.EntityType.ZOMBIE,
+            net.minecraft.world.entity.EntityType.ZOMBIE, net.minecraft.world.entity.EntityType.SPIDER};
 
     private static final int RADIUS_X = 3;
     private static final int RADIUS_X_RAND = 4;
@@ -140,7 +144,7 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
                     BlockEntity tile = world.getBlockEntity(loopPos);
 
                     if (tile instanceof SpawnerBlockEntity) {
-                        ((SpawnerBlockEntity) tile).getSpawner().setEntityId(MonsterRoomHooks.getRandomMonsterRoomMob(random), null, random, loopPos);
+                        ((SpawnerBlockEntity) tile).getSpawner().setEntityId(net.minecraft.Util.getRandom(MONSTER_ROOM_MOBS, random), null, random, loopPos);
                     } else {
                         System.err.println("Failed to fetch mob spawner entity at (" + xs + ", " + y + ", " + zs + ")");
                     }

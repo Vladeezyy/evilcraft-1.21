@@ -15,15 +15,15 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodStain;
 import org.cyclops.evilcraft.client.particle.ParticleBloodSplash;
@@ -51,7 +51,7 @@ public class ItemCreativeBloodDrop extends ItemBloodContainer {
         return ItemHelpers.isActivated(itemStack);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);

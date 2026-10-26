@@ -7,14 +7,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.fluid.FluidHandlerWrapper;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.LocationHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.FluidHandlerWrapper;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.LocationHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBloodStain;
@@ -101,7 +101,7 @@ public class BlockEntitySanguinaryPedestal extends BlockEntityTankInventory {
                 BlockPos location = blockEntity.getNextLocation();
                 Block block = level.getBlockState(location).getBlock();
                 if(block instanceof BlockBloodStain) {
-                    BlockEntityHelpers.getCapability(level, location, net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK)
+                    BlockEntityHelpers.getCapability(level, location, org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK)
                             .ifPresent((source) -> {
                                 FluidStack moved = FluidUtil.tryFluidTransfer(blockEntity.getBonusFluidHandler(), source, Integer.MAX_VALUE, true);
                                 if (!moved.isEmpty()) {
@@ -116,7 +116,7 @@ public class BlockEntitySanguinaryPedestal extends BlockEntityTankInventory {
             if(!blockEntity.getTank().isEmpty()) {
                 for(Direction direction : Direction.values()) {
                     BlockEntityHelpers.getCapability(level, pos.relative(direction),
-                                    direction.getOpposite(), net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK)
+                                    direction.getOpposite(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK)
                             .ifPresent(handler -> {
                                 if(!blockEntity.getTank().isEmpty()) {
                                     FluidStack fluidStack = new FluidStack(blockEntity.getTank().getFluid().getFluid(), Math.min(MB_RATE, blockEntity.getTank().getFluidAmount()));

@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.core.config.extendedconfig;
 
-import org.cyclops.cyclopscore.config.ConfigurableType;
-import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigurableType;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ExtendedConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.api.degradation.IDegradationEffect;
 import org.cyclops.evilcraft.core.config.ExtendedConfigurableType;

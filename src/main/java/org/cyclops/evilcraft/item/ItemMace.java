@@ -22,14 +22,14 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.client.particle.ParticleBlurTargettedEntityData;
 import org.cyclops.evilcraft.client.particle.ParticleDistortData;
@@ -114,7 +114,7 @@ public abstract class ItemMace extends ItemBloodContainer {
         super.onUseTick(level, player, itemStack, duration);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showUsingItemTick(Level world, ItemStack itemStack, LivingEntity entity, int duration) {
         int itemUsedCount = getUseDuration(itemStack, entity) - duration;
         double area = getArea(itemUsedCount);
@@ -170,7 +170,7 @@ public abstract class ItemMace extends ItemBloodContainer {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showUsedItemTick(Level world, LivingEntity player, int power) {
         int particles = (power + 1) * (power + 1) * (power + 1) * 10;
         for(int i = 0; i < particles; i++) {
@@ -241,7 +241,7 @@ public abstract class ItemMace extends ItemBloodContainer {
      */
     protected abstract void use(Level world, LivingEntity entity, int itemUsedCount, int power);
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void animateOutOfEnergy(Level world, LivingEntity entity) {
         double xCoord = entity.getX();
         double yCoord = entity.getY();
@@ -283,7 +283,7 @@ public abstract class ItemMace extends ItemBloodContainer {
      */
     protected abstract float getAttackSpeed();
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         ItemPowerableHelpers.addPreInformation(itemStack, list);

@@ -7,14 +7,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.infobook.AdvancedButtonEnum;
-import org.cyclops.cyclopscore.infobook.IInfoBook;
-import org.cyclops.cyclopscore.infobook.InfoSection;
-import org.cyclops.cyclopscore.infobook.ScreenInfoBook;
-import org.cyclops.cyclopscore.infobook.pageelement.RecipeAppendix;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.RecipeAppendix;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.tickaction.sanguinaryenvironmentalaccumulator.AccumulateItemTickAction;
@@ -73,7 +73,7 @@ public class EnvironmentalAccumulatorRecipeAppendix extends RecipeAppendix<Recip
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         boolean sanguinary = (getTick(gui) % 2) == 1;
         int middle = (width - SLOT_SIZE) / 2;

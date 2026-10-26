@@ -1,21 +1,22 @@
 package org.cyclops.evilcraft;
 
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.PersistentData;
+import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentInventoryConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentFluidContentConfig;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.logging.log4j.Level;
-import org.cyclops.cyclopscore.config.ConfigHandler;
-import org.cyclops.cyclopscore.infobook.IInfoBookRegistry;
-import org.cyclops.cyclopscore.infobook.InfoBookRegistry;
-import org.cyclops.cyclopscore.init.ModBaseVersionable;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBookRegistry;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBookRegistry;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseVersionable;
 import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
-import org.cyclops.cyclopscore.persist.world.GlobalCounters;
-import org.cyclops.cyclopscore.proxy.IClientProxy;
-import org.cyclops.cyclopscore.proxy.ICommonProxy;
+import org.cyclops.evilcraft.fabric.cyclopscore.persist.world.GlobalCounters;
+import org.cyclops.evilcraft.fabric.cyclopscore.proxy.IClientProxy;
+import org.cyclops.evilcraft.fabric.cyclopscore.proxy.ICommonProxy;
 import org.cyclops.evilcraft.advancement.criterion.BoxOfEternalClosureCaptureTriggerConfig;
 import org.cyclops.evilcraft.advancement.criterion.DistortTriggerConfig;
 import org.cyclops.evilcraft.advancement.criterion.FartTriggerConfig;
@@ -79,7 +80,6 @@ import org.cyclops.evilcraft.world.gen.structure.WorldStructurePieceDarkTempleCo
  * @author rubensworks
  *
  */
-@Mod(Reference.MOD_ID)
 public class EvilCraft extends ModBaseVersionable<EvilCraft> {
 
     /**
@@ -89,8 +89,8 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
 
     public static GlobalCounters globalCounters = null;
 
-    public EvilCraft(IEventBus modEventBus) {
-        super(Reference.MOD_ID, (instance) -> _instance = instance, modEventBus);
+    public EvilCraft() {
+        super(Reference.MOD_ID, (instance) -> _instance = instance);
 
         // Register world storages
         registerWorldStorage(new WorldSharedTank.TankData(this));
@@ -106,17 +106,22 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
 
         BroomParts.init();
         BroomModifiers.init();
+
+        // Fabric: capability lookups and entity data attachments
+        Capabilities.load();
+        PersistentData.load();
     }
 
     @Override
     protected void loadModCompats(ModCompatLoader modCompatLoader) {
+        super.loadModCompats(modCompatLoader);
         // Mod compats
         modCompatLoader.addModCompat(new BaublesModCompat());
     }
 
     @Override
-    protected void setup(FMLCommonSetupEvent event) {
-        super.setup(event);
+    protected void setup() {
+        super.setup();
 
         RegistryExportables.load();
 
@@ -136,6 +141,10 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         super.onConfigsRegister(configHandler);
 
         configHandler.addConfigurable(new GeneralConfig());
+
+        // Cyclops Core's fluid content and inventory data components, which it only registers on NeoForge
+        configHandler.addConfigurable(new DataComponentFluidContentConfig());
+        configHandler.addConfigurable(new DataComponentInventoryConfig());
 
         // Particles
         configHandler.addConfigurable(new ParticleBubbleExtendedConfig());
@@ -435,7 +444,6 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         configHandler.addConfigurable(new PoiWerewolvianConfig());
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     protected IClientProxy constructClientProxy() {
         return new ClientProxy();

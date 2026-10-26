@@ -7,11 +7,11 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.Level;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -28,13 +28,13 @@ public class ItemPrimedPendantConfig extends ItemConfig {
 
     private static final String DELIMITER = ";";
 
-    @ConfigurableProperty(category = "item", comment = "The capacity of the pendant.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The capacity of the pendant.", requiresMcRestart = true)
     public static int capacity = FluidHelpers.BUCKET_VOLUME * 5;
 
-    @ConfigurableProperty(category = "item", comment = "The amount of Blood to drain after one effect application.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The amount of Blood to drain after one effect application.", isCommandable = true)
     public static int usage = 10;
 
-    @ConfigurableProperty(category = "item",
+    @ConfigurablePropertyCommon(category = "item",
             comment = "Usage multipliers. Potion ids are first, followed by floating numbers. A number smaller than one blacklists that potion.")
     public static List<String> potionMultipliers = Lists.newArrayList(
             "minecraft:health_boost" + DELIMITER + "-1",
@@ -49,7 +49,7 @@ public class ItemPrimedPendantConfig extends ItemConfig {
 
                         .stacksTo(1))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     public static double getMultiplier(Holder<MobEffect> potion) {

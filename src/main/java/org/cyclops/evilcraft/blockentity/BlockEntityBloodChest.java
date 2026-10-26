@@ -20,12 +20,12 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
-import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.tickaction.EmptyFluidContainerInTankTickAction;
 import org.cyclops.evilcraft.blockentity.tickaction.bloodchest.RepairItemTickAction;
@@ -122,7 +122,7 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK,
                     (blockEntity, direction) -> new ItemHandlerSlotMasked(
                             blockEntity.getInventory(),
                             (direction == Direction.UP || direction == Direction.DOWN) ? IntStream.range(0, SLOTS_CHEST).toArray() : new int[]{SLOT_CONTAINER}

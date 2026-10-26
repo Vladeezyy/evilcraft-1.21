@@ -7,7 +7,7 @@ import org.cyclops.evilcraft.EvilCraft;
 /**
  * @author rubensworks
  */
-public class SoundEventEffectPageFlipSingleConfig extends org.cyclops.cyclopscore.config.extendedconfig.SoundEventConfig {
+public class SoundEventEffectPageFlipSingleConfig extends org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.SoundEventConfig {
     public SoundEventEffectPageFlipSingleConfig() {
         super(
                 EvilCraft._instance,

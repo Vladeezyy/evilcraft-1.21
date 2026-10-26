@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.blockentity;
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,13 +26,13 @@ import org.cyclops.cyclopscore.block.multi.CubeDetector;
 import org.cyclops.cyclopscore.block.multi.HollowCubeDetector;
 import org.cyclops.cyclopscore.block.multi.MaximumBlockCountValidator;
 import org.cyclops.cyclopscore.block.multi.MinimumSizeValidator;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.EntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.LocationHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
-import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.LocationHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
@@ -174,16 +176,20 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK,
                     (blockEntity, direction) -> {
                         if (direction == Direction.UP || direction == Direction.DOWN) {
                             // Expose drop slots; any extraction should un-halt the furnace
                             return new ItemHandlerSlotMasked(blockEntity.getInventory(), SLOTS_DROP) {
                                 @Override
-                                public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                                    ItemStack extracted = super.extractItem(slot, amount, simulate);
-                                    if (!extracted.isEmpty() && !simulate) {
-                                        blockEntity.resetWork(false);
+                                public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+                                    long extracted = super.extract(resource, maxAmount, transaction);
+                                    if (extracted > 0) {
+                                        transaction.addOuterCloseCallback(result -> {
+                                            if (result.wasCommitted()) {
+                                                blockEntity.resetWork(false);
+                                            }
+                                        });
                                     }
                                     return extracted;
                                 }

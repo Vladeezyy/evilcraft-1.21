@@ -2,12 +2,12 @@ package org.cyclops.evilcraft.blockentity.tickaction;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.fluids.FluidActionResult;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidActionResult;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTickingTankInventory;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;

@@ -4,7 +4,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
-import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSpiritFurnace;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritFurnace;

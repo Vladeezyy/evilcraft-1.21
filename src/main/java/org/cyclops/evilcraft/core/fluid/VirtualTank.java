@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.core.fluid;
 
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.IFluidTank;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

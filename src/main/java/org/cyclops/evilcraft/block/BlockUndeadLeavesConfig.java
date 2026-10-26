@@ -3,8 +3,8 @@ package org.cyclops.evilcraft.block;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.SoundType;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -14,7 +14,7 @@ import org.cyclops.evilcraft.EvilCraft;
  */
 public class BlockUndeadLeavesConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "block", comment = "How much Blood (mB) can be produced at most as a Blood Stain on each random tick.")
+    @ConfigurablePropertyCommon(category = "block", comment = "How much Blood (mB) can be produced at most as a Blood Stain on each random tick.")
     public static int maxBloodStainAmount = 25;
 
     public BlockUndeadLeavesConfig() {

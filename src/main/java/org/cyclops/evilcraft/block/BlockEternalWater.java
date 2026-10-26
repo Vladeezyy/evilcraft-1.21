@@ -23,10 +23,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityEternalWater;
 

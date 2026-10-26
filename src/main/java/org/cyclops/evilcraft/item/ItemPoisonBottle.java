@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -8,12 +9,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -25,7 +24,7 @@ public class ItemPoisonBottle extends Item {
 
     public ItemPoisonBottle(Item.Properties properties) {
         super(properties);
-        NeoForge.EVENT_BUS.addListener(this::onPoisonRightClick);
+        PlayerInteractEvent.RightClickBlock.addListener(this::onPoisonRightClick);
     }
 
     public void onPoisonRightClick(PlayerInteractEvent.RightClickBlock event) {
@@ -49,7 +48,7 @@ public class ItemPoisonBottle extends Item {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
         @Override
         public int getColor(ItemStack itemStack, int renderPass) {

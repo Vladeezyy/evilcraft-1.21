@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.inventory.container.InventoryContainer;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.InventoryContainer;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTickingTankInventory;
 
 import javax.annotation.Nullable;

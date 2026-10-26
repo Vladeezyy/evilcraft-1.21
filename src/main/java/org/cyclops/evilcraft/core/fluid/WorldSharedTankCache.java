@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.core.fluid;
 
+import org.cyclops.cyclopscore.events.IPlayerLoggedInEvent;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import com.google.common.collect.Maps;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -7,12 +9,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.network.packet.UpdateWorldSharedTankClientCachePacket;
 
@@ -113,16 +111,15 @@ public class WorldSharedTankCache {
         return this.tick;
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public void onTickServer(ServerTickEvent.Pre event) {
-        this.onTick(event);
+    public void registerEvents() {
+        ServerTickEvents.START_SERVER_TICK.register(server -> this.onTick());
+        IPlayerLoggedInEvent.EVENT.register(this::onLoggedIn);
     }
 
     /**
-     * When a tick event is received.
-     * @param event The received event.
+     * When a server tick starts.
      */
-    public void onTick(ServerTickEvent.Pre event) {
+    public void onTick() {
         tick++;
         if(getTickOffset() > INTERPOLATION_TICK_OFFSET) {
             Iterator<Map.Entry<String, UpdateWorldSharedTankClientCachePacket>> it = packetBuffer.entrySet().iterator();
@@ -134,12 +131,11 @@ public class WorldSharedTankCache {
         }
     }
 
-    @SubscribeEvent
-    public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    public void onLoggedIn(ServerPlayer player) {
         if(!MinecraftHelpers.isClientSide()) {
             for(Map.Entry<String, FluidStack> entry: tankCache.entrySet()) {
                 EvilCraft._instance.getPacketHandler().sendToPlayer(
-                        new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), (ServerPlayer) event.getEntity());
+                        new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), player);
             }
         }
     }

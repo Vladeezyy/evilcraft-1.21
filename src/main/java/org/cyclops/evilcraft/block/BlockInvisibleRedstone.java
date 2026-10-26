@@ -16,7 +16,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityInvisibleRedstone;
 

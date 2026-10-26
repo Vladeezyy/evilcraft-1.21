@@ -9,9 +9,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.item.ItemBlockNBT;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.ItemBlockNBT;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBoxOfEternalClosure;
@@ -27,22 +27,22 @@ public class ItemBlockBoxOfEternalClosure extends ItemBlockNBT {
     @Override
     protected boolean itemStackDataToTile(ItemStack itemStack, BlockEntity tile) {
         if (tile instanceof BlockEntityBoxOfEternalClosure) {
-            ((BlockEntityBoxOfEternalClosure) tile).setSpiritTag(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, new CompoundTag()));
-            ((BlockEntityBoxOfEternalClosure) tile).setPlayerId(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_ID, ""));
-            ((BlockEntityBoxOfEternalClosure) tile).setPlayerName(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_NAME, ""));
+            ((BlockEntityBoxOfEternalClosure) tile).setSpiritTag(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), new CompoundTag()));
+            ((BlockEntityBoxOfEternalClosure) tile).setPlayerId(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_ID.get(), ""));
+            ((BlockEntityBoxOfEternalClosure) tile).setPlayerName(itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_NAME.get(), ""));
             ((BlockEntityBoxOfEternalClosure) tile).initializeState();
         }
         return true;
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         tooltip.add(getInfo(stack));
         super.appendHoverText(stack, context, tooltip, flagIn);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Component getInfo(ItemStack itemStack) {
         Component content = Component.translatable("general." + Reference.MOD_ID + ".info.empty")
                 .withStyle(ChatFormatting.ITALIC);

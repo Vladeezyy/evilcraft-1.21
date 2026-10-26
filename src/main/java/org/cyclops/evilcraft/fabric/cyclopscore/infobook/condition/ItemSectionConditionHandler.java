@@ -1,0 +1,21 @@
+package org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition;
+
+
+
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+
+/**
+ * Condition handler for checking if an item has been registered.
+ * @author rubensworks
+ *
+ */
+public class ItemSectionConditionHandler implements ISectionConditionHandler {
+
+    @Override
+    public boolean isSatisfied(ModBase<?> mod, String param) {
+        return BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(param));
+    }
+
+}

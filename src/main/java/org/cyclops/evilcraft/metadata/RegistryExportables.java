@@ -1,11 +1,11 @@
 package org.cyclops.evilcraft.metadata;
 
-import org.cyclops.cyclopscore.CyclopsCore;
-import org.cyclops.cyclopscore.metadata.IRegistryExportableRegistry;
+import org.cyclops.evilcraft.EvilCraft;
+import org.cyclops.evilcraft.fabric.cyclopscore.metadata.IRegistryExportableRegistry;
 
 public class RegistryExportables {
 
-    public static IRegistryExportableRegistry REGISTRY = CyclopsCore._instance.getRegistryManager()
+    public static IRegistryExportableRegistry REGISTRY = EvilCraft._instance.getRegistryManager()
             .getRegistry(IRegistryExportableRegistry.class);
 
     public static void load() {

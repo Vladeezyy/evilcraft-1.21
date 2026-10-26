@@ -5,9 +5,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.client.render.entity.RenderDarkStick;
 
@@ -27,7 +27,7 @@ public class EntityItemDarkStickConfig extends EntityConfig<EntityItemDarkStick>
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public EntityRenderer<EntityItemDarkStick> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new RenderDarkStick(renderContext, this);
     }

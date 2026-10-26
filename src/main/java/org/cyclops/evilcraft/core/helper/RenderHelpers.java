@@ -2,15 +2,15 @@ package org.cyclops.evilcraft.core.helper;
 
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * A helper for rendering.
  * @author rubensworks
  *
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderHelpers {
     /**
      * Texture sheet of all blocks.

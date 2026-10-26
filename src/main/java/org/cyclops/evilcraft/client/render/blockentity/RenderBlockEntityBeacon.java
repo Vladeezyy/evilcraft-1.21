@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityBeacon;
 import org.joml.Vector4f;
 

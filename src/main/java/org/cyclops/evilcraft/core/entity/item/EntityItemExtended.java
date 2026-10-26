@@ -3,8 +3,8 @@ package org.cyclops.evilcraft.core.entity.item;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * An extended version of the entity item.
@@ -27,7 +27,7 @@ public abstract class EntityItemExtended extends ItemEntity {
     }
 
     // Needed for particle rendering
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public ItemEntity copy() {
         EntityItemExtended entity = (EntityItemExtended) getType().create(level());

@@ -3,17 +3,17 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStackSimple;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidHandlerItemStackSimple;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -33,19 +33,19 @@ public class ItemPoisonBottleConfig extends ItemConfig {
                         .stacksTo(1))
         );
         if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
+            RegisterColorHandlersEvent.Item.addListener(this::registerColors);
         }
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerColors(RegisterColorHandlersEvent.Item event) {
         event.register(new ItemPoisonBottle.ItemColor(), getInstance());
     }
 
     protected void registerCapability(RegisterCapabilitiesEvent event) {
         event.registerItem(Capabilities.FluidHandler.ITEM, (stack, context) -> {
-            FluidHandlerItemStackSimple.SwapEmpty capabilityProvider = new FluidHandlerItemStackSimple.SwapEmpty(org.cyclops.cyclopscore.RegistryEntries.COMPONENT_FLUID_CONTENT, stack, new ItemStack(Items.GLASS_BOTTLE), FluidHelpers.BUCKET_VOLUME);
+            FluidHandlerItemStackSimple.SwapEmpty capabilityProvider = new FluidHandlerItemStackSimple.SwapEmpty(org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries.COMPONENT_FLUID_CONTENT, stack, new ItemStack(Items.GLASS_BOTTLE), FluidHelpers.BUCKET_VOLUME);
             capabilityProvider.fill(new FluidStack(RegistryEntries.FLUID_POISON, FluidHelpers.BUCKET_VOLUME), IFluidHandler.FluidAction.EXECUTE);
             return capabilityProvider;
         }, getInstance());

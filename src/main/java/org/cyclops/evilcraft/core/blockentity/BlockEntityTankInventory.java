@@ -6,10 +6,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
-import org.cyclops.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -49,11 +49,11 @@ public class BlockEntityTankInventory extends CyclopsBlockEntity {
         }
 
         public void registerTankInventoryCapabilitiesItem() {
-            add(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandlerSided(direction));
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandlerSided(direction));
         }
 
         public void registerTankInventoryCapabilitiesFluid() {
-            add(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> blockEntity.getTank());
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> blockEntity.getTank());
         }
     }
 

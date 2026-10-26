@@ -9,8 +9,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
 import org.cyclops.evilcraft.Reference;
 
 import javax.annotation.Nullable;
@@ -21,7 +20,7 @@ import java.util.function.Function;
  * Model the box of eternal closure.
  * @author rubensworks
  */
-public class ModelBoxOfEternalClosure implements UnbakedModel, IUnbakedGeometry<ModelBoxOfEternalClosure> {
+public class ModelBoxOfEternalClosure implements UnbakedModel {
 
     public static ResourceLocation boxModel = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "block/box");
     public static ResourceLocation boxLidModel = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "block/box_lid");
@@ -57,7 +56,7 @@ public class ModelBoxOfEternalClosure implements UnbakedModel, IUnbakedGeometry<
         return bakedModel;
     }
 
-    @Override
+    
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         return bake(baker, spriteGetter, modelState);
     }

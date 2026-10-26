@@ -1,11 +1,11 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.capability.wrappers.FluidBucketWrapper;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -22,7 +22,7 @@ public class ItemBucketEternalWaterConfig extends ItemConfig {
                 eConfig -> new ItemBucketEternalWater(new Item.Properties()
                         )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
     }
 
     protected void registerCapability(RegisterCapabilitiesEvent event) {

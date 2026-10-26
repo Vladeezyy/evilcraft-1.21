@@ -8,10 +8,10 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.init.ModBase;
-import org.cyclops.cyclopscore.network.packet.PlayerPositionPacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.PlayerPositionPacket;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.Reference;
@@ -65,7 +65,7 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void actionClient(Level world, Player player) {
         if(GeneralConfig.farting)
             super.actionClient(world, player);
@@ -77,7 +77,7 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
         spawnFartParticles(world, player, position, true);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void spawnFartParticles(
             Level world, Player player,
             Vec3 pos, boolean isClientSidePlayer) {

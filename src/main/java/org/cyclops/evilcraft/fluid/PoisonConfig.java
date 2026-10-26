@@ -1,10 +1,10 @@
 package org.cyclops.evilcraft.fluid;
 
+import org.cyclops.evilcraft.fabric.fluids.SoundActions;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.neoforge.common.SoundActions;
-import org.cyclops.cyclopscore.config.extendedconfig.FluidConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 

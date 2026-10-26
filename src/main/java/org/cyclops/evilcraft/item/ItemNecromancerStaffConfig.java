@@ -3,10 +3,10 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -19,10 +19,10 @@ import java.util.Collections;
  */
 public class ItemNecromancerStaffConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The capacity of the container.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The capacity of the container.", requiresMcRestart = true)
     public static int capacity = FluidHelpers.BUCKET_VOLUME * 10;
 
-    @ConfigurableProperty(category = "item", comment = "The amount of Blood that will be drained per usage.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The amount of Blood that will be drained per usage.", isCommandable = true)
     public static int usage = FluidHelpers.BUCKET_VOLUME * 2;
 
     public ItemNecromancerStaffConfig() {
@@ -32,7 +32,7 @@ public class ItemNecromancerStaffConfig extends ItemConfig {
                 eConfig -> new ItemNecromancerStaff(new Item.Properties()
                         )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

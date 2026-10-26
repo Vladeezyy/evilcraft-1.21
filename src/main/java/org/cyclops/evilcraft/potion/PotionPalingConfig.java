@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.potion;
 
-import org.cyclops.cyclopscore.config.extendedconfig.EffectConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EffectConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

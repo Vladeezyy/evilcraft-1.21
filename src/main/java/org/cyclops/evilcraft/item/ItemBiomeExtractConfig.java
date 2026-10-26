@@ -6,13 +6,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -26,17 +26,17 @@ import java.util.List;
  */
 public class ItemBiomeExtractConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "If creative versions for all variants should be added to the creative tab.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "If creative versions for all variants should be added to the creative tab.", requiresMcRestart = true)
     public static boolean creativeTabVariants = true;
 
-    @ConfigurableProperty(category = "item",
+    @ConfigurablePropertyCommon(category = "item",
             comment = "A list of biome names for which no Biome Extracts may be created.")
     public static List<String> craftingBlacklist = Lists.newArrayList();
 
     /**
      * A list of biome ids for which no Biome Extracts may be used.
      */
-    @ConfigurableProperty(category = "item",
+    @ConfigurablePropertyCommon(category = "item",
             comment = "A list of biome names for which no Biome Extracts may be used.")
     public static List<String> usageBlacklist = Lists.newArrayList();
 
@@ -48,12 +48,12 @@ public class ItemBiomeExtractConfig extends ItemConfig {
                         )
         );
         if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::onRegisterColors);
+            RegisterColorHandlersEvent.Item.addListener(this::onRegisterColors);
         }
-        EvilCraft._instance.getModEventBus().addListener(this::onCreativeModeTabBuildContents);
+        BuildCreativeModeTabContentsEvent.addListener(this::onCreativeModeTabBuildContents);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void onRegisterColors(RegisterColorHandlersEvent.Item event) {
         event.register(new ItemBiomeExtract.ItemColor(), getInstance());
     }

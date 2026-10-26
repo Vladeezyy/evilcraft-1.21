@@ -10,8 +10,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
-import net.neoforged.neoforge.common.loot.LootModifier;
+import org.cyclops.evilcraft.fabric.loot.IGlobalLootModifier;
+import org.cyclops.evilcraft.fabric.loot.LootModifier;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +55,7 @@ public class LootModifierInjectBoxOfEternalClosure extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        if (getLootTables().contains(context.getQueriedLootTableId().toString())) {
+        if (getLootTables().contains(org.cyclops.evilcraft.fabric.loot.GlobalLootModifiers.getQueriedLootTableId(context).toString())) {
             ItemStack stack = new ItemStack(RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get());
             if (context.getRandom().nextBoolean()) {
                 BlockBoxOfEternalClosure.setVengeanceSwarmContent(stack);

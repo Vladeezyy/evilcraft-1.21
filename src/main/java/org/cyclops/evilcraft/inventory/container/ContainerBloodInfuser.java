@@ -5,10 +5,9 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.cyclopscore.helper.EntityHelpers;
-import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
-import org.cyclops.cyclopscore.inventory.slot.SlotRemoveOnly;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotRemoveOnly;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.gameevent.BloodInfuserRemoveEvent;
 import org.cyclops.evilcraft.block.BlockBloodInfuser;
@@ -77,7 +76,7 @@ public class ContainerBloodInfuser extends ContainerTileWorking<BlockEntityBlood
                 tileSupplier.ifPresent(tile -> {
                     EntityHelpers.spawnXpAtPlayer(player.level(), player, (int) Math.floor(tile.getXp()));
                     tile.resetXp();
-                    NeoForge.EVENT_BUS.post(new BloodInfuserRemoveEvent(player, stack));
+                    BloodInfuserRemoveEvent.LISTENERS.post(new BloodInfuserRemoveEvent(player, stack));
                 });
                 super.onTake(thePlayer, stack);
             }

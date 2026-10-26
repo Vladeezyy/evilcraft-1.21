@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.enchantment.entityeffect;
 
-import org.cyclops.cyclopscore.config.extendedconfig.EnchantmentEntityEffectConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EnchantmentEntityEffectConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

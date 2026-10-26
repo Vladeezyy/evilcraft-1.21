@@ -7,8 +7,8 @@ import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.TorchBlock;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -19,7 +19,7 @@ import org.cyclops.evilcraft.RegistryEntries;
  */
 public class BlockGemStoneTorchConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "block", comment = "The radius that will be kept spirit-proof.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "block", comment = "The radius that will be kept spirit-proof.", isCommandable = true)
     public static int area = 15;
 
     public BlockGemStoneTorchConfig() {

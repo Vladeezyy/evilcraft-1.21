@@ -4,12 +4,12 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -29,13 +29,13 @@ public class ItemBroomPartConfig extends ItemConfig {
                 eConfig -> new ItemBroomPart(new Item.Properties()
                         )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
         if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
+            RegisterColorHandlersEvent.Item.addListener(this::registerColors);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerColors(RegisterColorHandlersEvent.Item event) {
         event.register(new ItemBroomPart.ItemColor(), getInstance());
     }

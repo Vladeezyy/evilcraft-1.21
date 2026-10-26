@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.cyclopscore.block.multi.CubeDetector;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritFurnace;
 import org.cyclops.evilcraft.core.algorithm.Wrapper;
 

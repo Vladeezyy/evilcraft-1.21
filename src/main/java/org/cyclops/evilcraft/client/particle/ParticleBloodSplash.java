@@ -7,8 +7,8 @@ import net.minecraft.client.particle.WaterDropParticle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.RegistryEntries;
 
 
@@ -17,7 +17,7 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  * @see SplashParticle
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ParticleBloodSplash extends WaterDropParticle {
 
     public ParticleBloodSplash(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {

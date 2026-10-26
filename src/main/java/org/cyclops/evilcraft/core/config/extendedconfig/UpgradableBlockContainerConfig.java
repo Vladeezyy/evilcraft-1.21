@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
-import org.cyclops.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;
 
 import javax.annotation.Nullable;

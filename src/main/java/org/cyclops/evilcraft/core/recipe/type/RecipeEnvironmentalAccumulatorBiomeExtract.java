@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.biome.Biome;
-import org.cyclops.cyclopscore.recipe.ItemStackFromIngredient;
+import org.cyclops.evilcraft.fabric.cyclopscore.recipe.ItemStackFromIngredient;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.weather.WeatherType;
 import org.cyclops.evilcraft.item.ItemBiomeExtractConfig;

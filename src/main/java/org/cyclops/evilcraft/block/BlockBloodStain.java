@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,14 +21,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodStain;
 import org.cyclops.evilcraft.client.particle.ParticleBloodSplash;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
@@ -46,7 +43,7 @@ public class BlockBloodStain extends BlockWithEntity {
 
     public BlockBloodStain(Block.Properties properties) {
         super(properties, BlockEntityBloodStain::new);
-        NeoForge.EVENT_BUS.register(this);
+        LivingDeathEvent.addListener(this::bloodStainedBlockEvent);
     }
 
     @Override
@@ -101,14 +98,14 @@ public class BlockBloodStain extends BlockWithEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void attack(BlockState state, Level worldIn, BlockPos pos, Player player) {
         splash(worldIn, pos);
         super.attack(state, worldIn, pos, player);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
         if (entityIn.getDeltaMovement().length() > 0.1D) {
@@ -122,7 +119,7 @@ public class BlockBloodStain extends BlockWithEntity {
      * @param world The world.
      * @param blockPos The position.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void splash(Level world, BlockPos blockPos) {
         if(world.isClientSide()) {
             ParticleBloodSplash.spawnParticles(world, blockPos, 1, 1 + world.random.nextInt(1));
@@ -134,7 +131,6 @@ public class BlockBloodStain extends BlockWithEntity {
         world.removeBlock(blockPos, false);
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void bloodStainedBlockEvent(LivingDeathEvent event) {
         if(event.getSource() == event.getEntity().damageSources().fall()
                 && !(event.getEntity() instanceof EntityVengeanceSpirit)) {

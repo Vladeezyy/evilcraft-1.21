@@ -19,11 +19,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.component.DataComponentBiomeConfig;
 import org.cyclops.evilcraft.entity.item.EntityBiomeExtract;
@@ -83,10 +83,10 @@ public class ItemBiomeExtract extends Item {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);
-        DataComponentBiomeConfig.BiomeHolder biomeHolder = itemStack.get(RegistryEntries.COMPONENT_BIOME);
+        DataComponentBiomeConfig.BiomeHolder biomeHolder = itemStack.get(RegistryEntries.COMPONENT_BIOME.get());
         if (biomeHolder != null) {
             Holder<Biome> biome = biomeHolder.getBiome();
             if (biome != null) {
@@ -116,7 +116,7 @@ public class ItemBiomeExtract extends Item {
      */
     @Nullable
     public static Holder<Biome> getBiome(ItemStack itemStack) {
-        DataComponentBiomeConfig.BiomeHolder holder = itemStack.get(RegistryEntries.COMPONENT_BIOME);
+        DataComponentBiomeConfig.BiomeHolder holder = itemStack.get(RegistryEntries.COMPONENT_BIOME.get());
         return holder != null ? holder.getBiome() : null;
     }
 
@@ -129,7 +129,7 @@ public class ItemBiomeExtract extends Item {
     public ItemStack createItemStack(Holder<Biome> biome, int amount, HolderGetter<Biome> holderGetter) {
         ItemStack itemStack = new ItemStack(this, amount);
         if(biome != null) {
-            itemStack.set(RegistryEntries.COMPONENT_BIOME, new DataComponentBiomeConfig.BiomeHolder(biome.unwrapKey().get().location(), holderGetter));
+            itemStack.set(RegistryEntries.COMPONENT_BIOME.get(), new DataComponentBiomeConfig.BiomeHolder(biome.unwrapKey().get().location(), holderGetter));
             itemStack.set(DataComponents.RARITY, getRarity(biome));
         }
         return itemStack;
@@ -141,7 +141,7 @@ public class ItemBiomeExtract extends Item {
                 : (biome.value().getMobSettings().getCreatureProbability() <= 0.1F ? Rarity.RARE : Rarity.UNCOMMON);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
         @Override
         public int getColor(ItemStack itemStack, int renderPass) {

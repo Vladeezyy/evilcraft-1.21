@@ -13,15 +13,15 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import org.cyclops.cyclopscore.block.BlockWithEntityGui;
-import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.item.IInformationProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntityGui;
+import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.helper.BlockTankHelpers;
 
@@ -65,7 +65,7 @@ public abstract class BlockWithEntityGuiTank extends BlockWithEntityGui implemen
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag iTooltipFlag) {
 
     }

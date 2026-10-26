@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import org.cyclops.evilcraft.fabric.StreamCodecs;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -11,9 +12,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import org.cyclops.cyclopscore.helper.RecipeSerializerHelpers;
-import org.cyclops.cyclopscore.recipe.ItemStackFromIngredient;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RecipeSerializerHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.recipe.ItemStackFromIngredient;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuserConfig;
 import org.cyclops.evilcraft.core.weather.WeatherType;
 
@@ -38,7 +38,7 @@ public abstract class RecipeSerializerEnvironmentalAccumulatorAbstract<T extends
                     )
                     .apply(builder, this::createRecipe)
     );
-    protected final StreamCodec<RegistryFriendlyByteBuf, T> STREAM_CODEC = NeoForgeStreamCodecs.composite(
+    protected final StreamCodec<RegistryFriendlyByteBuf, T> STREAM_CODEC = StreamCodecs.composite(
             Ingredient.CONTENTS_STREAM_CODEC, RecipeEnvironmentalAccumulator::getInputIngredient,
             WeatherType.STREAM_CODEC, RecipeEnvironmentalAccumulator::getInputWeather,
             RecipeSerializerHelpers.STREAM_CODEC_ITEMSTACK_OR_TAG, RecipeEnvironmentalAccumulator::getOutputItem,

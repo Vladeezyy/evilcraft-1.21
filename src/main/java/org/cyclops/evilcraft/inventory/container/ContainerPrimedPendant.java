@@ -5,8 +5,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
-import org.cyclops.cyclopscore.inventory.container.ItemInventoryContainer;
-import org.cyclops.cyclopscore.inventory.slot.SlotSingleItem;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.ItemInventoryContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotSingleItem;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.item.ItemPrimedPendant;
 

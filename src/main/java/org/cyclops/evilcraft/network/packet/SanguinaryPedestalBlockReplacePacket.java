@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;
 import org.cyclops.evilcraft.Reference;
@@ -55,7 +55,7 @@ public class SanguinaryPedestalBlockReplacePacket extends PacketCodec<Sanguinary
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void actionClient(Level world, Player player) {
         world.playLocalSound(x, y, z, RegistryEntries.BLOCK_BLOOD_STAIN.get().defaultBlockState().getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.1F + world.random.nextFloat() * 0.5F,
                 0.9F + world.random.nextFloat() * 0.1F, false);

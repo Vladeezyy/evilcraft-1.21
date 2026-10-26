@@ -7,7 +7,7 @@ import org.cyclops.evilcraft.EvilCraft;
 /**
  * @author rubensworks
  */
-public class SoundEventMobVengeanceSpiritDeathConfig extends org.cyclops.cyclopscore.config.extendedconfig.SoundEventConfig {
+public class SoundEventMobVengeanceSpiritDeathConfig extends org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.SoundEventConfig {
     public SoundEventMobVengeanceSpiritDeathConfig() {
         super(
                 EvilCraft._instance,

@@ -6,15 +6,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.cyclopscore.infobook.AdvancedButtonEnum;
-import org.cyclops.cyclopscore.infobook.IInfoBook;
-import org.cyclops.cyclopscore.infobook.InfoSection;
-import org.cyclops.cyclopscore.infobook.ScreenInfoBook;
-import org.cyclops.cyclopscore.infobook.pageelement.RecipeAppendix;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.RecipeAppendix;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.core.recipe.type.RecipeBloodInfuser;
 
@@ -65,7 +65,7 @@ public class BroomModifierRecipeAppendix extends RecipeAppendix<RecipeBloodInfus
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         int tick = getTick(gui);
         Pair<ItemStack, Float> value = modifierValues.get(tick % modifierValues.size());
@@ -80,7 +80,7 @@ public class BroomModifierRecipeAppendix extends RecipeAppendix<RecipeBloodInfus
         drawString(gui, guiGraphics, line, x + SLOT_SIZE + 4, y + 3);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawString(ScreenInfoBook gui, GuiGraphics guiGraphics, String string, int x, int y) {
         Font fontRenderer = gui.getFont();
         MultiLineLabel.create(fontRenderer, Component.literal(string), 200)

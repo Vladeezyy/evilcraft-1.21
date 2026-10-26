@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -28,7 +28,7 @@ public class EntityBloodPearlConfig extends EntityConfig<EntityBloodPearl> {
         );
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<EntityBloodPearl> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new ThrownItemRenderer<>(renderContext);

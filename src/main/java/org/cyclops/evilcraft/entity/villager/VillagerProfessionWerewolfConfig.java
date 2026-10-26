@@ -1,13 +1,18 @@
 package org.cyclops.evilcraft.entity.villager;
 
+import java.util.List;
+import com.google.common.collect.Lists;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.npc.VillagerProfession;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.village.VillagerTradesEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.VillagerConfig;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.VillagerConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -18,7 +23,7 @@ import org.cyclops.evilcraft.RegistryEntries;
  */
 public class VillagerProfessionWerewolfConfig extends VillagerConfig {
 
-    @ConfigurableProperty(category = "mob", comment = "If villagers struck by lightning should have a 50% chance of becoming a werewolf villager", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "mob", comment = "If villagers struck by lightning should have a 50% chance of becoming a werewolf villager", isCommandable = true)
     public static boolean convertOnLightning = true;
 
     public VillagerProfessionWerewolfConfig() {
@@ -34,30 +39,35 @@ public class VillagerProfessionWerewolfConfig extends VillagerConfig {
                         SoundEvents.VILLAGER_WORK_BUTCHER
                 )
         );
-        NeoForge.EVENT_BUS.addListener(this::onTrades);
+        ModLifecycle.afterRegistries(this::registerTrades);
     }
 
-    public void onTrades(VillagerTradesEvent event) {
-        if (event.getType() == getInstance()) {
+    public void registerTrades() {
+        Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = new Int2ObjectOpenHashMap<>();
+        for (int level = 1; level <= 5; level++) {
+            trades.put(level, Lists.newArrayList());
+        }
+        {
             // Villager accepts these for emeralds
-            event.getTrades().get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_DARK_GEM.get(), 10, 50, 2));
-            event.getTrades().get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_HARDENED_BLOOD_SHARD.get(), 20, 50, 2));
-            event.getTrades().get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_POISON_SAC.get(), 3, 50, 2));
-            event.getTrades().get(3).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOK.get(), 2, 30, 5));
-            event.getTrades().get(3).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA.get(), 2, 30, 6));
-            event.getTrades().get(4).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA_EMPOWERED.get(), 1, 25, 10));
-            event.getTrades().get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOD_INFUSION_CORE.get(), 3, 20, 10));
-            event.getTrades().get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_BONE.get(), 2, 20, 20));
-            event.getTrades().get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_FUR.get(), 1, 20, 20));
+            trades.get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_DARK_GEM.get(), 10, 50, 2));
+            trades.get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_HARDENED_BLOOD_SHARD.get(), 20, 50, 2));
+            trades.get(2).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_POISON_SAC.get(), 3, 50, 2));
+            trades.get(3).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOK.get(), 2, 30, 5));
+            trades.get(3).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA.get(), 2, 30, 6));
+            trades.get(4).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA_EMPOWERED.get(), 1, 25, 10));
+            trades.get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOD_INFUSION_CORE.get(), 3, 20, 10));
+            trades.get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_BONE.get(), 2, 20, 20));
+            trades.get(5).add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_FUR.get(), 1, 20, 20));
 
             // Villager offers these for emeralds
             // Args: output item, emeralds, items, xp
-            event.getTrades().get(2).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_DARK_GEM_CRUSHED.get(), 1, 5, 10));
-            event.getTrades().get(3).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 1, 3, 10));
-            event.getTrades().get(4).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_VENGEANCE_FOCUS.get(), 3, 2, 10));
-            event.getTrades().get(4).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_BOX_OF_ETERNAL_CLOSURE.get(), 7, 1, 10));
-            event.getTrades().get(5).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_GARMONBOZIA.get(), 10, 1, 30));
+            trades.get(2).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_DARK_GEM_CRUSHED.get(), 1, 5, 10));
+            trades.get(3).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 1, 3, 10));
+            trades.get(4).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_VENGEANCE_FOCUS.get(), 3, 2, 10));
+            trades.get(4).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_BOX_OF_ETERNAL_CLOSURE.get(), 7, 1, 10));
+            trades.get(5).add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_GARMONBOZIA.get(), 10, 1, 30));
         }
+        trades.forEach((level, listings) -> TradeOfferHelper.registerVillagerOffers(getInstance(), level, factories -> factories.addAll(listings)));
     }
 
 }

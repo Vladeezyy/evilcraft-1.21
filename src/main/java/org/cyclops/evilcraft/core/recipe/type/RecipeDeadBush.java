@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.tags.ItemTags;
@@ -13,8 +14,7 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.Tags;
+import org.cyclops.evilcraft.fabric.CommonHooks;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -41,7 +41,7 @@ public class RecipeDeadBush extends CustomRecipe {
             ItemStack itemStack = inv.getItem(i);
             if (itemStack.is(ItemTags.SAPLINGS)) {
                 bushes++;
-            } else if (itemStack.is(Tags.Items.TOOLS_SHEAR)) {
+            } else if (itemStack.is(ConventionalItemTags.SHEAR_TOOLS)) {
                 shears++;
             }
         }
@@ -60,7 +60,7 @@ public class RecipeDeadBush extends CustomRecipe {
 
     @Override
     public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.of(Ingredient.EMPTY, Ingredient.of(ItemTags.SAPLINGS), Ingredient.of(Tags.Items.TOOLS_SHEAR));
+        return NonNullList.of(Ingredient.EMPTY, Ingredient.of(ItemTags.SAPLINGS), Ingredient.of(ConventionalItemTags.SHEAR_TOOLS));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class RecipeDeadBush extends CustomRecipe {
         NonNullList<ItemStack> stacks = NonNullList.create();
         for (int i = 0; i < inv.size(); i++) {
             ItemStack itemStack = inv.getItem(i);
-            if (itemStack.is(Tags.Items.TOOLS_SHEAR)) {
+            if (itemStack.is(ConventionalItemTags.SHEAR_TOOLS)) {
                 itemStack = itemStack.copy();
 
                 Player craftingPlayer = CommonHooks.getCraftingPlayer();

@@ -5,9 +5,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -20,10 +20,10 @@ import java.util.Collections;
  */
 public class ItemVeinSwordConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The multiply boost this sword has on the blood that is obtained.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The multiply boost this sword has on the blood that is obtained.", isCommandable = true)
     public static double extractionBoost = 2.0;
 
-    @ConfigurableProperty(category = "item", comment = "Maximum uses for this item.")
+    @ConfigurablePropertyCommon(category = "item", comment = "Maximum uses for this item.")
     public static int durability = 32;
 
     public ItemVeinSwordConfig() {
@@ -33,7 +33,7 @@ public class ItemVeinSwordConfig extends ItemConfig {
                 eConfig -> new ItemVeinSword(new Item.Properties()
                             .attributes(SwordItem.createAttributes(Tiers.GOLD, 3, -2.4F)))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

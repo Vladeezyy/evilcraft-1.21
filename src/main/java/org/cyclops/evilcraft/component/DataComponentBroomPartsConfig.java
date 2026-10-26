@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.component;
 
-import org.cyclops.cyclopscore.config.extendedconfig.DataComponentConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.DataComponentConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.core.broom.BroomPartsContents;
 

@@ -8,8 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityWorking;
 
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * @author rubensworks
  * @see SplashParticle
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ParticleBloodBubble extends WaterDropParticle {
 
     public ParticleBloodBubble(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
@@ -57,7 +57,7 @@ public class ParticleBloodBubble extends WaterDropParticle {
      * @param random Random instance.
      * @param rotatedDirection The direction to emit the particles at.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void randomDisplayTick(@Nullable BlockEntityWorking tile, Level world, BlockPos blockPos, RandomSource random, Direction rotatedDirection) {
         if(tile != null && random.nextInt(10) == 0) {
             if (tile.isVisuallyWorking()) {

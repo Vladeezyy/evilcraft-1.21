@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.cyclops.evilcraft.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BucketItemAccessor",
+    "LightningBoltMixin",
+    "LivingEntityDamageMixin",
+    "LivingEntityMixin",
+    "ResultSlotMixin"
+  ],
+  "client": [
+    "client.AbstractClientPlayerMixin",
+    "client.ClientPacketListenerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

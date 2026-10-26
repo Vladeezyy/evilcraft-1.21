@@ -15,16 +15,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.ChunkRenderTypeSet;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.client.model.DelegatingChildDynamicItemAndBlockModel;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.ModelHelpers;
-import org.cyclops.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.fabric.client.IClientFluidTypeExtensions;
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingChildDynamicItemAndBlockModel;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDarkTankConfig;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
@@ -187,10 +186,5 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     @Override
     public ItemTransforms getTransforms() {
         return ModelHelpers.DEFAULT_CAMERA_TRANSFORMS;
-    }
-
-    @Override
-    public ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
-        return ChunkRenderTypeSet.of(RenderType.translucent());
     }
 }

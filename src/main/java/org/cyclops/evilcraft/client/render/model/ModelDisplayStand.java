@@ -9,8 +9,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
 
 import java.util.Collection;
 import java.util.function.Function;
@@ -19,7 +18,7 @@ import java.util.function.Function;
  * Model for the display stand.
  * @author rubensworks
  */
-public class ModelDisplayStand implements UnbakedModel, IUnbakedGeometry<ModelDisplayStand> {
+public class ModelDisplayStand implements UnbakedModel {
 
     private final BlockModel blockModel;
 
@@ -37,7 +36,7 @@ public class ModelDisplayStand implements UnbakedModel, IUnbakedGeometry<ModelDi
         return this.blockModel.getDependencies();
     }
 
-    @Override
+    
     public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         return new ModelDisplayStandBaked(this.blockModel, this.blockModel.bake(bakery, spriteGetter, modelState), context, modelState, spriteGetter);
     }

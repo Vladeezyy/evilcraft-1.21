@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
+import net.fabricmc.fabric.api.util.TriState;
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
@@ -38,19 +41,14 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityDisplayStand;
 
@@ -85,7 +83,7 @@ public class BlockDisplayStand extends BlockWithEntity {
 
     public BlockDisplayStand(Block.Properties properties) {
         super(properties, BlockEntityDisplayStand::new);
-        NeoForge.EVENT_BUS.register(this);
+        PlayerInteractEvent.RightClickBlock.addListener(this::onRightClick);
 
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
@@ -195,12 +193,12 @@ public class BlockDisplayStand extends BlockWithEntity {
 
     public ItemStack getTypedDisplayStandItem(BlockState blockState) {
         ItemStack itemStack = new ItemStack(this);
-        itemStack.set(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE, blockState);
+        itemStack.set(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE.get(), blockState);
         return itemStack;
     }
 
     public ItemStack getDisplayStandType(ItemStack displayStandStack) {
-        BlockState blockState = displayStandStack.get(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE);
+        BlockState blockState = displayStandStack.get(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE.get());
         if (blockState != null) {
             return BlockHelpers.getItemStackFromBlockState(blockState);
         }
@@ -208,14 +206,13 @@ public class BlockDisplayStand extends BlockWithEntity {
     }
 
     public static void setDisplayStandType(ItemStack displayStandStack, ItemStack type) {
-        displayStandStack.set(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE, BlockHelpers.getBlockStateFromItemStack(type));
+        displayStandStack.set(RegistryEntries.COMPONENT_DISPLAY_STAND_TYPE.get(), BlockHelpers.getBlockStateFromItemStack(type));
     }
 
-    @SubscribeEvent
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Force allow right clicking with a fluid container passing through to this block
         if (!event.getItemStack().isEmpty()
-                && event.getItemStack().getCapability(Capabilities.FluidHandler.ITEM) != null
+                && Capabilities.FluidHandler.ITEM.getCapability(event.getItemStack(), null) != null
                 && event.getLevel().getBlockState(event.getPos()).getBlock() == this) {
             event.setUseBlock(TriState.TRUE);
         }
@@ -251,7 +248,7 @@ public class BlockDisplayStand extends BlockWithEntity {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
         super.appendHoverText(stack, context, tooltip, flagIn);
         ItemStack blockType = getDisplayStandType(stack);

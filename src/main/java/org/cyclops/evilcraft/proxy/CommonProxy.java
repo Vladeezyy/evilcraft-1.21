@@ -1,9 +1,10 @@
 package org.cyclops.evilcraft.proxy;
 
-import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.cyclopscore.init.ModBase;
-import org.cyclops.cyclopscore.network.PacketHandler;
-import org.cyclops.cyclopscore.proxy.CommonProxyComponent;
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
+import org.cyclops.evilcraft.fabric.event.EntityStruckByLightningEvent;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.network.PacketHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.proxy.CommonProxyComponent;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.core.fluid.WorldSharedTankCache;
 import org.cyclops.evilcraft.event.EntityStruckByLightningEventHook;
@@ -43,9 +44,9 @@ public class CommonProxy extends CommonProxyComponent {
     @Override
     public void registerEventHooks() {
         super.registerEventHooks();
-        NeoForge.EVENT_BUS.register(new EntityStruckByLightningEventHook());
-        NeoForge.EVENT_BUS.register(new LivingUpdateEventHook());
-        NeoForge.EVENT_BUS.register(WorldSharedTankCache.getInstance());
+        EntityStruckByLightningEvent.LISTENERS.register(new EntityStruckByLightningEventHook()::onEntityStruckByLightning);
+        EntityTickEvent.Post.addListener(new LivingUpdateEventHook()::tick);
+        WorldSharedTankCache.getInstance().registerEvents();
     }
 
 }

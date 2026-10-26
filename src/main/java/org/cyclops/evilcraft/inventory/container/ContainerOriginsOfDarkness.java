@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.inventory.container;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
-import org.cyclops.cyclopscore.inventory.container.ItemInventoryContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.ItemInventoryContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**

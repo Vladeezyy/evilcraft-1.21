@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft;
 
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 
 /**
  * Class that can hold basic static things that are better not hard-coded

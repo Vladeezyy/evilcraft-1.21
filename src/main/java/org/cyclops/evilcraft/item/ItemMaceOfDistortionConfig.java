@@ -3,9 +3,9 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ import java.util.Collections;
  */
 public class ItemMaceOfDistortionConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The attack speed modifier of this mace, which is added to the default player attack speed of 4.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The attack speed modifier of this mace, which is added to the default player attack speed of 4.", isCommandable = true)
     public static double attackSpeed = -2.4;
 
     public ItemMaceOfDistortionConfig() {
@@ -28,7 +28,7 @@ public class ItemMaceOfDistortionConfig extends ItemConfig {
                 eConfig -> new ItemMaceOfDistortion(new Item.Properties()
                         )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

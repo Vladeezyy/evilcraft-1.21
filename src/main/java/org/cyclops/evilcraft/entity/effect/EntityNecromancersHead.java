@@ -18,10 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.EntityHelpers;
-import org.cyclops.cyclopscore.helper.WorldHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.WorldHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityControlledZombie;
 import org.cyclops.evilcraft.item.ItemNecromancerStaff;
@@ -34,7 +34,6 @@ import java.util.List;
  * @author rubensworks
  *
  */
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
 public class EntityNecromancersHead extends ThrowableProjectile implements ItemSupplier {
 
     private static final int DURATION = 200;

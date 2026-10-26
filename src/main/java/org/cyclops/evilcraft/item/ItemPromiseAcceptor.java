@@ -2,9 +2,9 @@ package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 
 /**
  * Blood reactant.
@@ -22,7 +22,7 @@ public class ItemPromiseAcceptor extends Item {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean isFoil(ItemStack itemStack) {
         return true;
     }
@@ -31,7 +31,7 @@ public class ItemPromiseAcceptor extends Item {
         return this.type;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
         @Override
         public int getColor(ItemStack itemStack, int renderPass) {

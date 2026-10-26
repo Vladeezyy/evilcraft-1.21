@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -24,7 +24,7 @@ public class ItemPowerableHelpers {
      * @return The power this Mace currently has.
      */
     public static int getPower(ItemStack itemStack) {
-        return itemStack.getOrDefault(RegistryEntries.COMPONENT_POWER, 0);
+        return itemStack.getOrDefault(RegistryEntries.COMPONENT_POWER.get(), 0);
     }
 
     /**
@@ -33,7 +33,7 @@ public class ItemPowerableHelpers {
      * @param power The new power level.
      */
     public static void setPower(ItemStack itemStack, int power) {
-        itemStack.set(RegistryEntries.COMPONENT_POWER, power);
+        itemStack.set(RegistryEntries.COMPONENT_POWER.get(), power);
     }
 
     /**

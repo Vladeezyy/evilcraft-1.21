@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.event;
 
+import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
@@ -7,16 +8,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.RenderHelpers;
-import org.cyclops.cyclopscore.helper.WorldHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.WorldHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.Reference;
@@ -35,8 +34,7 @@ public class RenderOverlayEventHook {
 
     private int filledHeight = -1;
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
+    @Environment(EnvType.CLIENT)
     public void onRenderOverlayEvent(RenderGuiEvent.Post event) {
         if (!shouldRenderOverlays()) {
             return;
@@ -87,7 +85,7 @@ public class RenderOverlayEventHook {
     /**
      * @return If custom GUI overlays may be rendered in the current client state.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static boolean shouldRenderOverlays() {
         Minecraft minecraft = Minecraft.getInstance();
         // Respect the F1 GUI toggle and hide overlays in spectator mode.

@@ -5,10 +5,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.client.gui.ScreenFactorySafe;
-import org.cyclops.cyclopscore.config.extendedconfig.GuiConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.GuiConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.client.gui.container.ContainerScreenSpiritFurnace;
 
@@ -24,7 +24,7 @@ public class ContainerSpiritFurnaceConfig extends GuiConfig<ContainerSpiritFurna
                 eConfig -> new MenuType<>(ContainerSpiritFurnace::new, FeatureFlags.VANILLA_SET));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public <U extends Screen & MenuAccess<ContainerSpiritFurnace>> MenuScreens.ScreenConstructor<ContainerSpiritFurnace, U> getScreenFactory() {
         return new ScreenFactorySafe<>(ContainerScreenSpiritFurnace::new);

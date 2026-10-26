@@ -7,11 +7,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
-import org.cyclops.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDisplayStand;
@@ -44,8 +44,8 @@ public class BlockEntityDisplayStand extends CyclopsBlockEntity {
 
         @Override
         public void populate() {
-            add(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
-            add(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> blockEntity.getContents().getCapability(Capabilities.FluidHandler.ITEM));
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> Capabilities.FluidHandler.ITEM.getCapability(blockEntity.getContents(), null));
         }
     }
 

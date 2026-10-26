@@ -1,8 +1,9 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import com.google.common.collect.Sets;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockEntityConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockEntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -20,7 +21,7 @@ public class BlockEntitySpiritReanimatorConfig extends BlockEntityConfig<BlockEn
                 (eConfig) -> new BlockEntityType<>(BlockEntitySpiritReanimator::new,
                         Sets.newHashSet(RegistryEntries.BLOCK_SPIRIT_REANIMATOR.get()), null)
         );
-        EvilCraft._instance.getModEventBus().addListener(new BlockEntitySpiritReanimator.CapabilityRegistrar(this::getInstance)::register);
+        RegisterCapabilitiesEvent.addListener(new BlockEntitySpiritReanimator.CapabilityRegistrar(this::getInstance)::register);
     }
 
 }

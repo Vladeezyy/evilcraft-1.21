@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.component;
 
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.cyclopscore.config.extendedconfig.DataComponentConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.DataComponentConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

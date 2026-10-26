@@ -1,12 +1,12 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodinfuser;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidActionResult;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.FluidActionResult;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.blockentity.tickaction.EmptyFluidContainerInTankTickAction;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;

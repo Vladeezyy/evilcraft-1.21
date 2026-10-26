@@ -3,13 +3,13 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import javax.annotation.Nonnull;
@@ -29,8 +29,8 @@ public class ItemCreativeBloodDropConfig extends ItemConfig {
             "creative_blood_drop",
                 eConfig -> new ItemCreativeBloodDrop(new Item.Properties())
         );
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

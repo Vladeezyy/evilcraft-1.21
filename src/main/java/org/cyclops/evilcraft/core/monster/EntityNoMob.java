@@ -25,7 +25,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.neoforged.neoforge.common.CommonHooks;
+import org.cyclops.evilcraft.fabric.CommonHooks;
 
 import java.util.function.Predicate;
 

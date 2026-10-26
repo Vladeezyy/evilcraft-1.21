@@ -4,15 +4,15 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.BubbleParticle;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.TextureSheetParticle;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 /**
  * {@link BubbleParticle} that has a modifiable gravity factor.
  * The higher this factor, the more quickly it will drop.
  * @author Ruben Taelman
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ParticleBubbleExtended extends TextureSheetParticle {
 
     private final float gravity;

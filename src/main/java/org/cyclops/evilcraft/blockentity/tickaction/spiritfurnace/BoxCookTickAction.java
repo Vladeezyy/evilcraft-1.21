@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity.tickaction.spiritfurnace;
 
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -29,12 +30,10 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
-import org.cyclops.cyclopscore.item.WeightedItemStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.WeightedItemStack;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
 import org.cyclops.evilcraft.block.BlockSpiritFurnaceConfig;
@@ -213,7 +212,7 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
                     }
                     if(deathLootTable != null) {
                         LootTable loottable = tile.getLevel().getServer().reloadableRegistries().getLootTable(deathLootTable);
-                        FakePlayer killerEntity = FakePlayerFactory.getMinecraft((ServerLevel) tile.getLevel());
+                        FakePlayer killerEntity = FakePlayer.get((ServerLevel) tile.getLevel());
                         LootParams.Builder lootcontext$builder = (new LootParams.Builder((ServerLevel) tile.getLevel()))
                                 .withParameter(LootContextParams.THIS_ENTITY, entity)
                                 .withParameter(LootContextParams.ORIGIN, new Vec3(tile.getBlockPos().getX(), tile.getBlockPos().getY(), tile.getBlockPos().getZ()))

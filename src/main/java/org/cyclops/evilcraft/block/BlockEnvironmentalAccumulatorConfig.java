@@ -2,9 +2,9 @@ package org.cyclops.evilcraft.block;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -14,13 +14,13 @@ import org.cyclops.evilcraft.EvilCraft;
  */
 public class BlockEnvironmentalAccumulatorConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to cool down")
+    @ConfigurablePropertyCommon(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to cool down")
     public static int defaultTickCooldown = MinecraftHelpers.MINECRAFT_DAY / 20;
 
-    @ConfigurableProperty(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to process an item.")
+    @ConfigurablePropertyCommon(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to process an item.")
     public static int defaultProcessItemTickCount = 100;
 
-    @ConfigurableProperty(category = "machine", isCommandable = true, comment = "Sets the default default speed in increments per tick with which an item will move when being process by an environmental accumulator.")
+    @ConfigurablePropertyCommon(category = "machine", isCommandable = true, comment = "Sets the default default speed in increments per tick with which an item will move when being process by an environmental accumulator.")
     public static double defaultProcessItemSpeed = 0.3d / 20;
 
     public BlockEnvironmentalAccumulatorConfig() {
@@ -35,7 +35,7 @@ public class BlockEnvironmentalAccumulatorConfig extends BlockConfig {
     }
 
     @Override
-    protected String getConfigPropertyPrefix(ConfigurableProperty annotation) {
+    public String getConfigPropertyPrefix(ConfigurablePropertyCommon annotation) {
         return "envir_acc";
     }
 

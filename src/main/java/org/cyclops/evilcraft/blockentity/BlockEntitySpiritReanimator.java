@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
-import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
@@ -151,7 +151,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK,
                     (blockEntity, direction) -> {
                         int slots[];
                         if (direction == Direction.UP) {

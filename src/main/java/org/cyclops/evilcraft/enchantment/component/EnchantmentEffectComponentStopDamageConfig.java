@@ -1,8 +1,9 @@
 package org.cyclops.evilcraft.enchantment.component;
 
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
+import org.cyclops.evilcraft.fabric.event.BlockEvent;
 import com.mojang.serialization.Codec;
-import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -18,6 +19,8 @@ public class EnchantmentEffectComponentStopDamageConfig extends EnchantmentEffec
                 builder -> builder
                         .persistent(Codec.BOOL)
         );
-        NeoForge.EVENT_BUS.register(new EnchantmentEffectComponentStopDamage());
+        EnchantmentEffectComponentStopDamage listener = new EnchantmentEffectComponentStopDamage();
+        LivingDamageEvent.Pre.LISTENERS.register(listener::unusingEvent);
+        BlockEvent.BreakEvent.addListener(listener::unusingEvent);
     }
 }

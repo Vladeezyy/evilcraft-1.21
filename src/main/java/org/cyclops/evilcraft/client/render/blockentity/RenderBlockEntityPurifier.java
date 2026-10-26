@@ -23,11 +23,11 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.client.IClientFluidTypeExtensions;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.blockentity.BlockEntityPurifier;
 import org.cyclops.evilcraft.blockentity.tickaction.purifier.DisenchantPurifyAction;
@@ -72,7 +72,7 @@ public class RenderBlockEntityPurifier implements BlockEntityRenderer<BlockEntit
         FluidStack fluid = tile.getTank().getFluid();
         RenderHelpers.renderFluidContext(fluid, matrixStackIn, () -> {
             float height = (float) ((fluid.getAmount() * 0.7D) / tile.getTank().getCapacity() + 0.23D + 0.01D);
-            int brightness = Math.max(combinedLightIn, fluid.getFluid().getFluidType().getLightLevel(fluid));
+            int brightness = Math.max(combinedLightIn, org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
             int l2 = brightness >> 0x10 & 0xFFFF;
             int i3 = brightness & 0xFFFF;
 

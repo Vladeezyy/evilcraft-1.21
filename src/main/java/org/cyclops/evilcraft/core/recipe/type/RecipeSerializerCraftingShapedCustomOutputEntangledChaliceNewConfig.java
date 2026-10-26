@@ -1,10 +1,10 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.RecipeConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.item.ItemEntangledChalice;

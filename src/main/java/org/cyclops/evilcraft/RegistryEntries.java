@@ -28,7 +28,7 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import org.cyclops.evilcraft.fabric.registries.DeferredHolder;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
 import org.cyclops.evilcraft.advancement.criterion.BoxOfEternalClosureCaptureTrigger;
 import org.cyclops.evilcraft.advancement.criterion.DistortTrigger;

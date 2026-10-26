@@ -8,11 +8,11 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.client.IClientFluidTypeExtensions;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
 import org.cyclops.evilcraft.block.BlockEntangledChalice;
 import org.cyclops.evilcraft.blockentity.BlockEntityEntangledChalice;
 import org.joml.Matrix4f;
@@ -36,7 +36,7 @@ public class RenderBlockEntityEntangledChalice implements BlockEntityRenderer<Bl
                 RenderHelpers.renderFluidContext(tile.getTank().getFluid(), matrixStack, () -> {
                     float height = Math.min(0.95F, ((float) fluid.getAmount() / (float) tile.getTank().getCapacity())) * 0.1875F + 0.8125F;
                     IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluid.getFluid());
-                    int brightness = Math.max(combinedLight, fluid.getFluid().getFluidType().getLightLevel(fluid));
+                    int brightness = Math.max(combinedLight, org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
                     int l2 = brightness >> 0x10 & 0xFFFF;
                     int i3 = brightness & 0xFFFF;
 

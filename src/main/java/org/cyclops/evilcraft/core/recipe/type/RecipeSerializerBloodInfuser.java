@@ -9,8 +9,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.helper.RecipeSerializerHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RecipeSerializerHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuserConfig;
 
 /**

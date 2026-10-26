@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
+import org.cyclops.evilcraft.fabric.event.LivingEvent;
+import org.cyclops.evilcraft.fabric.event.LivingFallEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -10,11 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingEvent;
-import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.evilcraft.Reference;
 
 /**
@@ -34,9 +33,9 @@ public class ItemEffortlessRing extends Item {
 
     public ItemEffortlessRing(Properties properties) {
         super(properties);
-        NeoForge.EVENT_BUS.addListener(this::onPlayerFall);
-        NeoForge.EVENT_BUS.addListener(this::onPlayerJump);
-        NeoForge.EVENT_BUS.addListener(this::onPlayerUpdate);
+        LivingFallEvent.LISTENERS.register(this::onPlayerFall);
+        LivingEvent.LivingJumpEvent.LISTENERS.register(this::onPlayerJump);
+        EntityTickEvent.Pre.addListener(this::onPlayerUpdate);
     }
 
     /**

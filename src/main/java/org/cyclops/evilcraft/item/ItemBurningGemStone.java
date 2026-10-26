@@ -4,8 +4,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -42,7 +40,6 @@ public class ItemBurningGemStone extends Item {
                 if(!simulate) {
                     itemStack.hurtAndBreak(1 + swarmTier, (ServerLevel) player.level(), player, (i) -> {
                         player.getInventory().setItem(current.getLeft(), ItemStack.EMPTY);
-                        NeoForge.EVENT_BUS.post(new PlayerDestroyItemEvent(player, itemStack, null));
                     });
                     player.causeFoodExhaustion(10);
                 }

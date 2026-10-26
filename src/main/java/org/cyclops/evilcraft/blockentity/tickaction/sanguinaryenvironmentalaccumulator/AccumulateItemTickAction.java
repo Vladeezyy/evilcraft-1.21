@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.blockentity.tickaction.sanguinaryenvironmentalaccumulator;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
 import org.cyclops.evilcraft.block.BlockSanguinaryEnvironmentalAccumulatorConfig;
 import org.cyclops.evilcraft.blockentity.BlockEntitySanguinaryEnvironmentalAccumulator;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;

@@ -3,9 +3,9 @@ package org.cyclops.evilcraft.client.key;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.client.key.IKeyHandler;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyHandler;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.evilcraft.EvilCraft;
@@ -18,7 +18,7 @@ import org.cyclops.evilcraft.network.packet.ExaltedCrafterOpenPacket;
  * @author immortaleeb
  *
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ExaltedCrafterKeyHandler implements IKeyHandler {
 
     @Override

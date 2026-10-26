@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.enchantment.entityeffect;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.server.level.ServerLevel;
@@ -8,17 +10,11 @@ import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.minecraft.world.item.enchantment.LevelBasedValue;
 import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.cyclops.evilcraft.Reference;
 
 /**
  * @author rubensworks
  */
-@EventBusSubscriber(modid = Reference.MOD_ID)
 public record EnchantmentEntityEffectHealFromDamage(
         LevelBasedValue damageMultiplier
 ) implements EnchantmentEntityEffect {
@@ -30,16 +26,16 @@ public record EnchantmentEntityEffectHealFromDamage(
     );
 
     private static LivingDamageEvent.Post lastDamageEvent;
-    @SubscribeEvent(priority = EventPriority.NORMAL)
+
+    static {
+        LivingDamageEvent.Post.LISTENERS.register(EnchantmentEntityEffectHealFromDamage::stealLife);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> lastDamageEvent = null);
+    }
+
     public static void stealLife(LivingDamageEvent.Post event) {
         if (!event.getEntity().level().isClientSide()) {
             lastDamageEvent = event;
         }
-    }
-
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public static void onServerStopped(ServerStoppedEvent event) {
-        lastDamageEvent = null;
     }
 
     @Override

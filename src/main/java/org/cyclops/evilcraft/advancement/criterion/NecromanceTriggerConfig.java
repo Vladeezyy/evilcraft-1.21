@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.advancement.criterion;
 
-import org.cyclops.cyclopscore.config.extendedconfig.CriterionTriggerConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.CriterionTriggerConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

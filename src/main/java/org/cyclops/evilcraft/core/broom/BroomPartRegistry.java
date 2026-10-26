@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.broom;
 
+import org.cyclops.evilcraft.fabric.event.ItemTooltipEvent;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -12,13 +13,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -43,14 +40,13 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     private final Multimap<IBroomPart, Supplier<ItemStack>> partItems = MultimapBuilder.SetMultimapBuilder.hashKeys().hashSetValues().build();
     private final Multimap<IBroomPart.BroomPartType, IBroomPart> partsByType = MultimapBuilder.SetMultimapBuilder.hashKeys().hashSetValues().build();
     private final Map<IBroomPart, Map<BroomModifier, Float>> baseModifiers = Maps.newHashMap();
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private Map<IBroomPart, ResourceLocation> partModels;
 
     public BroomPartRegistry() {
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, this::beforeItemsRegistered);
-        NeoForge.EVENT_BUS.addListener(this::onTooltipEvent);
         if(MinecraftHelpers.isClientSide()) {
             partModels = Maps.newHashMap();
+            ItemTooltipEvent.addListener(this::onTooltipEvent);
         }
     }
 
@@ -143,19 +139,19 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerPartModel(IBroomPart part, ResourceLocation modelLocation) {
         partModels.put(part, modelLocation);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public ResourceLocation getPartModel(IBroomPart part) {
         return partModels.get(part);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Collection<ResourceLocation> getPartModels() {
         return Collections.unmodifiableCollection(partModels.values());
     }
@@ -164,8 +160,8 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     public Collection<IBroomPart> getBroomParts(ItemStack broomStack) {
         if(!broomStack.isEmpty()) {
             List<IBroomPart> parts = Lists.newArrayList();
-            if(broomStack.has(RegistryEntries.COMPONENT_BROOM_PARTS)) {
-                parts.addAll(broomStack.get(RegistryEntries.COMPONENT_BROOM_PARTS).getParts());
+            if(broomStack.has(RegistryEntries.COMPONENT_BROOM_PARTS.get())) {
+                parts.addAll(broomStack.get(RegistryEntries.COMPONENT_BROOM_PARTS.get()).getParts());
             }
 
             if(parts.isEmpty()) {
@@ -182,7 +178,7 @@ public class BroomPartRegistry implements IBroomPartRegistry {
 
     @Override
     public void setBroomParts(ItemStack broomStack, Collection<IBroomPart> broomParts) {
-        broomStack.set(RegistryEntries.COMPONENT_BROOM_PARTS, new BroomPartsContents(Lists.newArrayList(broomParts)));
+        broomStack.set(RegistryEntries.COMPONENT_BROOM_PARTS.get(), new BroomPartsContents(Lists.newArrayList(broomParts)));
         broomStack.set(DataComponents.RARITY, getRarity(broomParts));
     }
 
@@ -215,16 +211,13 @@ public class BroomPartRegistry implements IBroomPartRegistry {
         }
     }
 
-    public void beforeItemsRegistered(RegisterEvent event) {
-        // The block registry even is called before the items event
-        if (event.getRegistryKey().equals(Registries.ITEM)) {
-            parts.clear();
-            partItems.clear();
-            partsByType.clear();
-            baseModifiers.clear();
-            if (MinecraftHelpers.isClientSide()) {
-                partModels.clear();
-            }
+    public void beforeItemsRegistered() {
+        parts.clear();
+        partItems.clear();
+        partsByType.clear();
+        baseModifiers.clear();
+        if (MinecraftHelpers.isClientSide()) {
+            partModels.clear();
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -15,12 +16,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.ExtendedDamageSources;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritPortal;
@@ -41,7 +38,7 @@ public class BlockSpiritPortal extends BlockWithEntity {
 
     public BlockSpiritPortal(Block.Properties properties) {
         super(properties, BlockEntitySpiritPortal::new);
-        NeoForge.EVENT_BUS.register(this);
+        LivingDeathEvent.addListener(this::palingDeath);
     }
 
     @Override
@@ -69,7 +66,6 @@ public class BlockSpiritPortal extends BlockWithEntity {
         return blockState != null && (blockState.isAir()|| blockState.canBeReplaced());
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void palingDeath(LivingDeathEvent event) {
         if(event.getSource().type()
                 .equals(event.getEntity().level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ExtendedDamageSources.DAMAGE_TYPE_PALING).value())) {

@@ -17,14 +17,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
-import org.cyclops.cyclopscore.item.DamageIndicatedItemFluidContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.DamageIndicatedItemFluidContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 
 import javax.annotation.Nullable;
@@ -101,7 +101,7 @@ public class ItemBloodContainer extends DamageIndicatedItemFluidContainer {
                     world.destroyBlock(blockPos, true);
                 }
 
-                world.setBlock(blockPos, getFluid().getFluidType().getBlockForFluidState(world, blockPos, getFluid().defaultFluidState()), 3);
+                world.setBlock(blockPos, getFluid().defaultFluidState().createLegacyBlock(), 3);
 
                 return true;
             }

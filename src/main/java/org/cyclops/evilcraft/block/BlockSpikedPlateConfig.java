@@ -2,8 +2,8 @@ package org.cyclops.evilcraft.block;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.item.ItemBloodExtractorConfig;
 
@@ -14,10 +14,10 @@ import org.cyclops.evilcraft.item.ItemBloodExtractorConfig;
  */
 public class BlockSpikedPlateConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "block", comment = "The multiplier for amount of mB to receive per mob HP.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "block", comment = "The multiplier for amount of mB to receive per mob HP.", isCommandable = true)
     public static double mobMultiplier = ItemBloodExtractorConfig.maximumMobMultiplier;
 
-    @ConfigurableProperty(category = "block", comment = "The amount of damage per time.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "block", comment = "The amount of damage per time.", isCommandable = true)
     public static double damage = 4.0D;
 
     public BlockSpikedPlateConfig() {

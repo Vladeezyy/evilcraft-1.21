@@ -9,12 +9,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -75,7 +75,7 @@ public class ItemEntangledChalice extends ItemBlockFluidContainer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flagIn) {
         super.appendHoverText(itemStack, context, list, flagIn);
         ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) FluidUtil.getFluidHandler(itemStack).orElse(null);
@@ -121,7 +121,7 @@ public class ItemEntangledChalice extends ItemBlockFluidContainer {
          * @return The tank id.
          */
         public String getTankID() {
-            return getContainer().getOrDefault(RegistryEntries.COMPONENT_WORLD_SHARED_TANK_ID, "");
+            return getContainer().getOrDefault(RegistryEntries.COMPONENT_WORLD_SHARED_TANK_ID.get(), "");
         }
 
         /**
@@ -129,7 +129,7 @@ public class ItemEntangledChalice extends ItemBlockFluidContainer {
          * @param tankID The tank id.
          */
         public void setTankID(String tankID) {
-            getContainer().set(RegistryEntries.COMPONENT_WORLD_SHARED_TANK_ID, tankID);
+            getContainer().set(RegistryEntries.COMPONENT_WORLD_SHARED_TANK_ID.get(), tankID);
         }
 
         /**

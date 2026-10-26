@@ -5,9 +5,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -20,9 +20,9 @@ import java.util.Collections;
  */
 public class ItemRejuvenatedFleshConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The amount of blood (mB) this container can hold.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The amount of blood (mB) this container can hold.", requiresMcRestart = true)
     public static int containerSize = 10000;
-    @ConfigurableProperty(category = "item", comment = "The amount of blood (mB) that is consumed per bite.")
+    @ConfigurablePropertyCommon(category = "item", comment = "The amount of blood (mB) that is consumed per bite.")
     public static int biteUsage = 250;
 
     public ItemRejuvenatedFleshConfig() {
@@ -33,7 +33,7 @@ public class ItemRejuvenatedFleshConfig extends ItemConfig {
                         .stacksTo(1)
                         .component(DataComponents.RARITY, Rarity.RARE))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
-import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.RecipeConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

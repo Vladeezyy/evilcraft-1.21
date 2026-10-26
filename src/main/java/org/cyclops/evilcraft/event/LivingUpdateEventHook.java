@@ -1,9 +1,7 @@
 package org.cyclops.evilcraft.event;
 
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import org.cyclops.evilcraft.ExtendedDamageSources;
 import org.cyclops.evilcraft.GeneralConfig;
 
@@ -20,7 +18,6 @@ public class LivingUpdateEventHook {
      * When a sound event is received.
      * @param event The received event.
      */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void tick(EntityTickEvent.Post event) {
         dieWithoutAnyReason(event);
     }

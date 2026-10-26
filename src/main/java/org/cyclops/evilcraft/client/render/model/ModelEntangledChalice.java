@@ -9,8 +9,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -20,7 +19,7 @@ import java.util.function.Function;
  * Model the entangled chalice.
  * @author rubensworks
  */
-public class ModelEntangledChalice implements UnbakedModel, IUnbakedGeometry<ModelEntangledChalice> {
+public class ModelEntangledChalice implements UnbakedModel {
 
     @Override
     public Collection<ResourceLocation> getDependencies() {
@@ -50,7 +49,7 @@ public class ModelEntangledChalice implements UnbakedModel, IUnbakedGeometry<Mod
         return bakedModel;
     }
 
-    @Override
+    
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         return bake(baker, spriteGetter, modelState);
     }

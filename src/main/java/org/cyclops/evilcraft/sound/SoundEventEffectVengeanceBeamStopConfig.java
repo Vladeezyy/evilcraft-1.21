@@ -7,7 +7,7 @@ import org.cyclops.evilcraft.EvilCraft;
 /**
  * @author rubensworks
  */
-public class SoundEventEffectVengeanceBeamStopConfig extends org.cyclops.cyclopscore.config.extendedconfig.SoundEventConfig {
+public class SoundEventEffectVengeanceBeamStopConfig extends org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.SoundEventConfig {
     public SoundEventEffectVengeanceBeamStopConfig() {
         super(
                 EvilCraft._instance,

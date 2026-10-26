@@ -1,10 +1,11 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import com.google.common.collect.Sets;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockEntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockEntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.client.render.blockentity.RenderBlockEntityBloodChest;
@@ -23,10 +24,10 @@ public class BlockEntityBloodChestConfig extends BlockEntityConfig<BlockEntityBl
                 (eConfig) -> new BlockEntityType<>(BlockEntityBloodChest::new,
                         Sets.newHashSet(RegistryEntries.BLOCK_BLOOD_CHEST.get()), null)
         );
-        EvilCraft._instance.getModEventBus().addListener(new BlockEntityBloodChest.CapabilityRegistrar(this::getInstance)::register);
+        RegisterCapabilitiesEvent.addListener(new BlockEntityBloodChest.CapabilityRegistrar(this::getInstance)::register);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void onRegistered() {
         super.onRegistered();

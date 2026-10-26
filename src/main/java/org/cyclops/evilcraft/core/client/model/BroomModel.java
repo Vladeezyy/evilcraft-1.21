@@ -9,8 +9,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
+import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
 import org.cyclops.evilcraft.api.broom.IBroomPart;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 
@@ -22,7 +21,7 @@ import java.util.function.Function;
  * Model for a variant of a broom item.
  * @author rubensworks
  */
-public class BroomModel implements UnbakedModel, IUnbakedGeometry<BroomModel> {
+public class BroomModel implements UnbakedModel {
 
     @Override
     public Collection<ResourceLocation> getDependencies() {
@@ -54,7 +53,7 @@ public class BroomModel implements UnbakedModel, IUnbakedGeometry<BroomModel> {
         return bakedModel;
     }
 
-    @Override
+    
     public BakedModel bake(IGeometryBakingContext context, ModelBaker baker, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides) {
         return bake(baker, spriteGetter, modelState);
     }

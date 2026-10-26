@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.entity.monster;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -48,16 +49,13 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.ArrayUtils;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.helper.WorldHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.WorldHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
 import org.cyclops.evilcraft.EvilCraft;
@@ -164,7 +162,6 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         return super.getAttributeValue(attribute);
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void vengeanceEvent(LivingDeathEvent event) {
         if (event.getEntity() != null) {
             Level level = event.getEntity().level();
@@ -345,7 +342,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void spawnSmoke() {
         EntityDimensions size = getDimensions(getPose());
         int numParticles = random.nextInt(5);
@@ -371,7 +368,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void spawnSwarmParticles() {
         EntityDimensions size = getDimensions(getPose());
         int numParticles = 5 * (random.nextInt((getSwarmTier() << 1) + 1) + 1);
@@ -408,7 +405,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
                 (isAlternativelyVisible() || isClientVisible());
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private boolean isClientVisible() {
         if (isEnabledVengeance(Minecraft.getInstance().player)) {
             return true;
@@ -612,7 +609,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void showBurstParticles(double hitX, double hitY, double hitZ,
             double impactMotionX, double impactMotionY, double impactMotionZ) {
         for(int i = 0; i < level().random.nextInt(5); i++) {

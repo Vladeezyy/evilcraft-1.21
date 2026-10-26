@@ -22,10 +22,10 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.weather.WeatherType;
@@ -53,11 +53,11 @@ public class ItemWeatherContainer extends Item {
     }
 
     public static WeatherContainerType getWeatherType(ItemStack itemStack) {
-        return itemStack.getOrDefault(RegistryEntries.COMPONENT_WEATHER_CONTAINER_TYPE, WeatherContainerType.EMPTY);
+        return itemStack.getOrDefault(RegistryEntries.COMPONENT_WEATHER_CONTAINER_TYPE.get(), WeatherContainerType.EMPTY);
     }
 
     public static void setWeatherType(ItemStack itemStack, WeatherContainerType type) {
-        itemStack.set(RegistryEntries.COMPONENT_WEATHER_CONTAINER_TYPE, type);
+        itemStack.set(RegistryEntries.COMPONENT_WEATHER_CONTAINER_TYPE.get(), type);
         itemStack.set(DataComponents.RARITY, type.rarity);
     }
 
@@ -101,7 +101,7 @@ public class ItemWeatherContainer extends Item {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         WeatherContainerType type = getWeatherType(itemStack);
         list.add(type.description.withStyle(type.damageColor));
@@ -225,7 +225,7 @@ public class ItemWeatherContainer extends Item {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
         @Override
         public int getColor(ItemStack itemStack, int renderPass) {

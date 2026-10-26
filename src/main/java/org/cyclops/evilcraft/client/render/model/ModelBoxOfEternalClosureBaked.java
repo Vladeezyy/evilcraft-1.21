@@ -17,9 +17,9 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import org.cyclops.cyclopscore.client.model.DelegatingDynamicItemAndBlockModel;
-import org.cyclops.cyclopscore.helper.ModelHelpers;
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingDynamicItemAndBlockModel;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
 import org.joml.Vector3f;
 

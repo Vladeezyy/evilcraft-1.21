@@ -2,12 +2,12 @@ package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -17,7 +17,7 @@ import org.cyclops.evilcraft.EvilCraft;
  */
 public class ItemWerewolfFleshConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "Humanoid flesh will drop in a 1/X chance.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "Humanoid flesh will drop in a 1/X chance.", isCommandable = true)
     public static int humanoidFleshDropChance = 5;
 
     public ItemWerewolfFleshConfig(boolean humanoid) {
@@ -29,11 +29,11 @@ public class ItemWerewolfFleshConfig extends ItemConfig {
                         .stacksTo(16), humanoid)
         );
         if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
+            RegisterColorHandlersEvent.Item.addListener(this::registerColors);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerColors(RegisterColorHandlersEvent.Item event) {
         event.register(new ItemWerewolfFlesh.ItemColor(), getInstance());
     }

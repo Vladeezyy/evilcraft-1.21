@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -20,11 +21,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -53,7 +52,7 @@ public class ItemWerewolfFlesh extends Item {
                         .build()));
         this.humanoid = humanoid;
         if (this.humanoid) {
-            NeoForge.EVENT_BUS.addListener(this::dropHumanoidFleshEvent);
+            LivingDeathEvent.addListener(this::dropHumanoidFleshEvent);
         }
     }
 
@@ -151,7 +150,7 @@ public class ItemWerewolfFlesh extends Item {
         return itemStack;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);
@@ -170,7 +169,7 @@ public class ItemWerewolfFlesh extends Item {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
         @Override
         public int getColor(ItemStack itemStack, int renderPass) {

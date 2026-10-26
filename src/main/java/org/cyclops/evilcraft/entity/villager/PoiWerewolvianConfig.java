@@ -1,11 +1,12 @@
 package org.cyclops.evilcraft.entity.villager;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import org.cyclops.cyclopscore.helper.IStructureHelpers;
 import com.google.common.collect.Sets;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.config.extendedconfig.PoiConfigCommon;
-import org.cyclops.cyclopscore.helper.IStructureHelpersNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -34,12 +35,18 @@ public class PoiWerewolvianConfig extends PoiConfigCommon<EvilCraft> {
     @Override
     public void onRegistered() {
         super.onRegistered();
-        IStructureHelpersNeoForge sh = getMod().getModHelpers().getStructureHelpers();
-        for (String biome : new String[]{"plains", "snowy", "savanna", "desert", "taiga"}) {
-            sh.addToStructureTemplatePool(
-                    ResourceLocation.withDefaultNamespace("village/" + biome + "/houses"),
-                    ResourceLocation.fromNamespaceAndPath(getMod().getModId(), "village/werewolvian_mansion")
-            );
-        }
+        IStructureHelpers sh = getMod().getModHelpers().getStructureHelpers();
+        // When the server data (and its structure template pools) is loaded
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+            if (!client) {
+                for (String biome : new String[]{"plains", "snowy", "savanna", "desert", "taiga"}) {
+                    sh.addToStructureTemplatePool(
+                            ResourceLocation.withDefaultNamespace("village/" + biome + "/houses"),
+                            ResourceLocation.fromNamespaceAndPath(getMod().getModId(), "village/werewolvian_mansion"),
+                            registries
+                    );
+                }
+            }
+        });
     }
 }

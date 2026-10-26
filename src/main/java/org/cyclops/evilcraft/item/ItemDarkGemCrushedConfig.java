@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -20,13 +20,8 @@ public class ItemDarkGemCrushedConfig extends ItemConfig {
                 eConfig -> new Item(new Item.Properties()
                         )
         );
-        NeoForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTimeEventEvent);
+        ModLifecycle.afterRegistries(() -> FuelRegistry.INSTANCE.add(this.getInstance(), 16000));
     }
 
-    public void onFurnaceFuelBurnTimeEventEvent(FurnaceFuelBurnTimeEvent event) {
-        if (event.getItemStack().getItem() == this.getInstance()) {
-            event.setBurnTime(16000);
-        }
-    }
 
 }

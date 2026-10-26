@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.client.key;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.KeyMapping;
-import org.cyclops.cyclopscore.client.key.KeyRegistry;
+import org.cyclops.evilcraft.fabric.cyclopscore.client.key.KeyRegistry;
 import org.cyclops.evilcraft.EvilCraft;
 import org.lwjgl.glfw.GLFW;
 

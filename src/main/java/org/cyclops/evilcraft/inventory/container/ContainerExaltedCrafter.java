@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
-import org.cyclops.cyclopscore.inventory.container.ItemInventoryContainer;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.ItemInventoryContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.inventory.NBTCraftingGrid;
 import org.cyclops.evilcraft.item.ItemExaltedCrafter;

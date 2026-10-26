@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.core.fluid;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.logging.log4j.Level;
 import org.cyclops.evilcraft.EvilCraft;

@@ -39,12 +39,12 @@ public class LootFunctionCopyBoxOfEternalClosureData extends LootItemConditional
             String playerName = ((BlockEntityBoxOfEternalClosure) tile).getPlayerName();
             // Player data without a spirit is stale, so only copy data if a spirit is present.
             if (!spiritTag.isEmpty()) {
-                itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, spiritTag);
+                itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), spiritTag);
                 if (playerId != null && !playerId.isEmpty()) {
-                    itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_ID, playerId);
+                    itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_ID.get(), playerId);
                 }
                 if (playerName != null && !playerName.isEmpty()) {
-                    itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_NAME, playerName);
+                    itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_NAME.get(), playerName);
                 }
             }
         }

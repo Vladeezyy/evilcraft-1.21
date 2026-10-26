@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.entity.monster;
 
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -22,10 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 
 import java.util.List;
@@ -36,10 +33,6 @@ import java.util.List;
  *
  */
 public class EntityPoisonousLibelle extends FlyingMob implements Enemy {
-
-    static {
-        NeoForge.EVENT_BUS.register(EntityPoisonousLibelle.class);
-    }
 
     private static final int POISON_DURATION = 2;
 
@@ -86,13 +79,10 @@ public class EntityPoisonousLibelle extends FlyingMob implements Enemy {
         this(RegistryEntries.ENTITY_POISONOUS_LIBELLE.get(), world);
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    public static void checkLibelleSpawn(FinalizeSpawnEvent event) {
-        if(event.getEntity() instanceof EntityPoisonousLibelle) {
-            if(event.getEntity().getY() < EntityPoisonousLibelleConfig.minY) {
-                event.setSpawnCancelled(true);
-            }
-        }
+    @Override
+    public boolean checkSpawnRules(LevelAccessor level, MobSpawnType spawnType) {
+        // No spawning below the configured height
+        return this.getY() >= EntityPoisonousLibelleConfig.minY && super.checkSpawnRules(level, spawnType);
     }
 
     @Override

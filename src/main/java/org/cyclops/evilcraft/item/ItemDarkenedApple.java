@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -8,8 +9,6 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -31,7 +30,7 @@ public class ItemDarkenedApple extends Item {
                         .alwaysEdible()
                         .effect(() -> new MobEffectInstance(RegistryEntries.POTION_PALING, POTION_DURATION * 20, POTION_AMPLIFIER), 1)
                         .build()));
-        NeoForge.EVENT_BUS.addListener(this::onInteract);
+        PlayerInteractEvent.EntityInteract.addListener(this::onInteract);
     }
 
     @Override

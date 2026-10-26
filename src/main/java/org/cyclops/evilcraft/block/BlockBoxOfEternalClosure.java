@@ -29,9 +29,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.cyclops.cyclopscore.block.BlockWithEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBoxOfEternalClosure;
 import org.cyclops.evilcraft.core.block.IBlockRarityProvider;
@@ -101,12 +101,12 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
 
     @Nullable
     public static EntityType<?> getSpiritTypeWithFallbackSpirit(ItemStack itemStack) {
-        if(itemStack.has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA)) {
+        if(itemStack.has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get())) {
             if (hasPlayer(itemStack)) {
                 return EntityType.ZOMBIE;
             }
             EntityType<?> spiritType = getSpiritTypeRaw(itemStack);
-            if (spiritType == null && itemStack.has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA)) {
+            if (spiritType == null && itemStack.has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get())) {
                 return RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get();
             }
             return spiritType;
@@ -131,7 +131,7 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
         spiritData.setRandomSwarmTier(new Random());
         spiritData.writeNBT(spiritTag);
 
-        itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, spiritTag);
+        itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), spiritTag);
     }
 
     /**
@@ -147,17 +147,17 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
         spiritData.setPlayerName(name);
         spiritData.writeNBT(spiritTag);
 
-        itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_ID, spiritData.getPlayerId());
-        itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_NAME, spiritData.getPlayerName());
-        itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, spiritTag);
+        itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_ID.get(), spiritData.getPlayerId());
+        itemStack.set(RegistryEntries.COMPONENT_BOX_PLAYER_NAME.get(), spiritData.getPlayerName());
+        itemStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), spiritTag);
     }
 
     public static String getPlayerName(ItemStack itemStack) {
-        return itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_NAME, "");
+        return itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_NAME.get(), "");
     }
 
     public static String getPlayerId(ItemStack itemStack) {
-        return itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_ID, "");
+        return itemStack.getOrDefault(RegistryEntries.COMPONENT_BOX_PLAYER_ID.get(), "");
     }
 
     public static boolean hasPlayer(ItemStack itemStack) {

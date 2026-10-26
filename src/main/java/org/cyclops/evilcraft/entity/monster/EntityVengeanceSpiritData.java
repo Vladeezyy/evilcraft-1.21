@@ -123,7 +123,7 @@ public class EntityVengeanceSpiritData {
 
     @Nullable
     public static EntityType<?> getSpiritType(ItemStack itemStack) {
-        CompoundTag tag = itemStack.get(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA);
+        CompoundTag tag = itemStack.get(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get());
         if(tag != null && !tag.isEmpty()) {
             String innerEntity = tag.getString(NBTKEY_INNER_SPIRIT);
             if (!innerEntity.isEmpty()) {

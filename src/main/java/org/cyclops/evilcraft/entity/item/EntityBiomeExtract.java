@@ -27,9 +27,9 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.CyclopsCore;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.algorithm.OrganicSpread;
@@ -171,7 +171,7 @@ public class EntityBiomeExtract extends EntityThrowable {
 
             chunk.setUnsaved(true);
         } else {
-            CyclopsCore.clog(org.apache.logging.log4j.Level.WARN, "Tried changing biome at non-existing chunk for position " + posIn);
+            org.cyclops.evilcraft.EvilCraft.clog("Tried changing biome at non-existing chunk for position " + posIn, org.apache.logging.log4j.Level.WARN);
         }
     }
 

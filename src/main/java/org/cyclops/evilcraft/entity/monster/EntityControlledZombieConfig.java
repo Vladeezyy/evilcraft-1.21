@@ -7,11 +7,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.client.render.entity.RenderControlledZombie;
 
@@ -30,10 +30,10 @@ public class EntityControlledZombieConfig extends EntityConfig<EntityControlledZ
                         .sized(0.6F, 1.8F),
                 getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "controlled_zombie_spawn_egg", Helpers.RGBToInt(10, 10, 10), Helpers.RGBToInt(114, 80, 129))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onEntityAttributeCreationEvent);
+        EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<? super EntityControlledZombie> getRender(EntityRendererProvider.Context renderContext, ItemRenderer itemRenderer) {
         return new RenderControlledZombie(this, renderContext);

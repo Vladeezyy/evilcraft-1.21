@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.loot.modifier;
 
-import org.cyclops.cyclopscore.config.extendedconfig.LootModifierConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.LootModifierConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

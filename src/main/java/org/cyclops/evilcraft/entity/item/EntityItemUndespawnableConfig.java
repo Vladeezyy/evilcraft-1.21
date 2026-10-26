@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -27,7 +27,7 @@ public class EntityItemUndespawnableConfig extends EntityConfig<EntityItemUndesp
         );
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<ItemEntity> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new net.minecraft.client.renderer.entity.ItemEntityRenderer(renderContext);

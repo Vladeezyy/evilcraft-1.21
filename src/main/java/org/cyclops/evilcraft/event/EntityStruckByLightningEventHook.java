@@ -1,12 +1,10 @@
 package org.cyclops.evilcraft.event;
 
+import org.cyclops.evilcraft.fabric.event.EntityStruckByLightningEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityWerewolf;
 import org.cyclops.evilcraft.entity.villager.VillagerProfessionWerewolfConfig;
@@ -26,7 +24,6 @@ public class EntityStruckByLightningEventHook {
      * When a living attack event is received.
      * @param event The received event.
      */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onEntityStruckByLightning(EntityStruckByLightningEvent event) {
         empowerItem(event);
         transformVillager(event);

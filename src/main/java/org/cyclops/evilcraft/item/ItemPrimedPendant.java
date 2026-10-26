@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -24,14 +25,13 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.util.FakePlayer;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.inventory.InventoryLocationPlayer;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
-import org.cyclops.cyclopscore.inventory.NBTSimpleInventoryItemHeld;
-import org.cyclops.cyclopscore.inventory.NBTSimpleInventoryItemStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.NBTSimpleInventoryItemHeld;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.NBTSimpleInventoryItemStack;
 import org.cyclops.cyclopscore.inventory.container.NamedContainerProviderItem;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 import org.cyclops.evilcraft.inventory.container.ContainerPrimedPendant;
@@ -52,7 +52,7 @@ public class ItemPrimedPendant extends ItemBloodContainer {
         super(properties, ItemPrimedPendantConfig.capacity);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);
@@ -119,7 +119,7 @@ public class ItemPrimedPendant extends ItemBloodContainer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean isFoil(ItemStack itemStack) {
         return hasPotionStack(itemStack);
     }

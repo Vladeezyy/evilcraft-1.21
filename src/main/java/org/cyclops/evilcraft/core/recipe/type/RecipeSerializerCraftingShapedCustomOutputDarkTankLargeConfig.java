@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfig;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.RecipeConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 

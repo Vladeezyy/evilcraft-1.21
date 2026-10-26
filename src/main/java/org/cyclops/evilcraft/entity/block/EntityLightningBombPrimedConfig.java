@@ -6,10 +6,10 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.item.PrimedTnt;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.client.render.block.RenderBombPrimed;
@@ -21,7 +21,7 @@ import org.cyclops.evilcraft.client.render.block.RenderBombPrimed;
  */
 public class EntityLightningBombPrimedConfig extends EntityConfig<EntityLightningBombPrimed> {
 
-    @ConfigurableProperty(category = "entity", comment = "The amount of ticks (on average), this bomb should tick before explosion.")
+    @ConfigurablePropertyCommon(category = "entity", comment = "The amount of ticks (on average), this bomb should tick before explosion.")
     public static int fuse = 100;
 
     public EntityLightningBombPrimedConfig() {
@@ -32,7 +32,7 @@ public class EntityLightningBombPrimedConfig extends EntityConfig<EntityLightnin
         );
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<PrimedTnt> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new RenderBombPrimed(renderContext, RegistryEntries.BLOCK_LIGHTNING_BOMB_PRIMED.get());

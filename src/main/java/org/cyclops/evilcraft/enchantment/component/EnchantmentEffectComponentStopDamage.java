@@ -1,13 +1,11 @@
 package org.cyclops.evilcraft.enchantment.component;
 
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
+import org.cyclops.evilcraft.fabric.event.BlockEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import org.cyclops.cyclopscore.helper.EnchantmentHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.EnchantmentHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.algorithm.Wrapper;
 
@@ -16,7 +14,6 @@ import org.cyclops.evilcraft.core.algorithm.Wrapper;
  */
 public class EnchantmentEffectComponentStopDamage {
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void unusingEvent(LivingDamageEvent.Pre event) {
         if (!event.getEntity().getCommandSenderWorld().isClientSide() && event.getContainer().getSource().getEntity() instanceof LivingEntity) {
             LivingEntity entity = (LivingEntity) event.getContainer().getSource().getEntity();
@@ -32,7 +29,6 @@ public class EnchantmentEffectComponentStopDamage {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void unusingEvent(BlockEvent.BreakEvent event) {
         if (!event.getPlayer().level().isClientSide()) {
             InteractionHand hand = event.getPlayer().getUsedItemHand();

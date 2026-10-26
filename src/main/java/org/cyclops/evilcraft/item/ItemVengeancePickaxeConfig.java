@@ -5,9 +5,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Tiers;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -20,10 +20,10 @@ import java.util.Collections;
  */
 public class ItemVengeancePickaxeConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The default fortune enchantment level on these pickaxes in the creative tab.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The default fortune enchantment level on these pickaxes in the creative tab.", requiresMcRestart = true)
     public static int fortuneLevel = 5;
 
-    @ConfigurableProperty(category = "item", comment = "The default vengeance enchantment level on these pickaxes in the creative tab.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The default vengeance enchantment level on these pickaxes in the creative tab.", requiresMcRestart = true)
     public static int vengeanceLevel = 3;
 
     public ItemVengeancePickaxeConfig() {
@@ -34,7 +34,7 @@ public class ItemVengeancePickaxeConfig extends ItemConfig {
                         .attributes(PickaxeItem.createAttributes(Tiers.DIAMOND, 1, -2.8F))
                         .durability(154))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

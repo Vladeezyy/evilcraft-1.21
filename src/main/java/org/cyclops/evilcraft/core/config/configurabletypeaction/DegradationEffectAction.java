@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.core.config.configurabletypeaction;
 
-import org.cyclops.cyclopscore.config.configurabletypeaction.ConfigurableTypeAction;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.configurabletypeaction.ConfigurableTypeAction;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.api.degradation.IDegradationEffect;
 import org.cyclops.evilcraft.api.degradation.IDegradationRegistry;

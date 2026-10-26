@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
+import org.cyclops.evilcraft.fabric.event.ComputeFovModifierEvent;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
@@ -20,15 +22,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
-import net.neoforged.neoforge.client.event.RenderGuiEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.api.broom.BroomModifiers;
@@ -60,8 +59,8 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     public ItemBroom(Item.Properties properties) {
         super(properties, 10 * FluidHelpers.BUCKET_VOLUME);
         if (MinecraftHelpers.isClientSide()) {
-            NeoForge.EVENT_BUS.addListener(this::onFovEvent);
-            NeoForge.EVENT_BUS.addListener(this::onRenderOverlayEvent);
+            ComputeFovModifierEvent.LISTENERS.register(this::onFovEvent);
+            RenderGuiEvent.Post.addListener(this::onRenderOverlayEvent);
         }
     }
 
@@ -100,7 +99,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if (!context.getLevel().isClientSide() && context.getPlayer().isCrouching()) {
             BlockPos blockPos = context.getClickedPos();
-            if (!BlockEntityHelpers.getCapability(context.getLevel(), blockPos, context.getClickedFace(), net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK).isPresent()
+            if (!BlockEntityHelpers.getCapability(context.getLevel(), blockPos, context.getClickedFace(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK).isPresent()
                     && context.getLevel().isEmptyBlock(blockPos.offset(0, (int) Y_SPAWN_OFFSET, 0))) {
                 EntityBroom entityBroom = new EntityBroom(context.getLevel(), blockPos.getX() + 0.5, blockPos.getY() + Y_SPAWN_OFFSET, blockPos.getZ() + 0.5);
                 entityBroom.setBroomStack(stack);
@@ -139,7 +138,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);
         if(MinecraftHelpers.isShifted()) {
@@ -197,7 +196,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
         return Pair.of(modifiers, maxModifiers);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void onFovEvent(ComputeFovModifierEvent event) {
         if(event.getPlayer().getVehicle() instanceof EntityBroom) {
             EntityBroom broom = (EntityBroom) event.getPlayer().getVehicle();
@@ -206,7 +205,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void onRenderOverlayEvent(RenderGuiEvent.Post event) {
         if (!RenderOverlayEventHook.shouldRenderOverlays()) {
             return;

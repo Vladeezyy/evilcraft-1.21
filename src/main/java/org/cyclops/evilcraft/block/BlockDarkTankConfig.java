@@ -6,9 +6,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.core.item.ItemBlockFluidContainer;
 
@@ -22,16 +22,16 @@ import java.util.Collections;
  */
 public class BlockDarkTankConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "machine", comment = "The maximum tank size visible in the creative tabs. (Make sure that you do not cross the max int size.)")
+    @ConfigurablePropertyCommon(category = "machine", comment = "The maximum tank size visible in the creative tabs. (Make sure that you do not cross the max int size.)")
     public static int maxTankCreativeSize = 4096000;
 
-    @ConfigurableProperty(category = "machine", comment = "If creative versions for all fluids should be added to the creative tab.")
+    @ConfigurablePropertyCommon(category = "machine", comment = "If creative versions for all fluids should be added to the creative tab.")
     public static boolean creativeTabFluids = true;
 
-    @ConfigurableProperty(category = "machine", comment = "If the fluid should be rendered statically. Fluids won't be shown fluently, but more efficiently.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "machine", comment = "If the fluid should be rendered statically. Fluids won't be shown fluently, but more efficiently.", requiresMcRestart = true)
     public static boolean staticBlockRendering = false;
 
-    @ConfigurableProperty(category = "item", comment = "If held buckets should be autofilled when enabled.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "If held buckets should be autofilled when enabled.", isCommandable = true)
     public static boolean autoFillBuckets = false;
 
     public BlockDarkTankConfig() {
@@ -44,7 +44,7 @@ public class BlockDarkTankConfig extends BlockConfig {
                 (eConfig, block) -> new ItemBlockFluidContainer(block, (new Item.Properties())
                         )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import org.cyclops.cyclopscore.RegistryEntries;
+import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
 
 /**
  * Crafting recipe to clear the fluid content of a fluid container.
@@ -43,7 +43,7 @@ public class RecipeFluidContainerClear extends CustomRecipe {
                     return ItemStack.EMPTY;
                 }
                 result = element.copyWithCount(1);
-                result.remove(RegistryEntries.COMPONENT_FLUID_CONTENT);
+                result.remove(RegistryEntries.COMPONENT_FLUID_CONTENT.get());
             }
         }
         return result;

@@ -21,17 +21,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
 import org.cyclops.cyclopscore.helper.*;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSanguinaryEnvironmentalAccumulator;
 import org.cyclops.evilcraft.blockentity.tickaction.sanguinaryenvironmentalaccumulator.AccumulateItemTickAction;
@@ -175,7 +175,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK,
                     (blockEntity, direction) -> new ItemHandlerSlotMasked(
                             blockEntity.getInventory(),
                             direction == Direction.DOWN ? SLOT_ACCUMULATE_RESULT : SLOT_ACCUMULATE
@@ -223,12 +223,12 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         return RegistryEntries.RECIPETYPE_ENVIRONMENTAL_ACCUMULATOR.get();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showAccumulatingParticles() {
         BlockEntityEnvironmentalAccumulator.showAccumulatingParticles(level, getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.5F, getBlockPos().getZ() + 0.5F, BlockEntityEnvironmentalAccumulator.SPREAD);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showTankBeams() {
         RandomSource random = level.random;
         BlockPos target = getBlockPos();
@@ -260,7 +260,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showMissingTanks() {
         if(level.getGameTime() % 10 == 0) {
             RandomSource random = level.random;
@@ -320,7 +320,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         for (int i = 0; i < tankOffsets.length; i++) {
             BlockPos offset = tankOffsets[i];
             BlockPos location = getBlockPos().offset(offset);
-            IFluidHandler handler = BlockEntityHelpers.getCapability(getLevel(), location, Direction.UP, net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
+            IFluidHandler handler = BlockEntityHelpers.getCapability(getLevel(), location, Direction.UP, org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
             boolean oneValid = false;
             if (handler != null) {
                 int tankAmount = handler.getTanks();

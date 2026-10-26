@@ -8,13 +8,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -256,7 +256,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
         getInventory().setItem(SLOT_ADDITIONAL, itemStack);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void showEffect() {
         for (int i=0; i < 1; i++) {
             double particleX = getBlockPos().getX() + 0.2 + level.random.nextDouble() * 0.6;
@@ -273,7 +273,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void showEnchantingEffect() {
         if(level.random.nextInt(10) == 0) {
             for (int i=0; i < 1; i++) {
@@ -292,7 +292,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void showEnchantedEffect() {
         for (int i=0; i < 100; i++) {
             double particleX = getBlockPos().getX() + 0.45 + level.random.nextDouble() * 0.1;

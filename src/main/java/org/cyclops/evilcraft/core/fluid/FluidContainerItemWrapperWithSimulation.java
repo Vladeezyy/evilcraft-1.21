@@ -2,8 +2,8 @@ package org.cyclops.evilcraft.core.fluid;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 
 /**
  * Safer version of {@link FluidHandlerItemCapacity} that makes sure that simulated fluidstacks are
@@ -27,7 +27,7 @@ public class FluidContainerItemWrapperWithSimulation extends FluidHandlerItemCap
         }
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
         // Hacky hack to check if we're inside the part of FluidUtil that acts on the copy of the item to check filling...
-        if ("net.neoforged.neoforge.fluids.FluidUtil".equals(stackTraceElements[3].getClassName()) && "lambda$tryFillContainer$1".equals(stackTraceElements[3].getMethodName())) {
+        if ("org.cyclops.evilcraft.fabric.fluids.FluidUtil".equals(stackTraceElements[3].getClassName()) && "lambda$tryFillContainer$1".equals(stackTraceElements[3].getMethodName())) {
             doFill = FluidAction.SIMULATE;
         }
         return doFill;
@@ -48,7 +48,7 @@ public class FluidContainerItemWrapperWithSimulation extends FluidHandlerItemCap
     }
 
     public static FluidStack asSimulatedFluidStack(FluidStack fluidStack) {
-//        fluidStack.set(RegistryEntries.COMPONENT_SIMULATED, true);
+//        fluidStack.set(RegistryEntries.COMPONENT_SIMULATED.get(), true);
         return fluidStack;
     }
 

@@ -2,8 +2,8 @@ package org.cyclops.evilcraft.core.broom;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 
 import javax.annotation.Nullable;
@@ -20,7 +20,7 @@ public class BroomPartModifier extends BroomPartBase {
         this.modifier = modifier;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void registerModelResourceLocation() {
         BroomParts.REGISTRY.registerPartModel(this,
                 ResourceLocation.fromNamespaceAndPath(getId().getNamespace(), "broom_part/ring"));

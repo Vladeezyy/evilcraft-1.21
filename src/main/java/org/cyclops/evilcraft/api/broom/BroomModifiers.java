@@ -1,5 +1,10 @@
 package org.cyclops.evilcraft.api.broom;
 
+import org.cyclops.evilcraft.core.broom.BroomModifierRegistry;
+import org.cyclops.evilcraft.core.broom.BroomPartRegistry;
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -27,14 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
-import org.cyclops.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.ExtendedDamageSources;
 import org.cyclops.evilcraft.GeneralConfig;
@@ -57,10 +55,13 @@ public class BroomModifiers {
     public static final IBroomModifierRegistry REGISTRY = EvilCraft._instance.getRegistryManager().getRegistry(IBroomModifierRegistry.class);
 
     public static void init() {
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.LOWEST, BroomModifiers::afterItemsRegistered);
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, BroomModifiers::afterAfterItemsRegistered);
-        NeoForge.EVENT_BUS.addListener(BroomModifiers::onTagsUpdated);
-        NeoForge.EVENT_BUS.addListener(BroomModifiers::onLivingHurt);
+        // After all items of the mod were registered
+        ModLifecycle.afterRegistries(() -> {
+            afterItemsRegistered();
+            afterAfterItemsRegistered();
+        });
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> onTagsUpdated());
+        LivingDamageEvent.Pre.LISTENERS.register(BroomModifiers::onLivingHurt);
     }
 
     public static BroomModifier MODIFIER_COUNT;
@@ -85,20 +86,18 @@ public class BroomModifiers {
     public static BroomModifier ICY;
     public static BroomModifier STICKY;
 
-    public static void afterItemsRegistered(RegisterEvent event) {
-        if (event.getRegistryKey().equals(Registries.ITEM)) {
-            BroomParts.loadPre();
-            loadPre();
-        }
+    public static void afterItemsRegistered() {
+        ((BroomPartRegistry) BroomParts.REGISTRY).beforeItemsRegistered();
+        ((BroomModifierRegistry) REGISTRY).beforeItemsRegistered();
+        BroomParts.loadPre();
+        loadPre();
     }
 
-    public static void afterAfterItemsRegistered(RegisterEvent event) {
-        if (event.getRegistryKey().equals(Registries.POTION)) {
-            BroomParts.loadPost();
-        }
+    public static void afterAfterItemsRegistered() {
+        BroomParts.loadPost();
     }
 
-    public static void onTagsUpdated(TagsUpdatedEvent event) {
+    public static void onTagsUpdated() {
         loadPost();
     }
 

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -17,17 +18,15 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerInventoryIterator;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBloodStain;
@@ -47,7 +46,7 @@ public class ItemBloodExtractor extends ItemBloodContainer {
     public ItemBloodExtractor(Item.Properties properties) {
         super(properties, ItemBloodExtractorConfig.containerSize);
         setPlaceFluids(true);
-        NeoForge.EVENT_BUS.addListener(this::bloodObtainEvent);
+        LivingDeathEvent.addListener(this::bloodObtainEvent);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class ItemBloodExtractor extends ItemBloodContainer {
                 RandomSource random = context.getLevel().random;
 
                 // Fill the extractor a bit
-                BlockEntityHelpers.getCapability(context.getLevel(), context.getClickedPos(), net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK)
+                BlockEntityHelpers.getCapability(context.getLevel(), context.getClickedPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK)
                         .ifPresent((source) -> {
                             FluidStack moved = FluidUtil.tryFluidTransfer(FluidUtil.getFluidHandler(itemStack).orElse(null), source, Integer.MAX_VALUE, true);
                             if (!moved.isEmpty() && context.getLevel().isClientSide()) {
@@ -76,7 +75,7 @@ public class ItemBloodExtractor extends ItemBloodContainer {
         return ItemHelpers.isActivated(itemStack);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
         super.appendHoverText(itemStack, context, list, flag);

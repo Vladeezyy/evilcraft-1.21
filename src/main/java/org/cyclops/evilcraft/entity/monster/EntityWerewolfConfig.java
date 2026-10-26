@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.entity.monster;
 
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -9,14 +11,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.client.render.entity.ModelWerewolf;
@@ -29,7 +29,7 @@ import org.cyclops.evilcraft.client.render.entity.RenderWerewolf;
  */
 public class EntityWerewolfConfig extends EntityConfig<EntityWerewolf> {
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static ModelLayerLocation MODEL;
 
     public EntityWerewolfConfig() {
@@ -40,21 +40,23 @@ public class EntityWerewolfConfig extends EntityConfig<EntityWerewolf> {
                         .sized(0.6F, 2.9F),
                 getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "werewolf_spawn_egg", Helpers.RGBToInt(105, 67, 18), Helpers.RGBToInt(57, 25, 10))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onEntityAttributeCreationEvent);
-        NeoForge.EVENT_BUS.register(EntityWerewolf.class);
+        EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
+        EntityTickEvent.Post.addListener(EntityWerewolf::transformWerewolfVillager);
         if (MinecraftHelpers.isClientSide()) {
             ModelLoader.registerModel();
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public void onForgeRegistered() {
         super.onForgeRegistered();
-        ClientHooks.registerLayerDefinition(MODEL, ModelWerewolf::createBodyLayer);
+        if (MinecraftHelpers.isClientSide()) {
+            EntityModelLayerRegistry.registerModelLayer(MODEL, ModelWerewolf::createBodyLayer);
+        }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<? super EntityWerewolf> getRender(EntityRendererProvider.Context renderContext, ItemRenderer itemRenderer) {
         return new RenderWerewolf(renderContext, this, new ModelWerewolf(renderContext.bakeLayer(MODEL)), 0.5F);

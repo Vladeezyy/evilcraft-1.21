@@ -6,9 +6,9 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.extendedconfig.ParticleConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ParticleConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import javax.annotation.Nullable;
@@ -34,14 +34,14 @@ public class ParticleBubbleExtendedConfig extends ParticleConfig<ParticleBubbleE
         });
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Nullable
     @Override
     public ParticleProvider<ParticleBubbleExtendedData> getParticleFactory() {
         return null;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Nullable
     @Override
     public ParticleEngine.SpriteParticleRegistration<ParticleBubbleExtendedData> getParticleMetaFactory() {

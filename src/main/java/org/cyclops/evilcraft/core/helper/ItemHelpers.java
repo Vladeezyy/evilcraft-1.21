@@ -6,11 +6,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -31,7 +31,7 @@ public class ItemHelpers {
      * @return If it is an active container.
      */
     public static boolean isActivated(ItemStack itemStack) {
-        return !itemStack.isEmpty() && itemStack.getOrDefault(RegistryEntries.COMPONENT_ACTIVATED, false);
+        return !itemStack.isEmpty() && itemStack.getOrDefault(RegistryEntries.COMPONENT_ACTIVATED.get(), false);
     }
 
     /**
@@ -40,9 +40,9 @@ public class ItemHelpers {
      */
     public static void toggleActivation(ItemStack itemStack) {
         if (isActivated(itemStack)) {
-            itemStack.remove(RegistryEntries.COMPONENT_ACTIVATED);
+            itemStack.remove(RegistryEntries.COMPONENT_ACTIVATED.get());
         } else {
-            itemStack.set(RegistryEntries.COMPONENT_ACTIVATED, true);
+            itemStack.set(RegistryEntries.COMPONENT_ACTIVATED.get(), true);
         }
     }
 

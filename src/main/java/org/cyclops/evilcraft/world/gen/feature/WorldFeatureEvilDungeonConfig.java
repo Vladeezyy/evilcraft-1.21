@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.world.gen.feature;
 
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import org.cyclops.cyclopscore.config.extendedconfig.WorldFeatureConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.WorldFeatureConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

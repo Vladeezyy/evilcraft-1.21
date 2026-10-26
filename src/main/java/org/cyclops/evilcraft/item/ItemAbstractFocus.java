@@ -14,10 +14,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.helper.WorldHelpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.WorldHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -37,10 +37,10 @@ public abstract class ItemAbstractFocus extends Item {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void registerProperties() {
         ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pull"), new ItemPropertyFunction() {
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public float call(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
                 if (entityIn == null) {
                     return 0.0F;
@@ -51,7 +51,7 @@ public abstract class ItemAbstractFocus extends Item {
             }
         });
         ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pulling"), new ItemPropertyFunction() {
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public float call(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
                 return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
             }

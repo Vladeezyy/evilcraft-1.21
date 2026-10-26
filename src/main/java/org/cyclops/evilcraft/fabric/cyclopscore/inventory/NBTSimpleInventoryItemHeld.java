@@ -1,0 +1,64 @@
+package org.cyclops.evilcraft.fabric.cyclopscore.inventory;
+
+import org.cyclops.cyclopscore.inventory.ItemLocation;
+
+
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+
+/**
+ * A simple inventory for a currently held item by a player that can be stored in NBT.
+ * @author rubensworks
+ *
+ */
+public class NBTSimpleInventoryItemHeld extends SimpleInventory {
+
+    protected final Player player;
+    protected final ItemLocation itemLocation;
+    protected final String tagName;
+
+    /**
+     * Make a new instance.
+     * @param player The player holding the item.
+     * @param itemLocation The item location.
+     * @param size The amount of slots in the inventory.
+     * @param stackLimit The stack limit for each slot.
+     * @param tagName The NBT tag name to store this inventory in.
+     *                This should be the same tag name that is used to call the NBT read/write methods.
+     */
+    public NBTSimpleInventoryItemHeld(Player player, ItemLocation itemLocation, int size, int stackLimit, String tagName) {
+        super(size, stackLimit);
+        this.player = player;
+        this.itemLocation = itemLocation;
+        this.tagName = tagName;
+
+        ItemStack itemStack = itemLocation.getItemStack(player);
+        SimpleInventory contents = itemStack.get(RegistryEntries.COMPONENT_INVENTORY.get());
+        if (contents != null) {
+            for (int i = 0; i < contents.getContainerSize(); i++) {
+                setItem(i, contents.getItem(i));
+            }
+        }
+    }
+
+    @Override
+    public void setChanged() {
+        ItemStack itemStack = itemLocation.getItemStack(player);
+        itemStack.set(RegistryEntries.COMPONENT_INVENTORY.get(), this);
+    }
+
+    @Override
+    public void readFromNBT(HolderLookup.Provider provider, CompoundTag data, String tagName) {
+        InventoryHelpers.readFromNBT(provider, this, data, tagName);
+    }
+
+    @Override
+    public void writeToNBT(HolderLookup.Provider provider, CompoundTag data, String tagName) {
+        InventoryHelpers.writeToNBT(provider, this, data, tagName);
+    }
+
+}

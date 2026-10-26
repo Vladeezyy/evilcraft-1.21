@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.world.gen.structure;
 
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
-import org.cyclops.cyclopscore.config.extendedconfig.WorldStructurePieceConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.WorldStructurePieceConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 

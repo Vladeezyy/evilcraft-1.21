@@ -26,17 +26,17 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.cyclopscore.helper.CraftingHelpers;
-import org.cyclops.cyclopscore.helper.EntityHelpers;
-import org.cyclops.cyclopscore.helper.Helpers;
-import org.cyclops.cyclopscore.helper.LocationHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.CraftingHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.LocationHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.degradation.IDegradable;
 import org.cyclops.evilcraft.block.BlockEnvironmentalAccumulator;
@@ -130,7 +130,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
         @Override
         public void populate() {
-            add(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
         }
     }
 
@@ -154,7 +154,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         return Helpers.intToRGB(biome.getGrassColor(getBlockPos().getX(), getBlockPos().getZ()));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private Vector4f getOuterColorByState(int state) {
         Triple<Float, Float, Float> baseColor = getBaseBeamColor();
         float coolFactor = (getMaxCooldownTick() - tick) / (float) getMaxCooldownTick();
@@ -178,7 +178,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
      * Get the Y coordinate of the current moving item.
      * @return The Y coordinate of the inner item.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public float getMovingItemY() {
         if (state == BlockEnvironmentalAccumulator.STATE_PROCESSING_ITEM)
             return ITEM_MIN_SPAWN_HEIGHT + (getItemMoveDuration() - tick) * getItemMoveSpeed();
@@ -215,7 +215,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         getBossInfo().removeAllPlayers();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showWaterBeams() {
         RandomSource random = level.random;
         BlockPos target = getBlockPos();
@@ -247,12 +247,12 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void showAccumulatingParticles() {
         showAccumulatingParticles(level, getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.5F, getBlockPos().getZ() + 0.5F, SPREAD);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void showAccumulatingParticles(Level world, float centerX, float centerY, float centerZ, float spread) {
         RandomSource rand = world.random;
         for (int j = 0; j < rand.nextInt(20); j++) {

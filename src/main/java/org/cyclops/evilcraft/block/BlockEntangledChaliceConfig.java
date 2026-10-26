@@ -6,14 +6,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.blockentity.BlockEntityEntangledChalice;
 import org.cyclops.evilcraft.client.render.blockentity.RenderItemStackBlockEntityEntangledChalice;
@@ -30,7 +29,7 @@ import java.util.function.Consumer;
  */
 public class BlockEntangledChaliceConfig extends BlockConfig {
 
-    @ConfigurableProperty(category = "machine", comment = "If the fluid should be rendered statically. Fluids won't be shown fluently, but more efficiently.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "machine", comment = "If the fluid should be rendered statically. Fluids won't be shown fluently, but more efficiently.", requiresMcRestart = true)
     public static boolean staticBlockRendering = false;
 
     public BlockEntangledChaliceConfig() {
@@ -42,16 +41,10 @@ public class BlockEntangledChaliceConfig extends BlockConfig {
                         .strength(2.5F)
                         .sound(SoundType.STONE)),
                 (eConfig, block) -> new ItemEntangledChalice(block, (new Item.Properties())
-                        ) {
-                    @OnlyIn(Dist.CLIENT)
-                    @Override
-                    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-                        consumer.accept(new RenderItemStackBlockEntityEntangledChalice.ItemRenderProperties());
-                    }
-                }
+                        )
         );
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     protected void registerCapability(RegisterCapabilitiesEvent event) {
@@ -77,4 +70,13 @@ public class BlockEntangledChaliceConfig extends BlockConfig {
         ((BlockEntangledChalice) getInstance()).fillItemCategory(list);
         return list;
     }
+
+    @Override
+    public void onForgeRegistered() {
+        super.onForgeRegistered();
+        if (getMod().getModHelpers().getMinecraftHelpers().isClientSide()) {
+            RenderItemStackBlockEntityEntangledChalice.ItemRenderProperties.register(getItemInstance());
+        }
+    }
+
 }

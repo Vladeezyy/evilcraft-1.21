@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.core.fluid;
 
-import net.neoforged.neoforge.fluids.FluidStack;
-import org.cyclops.cyclopscore.fluid.SingleUseTank;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 
 /**
  * A single use tank that can accept multiple types of fluids.

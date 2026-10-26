@@ -2,8 +2,8 @@ package org.cyclops.evilcraft.api.broom;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.init.IRegistry;
 
 import javax.annotation.Nullable;
@@ -104,7 +104,7 @@ public interface IBroomPartRegistry extends IRegistry {
      * @param part The part
      * @param modelLocation The model resource location.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void registerPartModel(IBroomPart part, ResourceLocation modelLocation);
 
     /**
@@ -112,14 +112,14 @@ public interface IBroomPartRegistry extends IRegistry {
      * @param part The part.
      * @return The model resource location.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public ResourceLocation getPartModel(IBroomPart part);
 
     /**
      * Get all registered model resource locations for the parts.
      * @return All model resource locations.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Collection<ResourceLocation> getPartModels();
 
     /**

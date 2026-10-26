@@ -2,10 +2,10 @@ package org.cyclops.evilcraft.infobook;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.cyclopscore.infobook.IInfoBook;
-import org.cyclops.cyclopscore.infobook.InfoBook;
-import org.cyclops.cyclopscore.infobook.InfoBookParser;
-import org.cyclops.cyclopscore.infobook.pageelement.SectionAppendix;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBookParser;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.SectionAppendix;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;

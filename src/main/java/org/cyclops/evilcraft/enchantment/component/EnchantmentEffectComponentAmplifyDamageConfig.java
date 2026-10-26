@@ -1,8 +1,9 @@
 package org.cyclops.evilcraft.enchantment.component;
 
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
+import org.cyclops.evilcraft.fabric.event.BlockEvent;
 import net.minecraft.util.ExtraCodecs;
-import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.enchantment.entityeffect.EnchantmentEntityEffectHealFromDamage;
 
@@ -19,6 +20,8 @@ public class EnchantmentEffectComponentAmplifyDamageConfig extends EnchantmentEf
                 builder -> builder
                         .persistent(ExtraCodecs.POSITIVE_INT)
         );
-        NeoForge.EVENT_BUS.register(new EnchantmentEffectComponentAmplifyDamage());
+        EnchantmentEffectComponentAmplifyDamage listener = new EnchantmentEffectComponentAmplifyDamage();
+        LivingDamageEvent.Post.LISTENERS.register(listener::livingDamage);
+        BlockEvent.BreakEvent.addListener(listener::breakingEvent);
     }
 }

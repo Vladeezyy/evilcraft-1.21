@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfig;
-import org.cyclops.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.RecipeConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
 

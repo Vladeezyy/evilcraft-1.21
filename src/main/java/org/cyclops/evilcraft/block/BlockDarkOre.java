@@ -20,11 +20,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.item.IInformationProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.item.ItemDarkGem;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,14 +107,14 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void animateTick(BlockState stateIn, Level world, BlockPos blockPos, RandomSource rand) {
         if (isGlowing(world, blockPos)) {
             this.sparkle(world, blockPos);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void sparkle(Level world, BlockPos blockPos) {
         RandomSource random = world.random;
         double offset = 0.0625D;
@@ -167,7 +167,7 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag iTooltipFlag) {
 
     }

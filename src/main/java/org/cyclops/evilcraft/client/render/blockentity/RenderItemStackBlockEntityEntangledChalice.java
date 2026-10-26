@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.blockentity;
 
+import net.minecraft.world.level.ItemLike;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -7,10 +9,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityEntangledChalice;
 import org.cyclops.evilcraft.item.ItemEntangledChalice;
@@ -18,7 +19,7 @@ import org.cyclops.evilcraft.item.ItemEntangledChalice;
 /**
  * @author rubensworks
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderItemStackBlockEntityEntangledChalice extends BlockEntityWithoutLevelRenderer {
 
     private final BlockEntityRenderDispatcher blockEntityRenderDispatcher;
@@ -36,10 +37,16 @@ public class RenderItemStackBlockEntityEntangledChalice extends BlockEntityWitho
         this.blockEntityRenderDispatcher.renderItem(tile, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
     }
 
-    public static class ItemRenderProperties implements IClientItemExtensions {
-        @Override
-        public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-            return new RenderItemStackBlockEntityEntangledChalice();
+    public static class ItemRenderProperties {
+        private static RenderItemStackBlockEntityEntangledChalice renderer;
+
+        public static void register(ItemLike item) {
+            BuiltinItemRendererRegistry.INSTANCE.register(item, (stack, mode, matrices, vertexConsumers, light, overlay) -> {
+                if (renderer == null) {
+                    renderer = new RenderItemStackBlockEntityEntangledChalice();
+                }
+                renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
+            });
         }
     }
 

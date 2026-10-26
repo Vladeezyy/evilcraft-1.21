@@ -5,7 +5,7 @@ import com.mojang.serialization.Dynamic;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.codec.ByteBufCodecs;
-import org.cyclops.cyclopscore.config.extendedconfig.DataComponentConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.DataComponentConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

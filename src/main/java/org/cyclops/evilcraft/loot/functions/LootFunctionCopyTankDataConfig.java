@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.loot.functions;
 
-import org.cyclops.cyclopscore.config.extendedconfig.LootFunctionConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.LootFunctionConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**

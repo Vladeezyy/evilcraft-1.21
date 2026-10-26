@@ -1,14 +1,16 @@
 package org.cyclops.evilcraft.api.gameevent;
 
+import org.cyclops.evilcraft.fabric.event.ListenerList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.Event;
 
 /**
  * Event when a player removes a crafted item from a slot.
  * @author rubensworks
  */
-public class BloodInfuserRemoveEvent extends Event {
+public class BloodInfuserRemoveEvent {
+
+    public static final ListenerList<BloodInfuserRemoveEvent> LISTENERS = new ListenerList<>();
 
     public final Player player;
     public final ItemStack output;

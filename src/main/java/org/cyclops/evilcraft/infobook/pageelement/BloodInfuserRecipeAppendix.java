@@ -7,13 +7,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.infobook.AdvancedButtonEnum;
-import org.cyclops.cyclopscore.infobook.IInfoBook;
-import org.cyclops.cyclopscore.infobook.InfoSection;
-import org.cyclops.cyclopscore.infobook.ScreenInfoBook;
-import org.cyclops.cyclopscore.infobook.pageelement.RecipeAppendix;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.RecipeAppendix;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
 import org.cyclops.evilcraft.core.recipe.type.RecipeBloodInfuser;
@@ -61,7 +61,7 @@ public class BloodInfuserRecipeAppendix extends RecipeAppendix<RecipeBloodInfuse
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         int middle = (width - SLOT_SIZE) / 2;
         gui.drawArrowRight(guiGraphics, x + middle - 3, y + SLOT_OFFSET_Y + 2);

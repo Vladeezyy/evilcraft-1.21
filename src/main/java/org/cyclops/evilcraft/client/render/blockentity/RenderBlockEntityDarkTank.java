@@ -8,10 +8,10 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.helper.DirectionHelpers;
-import org.cyclops.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
 import org.cyclops.evilcraft.client.render.model.ModelDarkTankBaked;
 import org.joml.Matrix4f;
@@ -76,7 +76,7 @@ public class RenderBlockEntityDarkTank implements BlockEntityRenderer<BlockEntit
         FluidStack fluid = tile.getTank().getFluid();
         RenderHelpers.renderFluidContext(fluid, matrixStackIn, () -> {
             float height = (float) (tile.getFillRatio() * 0.99F);
-            int brightness = Math.max(combinedLightIn, fluid.getFluid().getFluidType().getLightLevel(fluid));
+            int brightness = Math.max(combinedLightIn, org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
             renderFluidSides(height, tile.getTank().getFluid(), tile.isEnabled(), brightness, matrixStackIn, bufferIn);
         });
     }

@@ -7,11 +7,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.client.render.entity.RenderNetherfish;
 
@@ -31,10 +31,10 @@ public class EntityNetherfishConfig extends EntityConfig<EntityNetherfish> {
                         .fireImmune(),
                 getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "netherfish_spawn_egg", Helpers.RGBToInt(73, 27, 20), Helpers.RGBToInt(160, 45, 27))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onEntityAttributeCreationEvent);
+        EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<? super EntityNetherfish> getRender(EntityRendererProvider.Context renderContext, ItemRenderer itemRenderer) {
         return new RenderNetherfish(renderContext, this);

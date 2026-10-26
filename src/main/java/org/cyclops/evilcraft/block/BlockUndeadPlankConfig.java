@@ -6,7 +6,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -23,12 +23,12 @@ public class BlockUndeadPlankConfig extends BlockConfig {
                 eConfig -> new Block(Block.Properties.of()
                         .strength(2.0F)
                         .sound(SoundType.WOOD)) {
-                    @Override
+                    
                     public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
                         return 5;
                     }
 
-                    @Override
+                    
                     public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
                         return 20;
                     }

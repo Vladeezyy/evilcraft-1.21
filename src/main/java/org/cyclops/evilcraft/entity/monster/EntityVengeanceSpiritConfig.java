@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.entity.monster;
 
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.google.common.collect.Lists;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -8,13 +9,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.client.render.entity.RenderVengeanceSpirit;
@@ -29,16 +29,16 @@ import java.util.List;
 public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpirit> {
 
     // TODO: set to false in nextmajor
-    @ConfigurableProperty(category = "mob", comment = "If vengeance spirits should also spawn when entities are killed by non-player damage sources.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "mob", comment = "If vengeance spirits should also spawn when entities are killed by non-player damage sources.", isCommandable = true)
     public static boolean spawnOnNonPlayerKills = true;
 
-    @ConfigurableProperty(category = "mob", comment = "The maximum amount of vengeance spirits naturally spawnable in the spawnLimitArea.")
+    @ConfigurablePropertyCommon(category = "mob", comment = "The maximum amount of vengeance spirits naturally spawnable in the spawnLimitArea.")
     public static int spawnLimit = 5;
 
-    @ConfigurableProperty(category = "mob", comment = "The area in which the spawn limit will be checked on each spawn attempt.")
+    @ConfigurablePropertyCommon(category = "mob", comment = "The area in which the spawn limit will be checked on each spawn attempt.")
     public static int spawnLimitArea = 32;
 
-    @ConfigurableProperty(category = "mob", comment = "The blacklisted entity spirits, by entity name. Regular expressions are allowed.")
+    @ConfigurablePropertyCommon(category = "mob", comment = "The blacklisted entity spirits, by entity name. Regular expressions are allowed.")
     public static List<String> entityBlacklist = Lists.newArrayList(
             "evilcraft:vengeance_spirit",
             "evilcraft:controlled_zombie",
@@ -47,10 +47,10 @@ public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpi
             "farmingforblockheads:merchant" // It causes rendering issues: https://github.com/CyclopsMC/EvilCraft/issues/1004
     );
 
-    @ConfigurableProperty(category = "mob", comment = "Whether vengeance spirits should always be visible in creative mode.")
+    @ConfigurablePropertyCommon(category = "mob", comment = "Whether vengeance spirits should always be visible in creative mode.")
     public static boolean alwaysVisibleInCreative = false;
 
-    @ConfigurableProperty(category = "mob", comment = "The 1/X chance that an actual spirit will spawn when doing actions like mining with the Vengeance Pickaxe.")
+    @ConfigurablePropertyCommon(category = "mob", comment = "The 1/X chance that an actual spirit will spawn when doing actions like mining with the Vengeance Pickaxe.")
     public static int nonDegradedSpawnChance = 5;
 
     public EntityVengeanceSpiritConfig() {
@@ -62,10 +62,10 @@ public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpi
                         .fireImmune(),
                 getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "vengeance_spirit_spawn_egg", Helpers.RGBToInt(64, 16, 93), Helpers.RGBToInt(134, 60, 169))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onEntityAttributeCreationEvent);
+        EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<? super EntityVengeanceSpirit> getRender(EntityRendererProvider.Context renderContext, ItemRenderer itemRenderer) {
         return new RenderVengeanceSpirit(renderContext, this);
@@ -82,7 +82,7 @@ public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpi
             }
             return false;
         });
-        NeoForge.EVENT_BUS.register(EntityVengeanceSpirit.class);
+        LivingDeathEvent.addListener(EntityVengeanceSpirit::vengeanceEvent);
     }
 
     public void onEntityAttributeCreationEvent(EntityAttributeCreationEvent event) {

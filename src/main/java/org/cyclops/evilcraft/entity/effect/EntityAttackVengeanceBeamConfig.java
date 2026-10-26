@@ -6,10 +6,10 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.EntityConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.core.client.render.RenderNull;
 
@@ -20,7 +20,7 @@ import org.cyclops.evilcraft.core.client.render.RenderNull;
  */
 public class EntityAttackVengeanceBeamConfig extends EntityConfig<EntityAttackVengeanceBeam> {
 
-    @ConfigurableProperty(category = "entity", comment = "If crossed beams should cause explosions.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "entity", comment = "If crossed beams should cause explosions.", isCommandable = true)
     public static boolean crossBeamsExplosions = true;
 
     public EntityAttackVengeanceBeamConfig() {
@@ -32,7 +32,7 @@ public class EntityAttackVengeanceBeamConfig extends EntityConfig<EntityAttackVe
         );
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public EntityRenderer<Entity> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new RenderNull(renderContext);

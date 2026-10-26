@@ -1,25 +1,23 @@
 package org.cyclops.evilcraft.core.helper;
 
+import net.fabricmc.fabric.api.util.TriState;
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.fluids.FluidActionResult;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-import org.cyclops.cyclopscore.Capabilities;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.item.DamageIndicatedItemComponent;
-import org.cyclops.cyclopscore.item.IInformationProvider;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.fluids.FluidActionResult;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.fluids.IFluidTank;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidTank;
+import org.cyclops.evilcraft.fabric.cyclopscore.Capabilities;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.DamageIndicatedItemComponent;
+import org.cyclops.evilcraft.fabric.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.core.block.IBlockTank;
 import org.cyclops.evilcraft.core.fluid.FluidContainerItemWrapperWithSimulation;
 
@@ -32,7 +30,7 @@ import javax.annotation.Nonnull;
 public class BlockTankHelpers {
 
     static {
-        NeoForge.EVENT_BUS.register(new BlockTankHelpers());
+        PlayerInteractEvent.RightClickBlock.addListener(new BlockTankHelpers()::onRightClick);
     }
 
     private BlockTankHelpers() {
@@ -44,7 +42,7 @@ public class BlockTankHelpers {
      * @param itemStack The itemStack that must be given information.
      * @return Information for that itemStack.
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static MutableComponent getInfoTank(ItemStack itemStack) {
         FluidStack fluidStack = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
         int amount = fluidStack.getAmount();
@@ -62,9 +60,9 @@ public class BlockTankHelpers {
      * @return The resulting itemstack.
      */
     public static ItemStack tileDataToItemStack(BlockEntity tile, ItemStack itemStack) {
-        IFluidHandler fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, tile.getBlockPos(), null, tile, null);
+        IFluidHandler fluidHandlerTile = org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK.getCapability(tile.getLevel(), tile.getBlockPos(), null, tile, null);
         if (fluidHandlerTile != null) {
-            IFluidHandlerItemCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY);
+            IFluidHandlerItemCapacity fluidHandlerItemCapacity = Capabilities.Item.FLUID_HANDLER_CAPACITY.getCapability(itemStack, null);
             if (fluidHandlerItemCapacity != null) {
                 if (fluidHandlerTile instanceof IFluidTank) {
                     IFluidTank fluidTank = (IFluidTank) fluidHandlerTile;
@@ -72,7 +70,7 @@ public class BlockTankHelpers {
                     itemStack = fluidHandlerItemCapacity.getContainer();
                 }
             }
-            IFluidHandlerItem fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
+            IFluidHandlerItem fluidHandlerItem = org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(itemStack, null);
             if (fluidHandlerItem != null) {
                 FluidActionResult res = FluidUtil.tryFillContainer(itemStack, fluidHandlerTile, Integer.MAX_VALUE, null, true);
                 if (res.isSuccess()) {
@@ -89,9 +87,9 @@ public class BlockTankHelpers {
      * @param tile The tile that has already been removed from the world.
      */
     public static void itemStackDataToTile(ItemStack itemStack, BlockEntity tile) {
-        IFluidHandler fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, tile.getBlockPos(), null, tile, null);
+        IFluidHandler fluidHandlerTile = org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK.getCapability(tile.getLevel(), tile.getBlockPos(), null, tile, null);
         if (fluidHandlerTile != null) {
-            IFluidHandlerItemCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY);
+            IFluidHandlerItemCapacity fluidHandlerItemCapacity = Capabilities.Item.FLUID_HANDLER_CAPACITY.getCapability(itemStack, null);
             if (fluidHandlerItemCapacity != null) {
                 if (fluidHandlerTile instanceof FluidTank) {
                     FluidTank fluidTank = (FluidTank) fluidHandlerTile;
@@ -99,7 +97,7 @@ public class BlockTankHelpers {
                 }
             }
 
-            IFluidHandlerItem fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
+            IFluidHandlerItem fluidHandlerItem = org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(itemStack, null);
             if (fluidHandlerItem != null) {
                 FluidUtil.tryEmptyContainer(itemStack, fluidHandlerTile, Integer.MAX_VALUE, null, true);
             }
@@ -110,7 +108,7 @@ public class BlockTankHelpers {
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Force allow shift-right clicking with a fluid container passing through to this block
         if (!event.getItemStack().isEmpty()
-                && event.getItemStack().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM) != null
+                && org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(event.getItemStack(), null) != null
                 && event.getLevel().getBlockState(event.getPos()).getBlock() instanceof IBlockTank) {
             event.setUseBlock(TriState.TRUE);
         }

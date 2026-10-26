@@ -4,10 +4,9 @@ import com.google.common.collect.Sets;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.client.render.blockentity.RenderItemStackBlockEntityBloodChest;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;
@@ -24,13 +23,13 @@ import java.util.function.Consumer;
  */
 public class BlockColossalBloodChestConfig extends UpgradableBlockContainerConfig {
 
-    @ConfigurableProperty(category = "machine", comment = "The amount Blood mB required for repairing one damage value.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "machine", comment = "The amount Blood mB required for repairing one damage value.", isCommandable = true)
     public static int baseMBPerDamage = 5;
 
-    @ConfigurableProperty(category = "machine", comment = "The amount of ticks required for repairing one damage value.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "machine", comment = "The amount of ticks required for repairing one damage value.", isCommandable = true)
     public static int ticksPerDamage = 2;
 
-    @ConfigurableProperty(category = "machine", comment = "The base amount of concurrent items that need to be available before efficiency can rise.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "machine", comment = "The base amount of concurrent items that need to be available before efficiency can rise.", isCommandable = true)
     public static int baseConcurrentItems = 1;
 
     public BlockColossalBloodChestConfig() {
@@ -44,13 +43,7 @@ public class BlockColossalBloodChestConfig extends UpgradableBlockContainerConfi
                         .noOcclusion()
                         .isValidSpawn((state, level, pos, type) -> false)),
                 (eConfig, block) -> new ItemBlockFluidContainer(block, (new Item.Properties())
-                        ) {
-                    @Override
-                    @OnlyIn(Dist.CLIENT)
-                    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-                        consumer.accept(new RenderItemStackBlockEntityBloodChest.ItemRenderProperties());
-                    }
-                }
+                        )
         );
     }
 
@@ -62,6 +55,15 @@ public class BlockColossalBloodChestConfig extends UpgradableBlockContainerConfi
                 Upgrades.UPGRADE_TIER1,
                 Upgrades.UPGRADE_TIER2,
                 Upgrades.UPGRADE_TIER3);
+    }
+
+
+    @Override
+    public void onForgeRegistered() {
+        super.onForgeRegistered();
+        if (getMod().getModHelpers().getMinecraftHelpers().isClientSide()) {
+            RenderItemStackBlockEntityBloodChest.ItemRenderProperties.register(getItemInstance());
+        }
     }
 
 }

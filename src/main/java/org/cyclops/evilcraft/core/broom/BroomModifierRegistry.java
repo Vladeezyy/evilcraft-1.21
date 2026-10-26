@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.broom;
 
+import org.cyclops.evilcraft.fabric.event.ItemTooltipEvent;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.ChatFormatting;
@@ -7,12 +8,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -40,8 +37,9 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
     private final List<Pair<Supplier<ItemStack>, Map<BroomModifier, Float>>> broomItems = Lists.newArrayList();
 
     public BroomModifierRegistry() {
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, this::beforeItemsRegistered);
-        NeoForge.EVENT_BUS.addListener(this::onTooltipEvent);
+        if (MinecraftHelpers.isClientSide()) {
+            ItemTooltipEvent.addListener(this::onTooltipEvent);
+        }
     }
 
     @Override
@@ -130,8 +128,8 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
             }
 
             // Hardcoded values
-            if(broomStack.has(RegistryEntries.COMPONENT_BROOM_MODIFIERS)) {
-                modifiers.putAll(broomStack.get(RegistryEntries.COMPONENT_BROOM_MODIFIERS).getModifiers());
+            if(broomStack.has(RegistryEntries.COMPONENT_BROOM_MODIFIERS.get())) {
+                modifiers.putAll(broomStack.get(RegistryEntries.COMPONENT_BROOM_MODIFIERS.get()).getModifiers());
             }
 
             return modifiers;
@@ -142,7 +140,7 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
     @Override
     public void setModifiers(ItemStack broomStack, Map<BroomModifier, Float> modifiers) {
         // Write modifiers
-        broomStack.set(RegistryEntries.COMPONENT_BROOM_MODIFIERS, new BroomModifiersContents(modifiers));
+        broomStack.set(RegistryEntries.COMPONENT_BROOM_MODIFIERS.get(), new BroomModifiersContents(modifiers));
 
         // Write corresponding modifier parts
         Collection<IBroomPart> parts = BroomParts.REGISTRY.getBroomParts(broomStack);
@@ -178,12 +176,9 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
         }
     }
 
-    public void beforeItemsRegistered(RegisterEvent event) {
-        // The block registry even is called before the items event
-        if (event.getRegistryKey().equals(Registries.BLOCK)) {
-            broomModifiers.clear();
-            broomModifierParts.clear();
-            broomItems.clear();
-        }
+    public void beforeItemsRegistered() {
+        broomModifiers.clear();
+        broomModifierParts.clear();
+        broomItems.clear();
     }
 }

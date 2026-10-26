@@ -4,9 +4,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.Collections;
  */
 public class ItemBloodPearlOfTeleportationConfig extends ItemConfig {
 
-    @ConfigurableProperty(category = "item", comment = "The amount of second slowness should be applied after each teleport.", isCommandable = true)
+    @ConfigurablePropertyCommon(category = "item", comment = "The amount of second slowness should be applied after each teleport.", isCommandable = true)
     public static int slownessDuration = 0;
 
     public ItemBloodPearlOfTeleportationConfig() {
@@ -29,7 +29,7 @@ public class ItemBloodPearlOfTeleportationConfig extends ItemConfig {
                 eConfig -> new ItemBloodPearlOfTeleportation(new Item.Properties()
                         .rarity(Rarity.UNCOMMON))
         );
-        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
+        BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override

@@ -11,12 +11,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.GeneralConfig;
@@ -64,7 +64,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
 
     @Nullable
     protected ItemStack fill(ItemStack itemStack) {
-        IFluidHandlerItem container = itemStack.getCapability(Capabilities.FluidHandler.ITEM);
+        IFluidHandlerItem container = Capabilities.FluidHandler.ITEM.getCapability(itemStack, null);
         FluidStack fluidStack = new FluidStack(getTank().getFluid().getFluid(),
                 Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()));
         if (container.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE) > 0) {
@@ -89,7 +89,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
             if(!blockEntity.getTank().isEmpty() && blockEntity.isEnabled()) {
                 Direction down = Direction.DOWN;
                 IFluidHandler handler = BlockEntityHelpers.getCapability(level, pos.relative(down), down.getOpposite(),
-                        net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
+                        org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
                 if(handler != null) {
                     FluidStack fluidStack = new FluidStack(blockEntity.getTank().getFluid().getFluid(),
                             Math.min(GeneralConfig.mbFlowRate, blockEntity.getTank().getFluidAmount()));
@@ -106,7 +106,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
                         if(!blockEntity.getTank().isEmpty() && entity instanceof ItemEntity) {
                             ItemEntity item = (ItemEntity) entity;
                             if (item.getItem() != null
-                                    && item.getItem().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM) != null &&
+                                    && org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(item.getItem(), null) != null &&
                                     item.getItem().getCount() == 1) {
                                 ItemStack itemStack = item.getItem().copy();
                                 ItemStack fillItemStack;
@@ -121,7 +121,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
                                 ItemStack itemStack = it.next();
                                 ItemStack fillItemStack;
                                 if(!itemStack.isEmpty()
-                                        && itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM) != null
+                                        && org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(itemStack, null) != null
                                         && (fillItemStack = blockEntity.fill(itemStack)) != null) {
                                     it.replace(fillItemStack);
                                 }
