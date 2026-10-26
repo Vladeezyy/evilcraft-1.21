@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "evilcraft:block/spirit_furnace_off" },
+    "active=true": { "model": "evilcraft:block/spirit_furnace_on" }
+  }
+}

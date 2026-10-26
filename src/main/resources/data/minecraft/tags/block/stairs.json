@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "evilcraft:undead_planks_stairs",
+    "evilcraft:reinforced_undead_planks_stairs",
+    "evilcraft:dark_brick_stairs",
+    "evilcraft:dark_blood_brick_stairs"
+  ]
+}

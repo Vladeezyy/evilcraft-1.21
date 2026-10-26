@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "evilcraft:block/dark_blood_brick_off" },
+    "active=true": { "model": "evilcraft:block/dark_blood_brick_on" }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "evilcraft:ore_dark",
+    "evilcraft:ore_dark_lower"
+  ],
+  "step": "underground_ores"
+}

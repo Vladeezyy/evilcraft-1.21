@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "primed=false": { "model": "evilcraft:block/lightning_bomb" },
+    "primed=true": { "model": "evilcraft:block/lightning_bomb" }
+  }
+}

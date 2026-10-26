@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "evilcraft:block/blood_chest" },
+    "facing=west" : { "model": "evilcraft:block/blood_chest", "y": 90 },
+    "facing=north": { "model": "evilcraft:block/blood_chest", "y": 180 },
+    "facing=east" : { "model": "evilcraft:block/blood_chest", "y": 270 }
+  }
+}

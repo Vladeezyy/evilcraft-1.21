@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "powered=false": { "model": "evilcraft:block/spiked_plate_up"   },
+    "powered=true":  { "model": "evilcraft:block/spiked_plate_down" }
+  }
+}

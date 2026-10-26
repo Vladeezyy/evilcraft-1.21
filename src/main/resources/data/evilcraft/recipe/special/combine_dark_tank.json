@@ -1,0 +1,7 @@
+{
+  "type": "evilcraft:crafting_special_fluidcontainer_combination",
+  "item": {
+    "item": "evilcraft:dark_tank"
+  },
+  "max_capacity": 655360000
+}

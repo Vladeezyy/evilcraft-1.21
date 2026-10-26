@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "evilcraft:block/colossal_blood_chest_on" },
+    "active=true": { "model": "evilcraft:block/colossal_blood_chest_off" }
+  }
+}

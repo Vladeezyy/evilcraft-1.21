@@ -1,0 +1,23 @@
+{
+  "_comment": "--- Mod Integrations ---",
+  "key.categories.evilcraft": "邪惡工藝",
+  "entity.evilcraft.werewolf": "狼人",
+  "entity.evilcraft.poisonous_libelle": "毒蜻蜓",
+  "entity.evilcraft.netherfish": "下界蠹蟲",
+  "entity.evilcraft.vengeance_spirit": "復仇之魂",
+  "gui.exalted_crafting": "便攜合成",
+  "gui.waila.tank_config": "液體含量",
+  "gui.waila.inner_blocks_config": "容器內物品",
+  "gui.waila.box_of_eternal_closure_config": "永恒的靈魂箱所含靈魂",
+  "gui.waila.block_info_config": "按住Shift查看方塊詳情",
+  "gui.nei.fluids": "液體",
+  "info_book.second_age.evolved_blood_machinery.colossal_blood_chest": "大型血能箱",
+  "info_book.second_age.evolved_blood_machinery.colossal_blood_chest.text1": "&1血能箱&0太棒了，“壞刀子進好刀子出”。唯一缺點就是會得到壞的效果，不斷地用&1凈化器&0清除也是蠻煩的。",
+  "info_book.second_age.evolved_blood_machinery.colossal_blood_chest.text4": "這種&1大型血能箱&0只會在你有很多需要修復的物品時使用，因為它的血液用量要比&1血能箱&0大，但是同時修復的物品數量越多，它的效率就越大。",
+  "info_book.second_age.evolved_blood_machinery.colossal_blood_chest.text5": "要用&1強化亡靈木板&0搭建一個3*3*3的&1空心結構&0，要保證搭建完成結構必須保持空心，并包含一個&1大型血能箱&0方塊。",
+  "info_book.second_age.evolved_blood_machinery.sanguinary_environmental_accumulator": "血腥環境存儲器",
+  "info_book.second_age.evolved_blood_machinery.sanguinary_environmental_accumulator.text2": "研究發現，我可以用這種新東西只做一種使用血液運行的新的&1環境存儲器&0，我也完全消除了這種機器的不良影響，不會再有生物群系退化也不會再在寺廟旁突然死亡。",
+  "info_book.second_age.evolved_blood_machinery.sanguinary_environmental_accumulator.text3": "這種機器工作需要大量的&4血液&0，你需要在周圍放置&18&0個裝有&4血液&0的任意容器，如圖！如果沒有容器，機器將無法工作，放置的容器周圍會有粒子效果。",
+  "info_book.second_age.tools.rejuvenated_flesh": "再生鮮肉",
+  "info_book.second_age.tools.rejuvenated_flesh.text": "通過將&1肉&0與&1痛苦之源&0結合，可以得到無限的食物，只需要給它提供血液。"
+}
