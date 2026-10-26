@@ -12,8 +12,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
@@ -62,7 +62,7 @@ public class CraftingRecipeAppendix extends RecipeAppendix<CraftingRecipe> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         gui.drawArrowRight(guiGraphics, x + (SLOT_SIZE + SLOT_OFFSET_X) * 3 - 3, y + SLOT_OFFSET_Y + SLOT_SIZE + 2);
 

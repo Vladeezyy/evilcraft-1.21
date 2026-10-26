@@ -34,8 +34,9 @@ public class RenderBlockEntitySpiritPortal implements BlockEntityRenderer<BlockE
     }
 
     @Override
-    public AABB getRenderBoundingBox(BlockEntitySpiritPortal blockEntity) {
-        return AABB.INFINITE;
+    public boolean shouldRenderOffScreen(BlockEntitySpiritPortal blockEntity) {
+        // The rendering is larger than the block
+        return true;
     }
 
     @Override

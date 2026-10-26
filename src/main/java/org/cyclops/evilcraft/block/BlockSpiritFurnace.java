@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import java.util.function.BiConsumer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -91,7 +92,7 @@ public class BlockSpiritFurnace extends BlockWithEntityGuiTank implements CubeDe
     @Override
     public void onPlace(BlockState blockStateNew, Level world, BlockPos blockPos, BlockState blockStateOld, boolean isMoving) {
         super.onPlace(blockStateNew, world, blockPos, blockStateOld, isMoving);
-        if(!world.captureBlockSnapshots && blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
+        if(blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
             triggerDetector(world, blockPos, true);
         }
     }
@@ -103,11 +104,9 @@ public class BlockSpiritFurnace extends BlockWithEntityGuiTank implements CubeDe
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         if(world.getBlockState(pos).getValue(ACTIVE)) triggerDetector(world, pos, false);
-        // IForgeBlock.super.onBlockExploded(state, world, pos, explosion);
-        world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        this.wasExploded(world, pos, explosion);
+        super.onExplosionHit(state, world, pos, explosion, dropConsumer);
     }
 
     @Override

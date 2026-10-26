@@ -41,19 +41,19 @@ public abstract class ContainerTileWorking<T extends BlockEntityWorking<T, ?>> e
 
                 @Override
                 public boolean mayPlace(ItemStack itemStack) {
-                    return super.mayPlace(itemStack) && getTileWorkingMetadata().canInsertItem(container, getSlotIndex(), itemStack);
+                    return super.mayPlace(itemStack) && getTileWorkingMetadata().canInsertItem(container, getContainerSlot(), itemStack);
                 }
 
                 @Override
                 public boolean mayPickup(Player playerIn) {
                     return super.mayPickup(player) &&
-                            getTileWorkingMetadata().canExtractItem(container, getSlotIndex(), getItem(), getCarried());
+                            getTileWorkingMetadata().canExtractItem(container, getContainerSlot(), getItem(), getCarried());
                 }
 
                 @Override
                 public void setChanged() {
                     if(!ItemStack.matches(lastSlotContents, this.getItem())) {
-                        getTileSupplier().ifPresent(tile -> tile.onUpgradeSlotChanged(getSlotIndex(), lastSlotContents, this.getItem()));
+                        getTileSupplier().ifPresent(tile -> tile.onUpgradeSlotChanged(getContainerSlot(), lastSlotContents, this.getItem()));
                     }
                     lastSlotContents = this.getItem();
                     if(!lastSlotContents.isEmpty()) lastSlotContents = lastSlotContents.copy();

@@ -43,7 +43,7 @@ public class BroomPartModel implements UnbakedModel {
         // Add aspects to baked model.
         for(IBroomPart part : BroomParts.REGISTRY.getParts()) {
             try {
-                BakedModel bakedAspectModel = bakery.bake(BroomParts.REGISTRY.getPartModel(part), modelState, spriteGetter);
+                BakedModel bakedAspectModel = bakery.bake(BroomParts.REGISTRY.getPartModel(part), modelState);
                 bakedModel.addBroomPartModel(part, bakedAspectModel);
             } catch (Exception e) {
                 e.printStackTrace();

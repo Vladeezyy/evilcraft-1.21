@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -54,7 +55,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class BlockEntangledChalice extends BlockWithEntity implements IInformationProvider, IBlockTank, IBlockRarityProvider {
+public class BlockEntangledChalice extends BlockWithEntity implements IInformationProvider, IBlockTank, IBlockRarityProvider, IDynamicLightBlock {
 
     public static final MapCodec<BlockEntangledChalice> CODEC = simpleCodec(BlockEntangledChalice::new);
 

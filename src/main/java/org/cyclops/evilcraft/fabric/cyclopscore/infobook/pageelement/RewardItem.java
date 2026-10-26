@@ -5,8 +5,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
@@ -49,13 +49,13 @@ public class RewardItem implements IReward {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public AdvancedButton createButton(IInfoBook infoBook) {
         return new RecipeAppendix.ItemButton(infoBook);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my, AdvancedButton button) {
         RecipeAppendix.renderItemForButton(gui, guiGraphics, x, y, itemStack, mx, my, true, (RecipeAppendix.ItemButton) button);
     }

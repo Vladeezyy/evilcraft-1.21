@@ -24,8 +24,7 @@ public class EntityBroomConfig extends EntityConfig<EntityBroom> {
             "broom",
                 eConfig -> EntityType.Builder.<EntityBroom>of(EntityBroom::new, MobCategory.MISC)
                         .sized(0.6F, 1.8F)
-                        .setShouldReceiveVelocityUpdates(true)
-                        .setUpdateInterval(10)
+                        .updateInterval(10)
         );
     }
 

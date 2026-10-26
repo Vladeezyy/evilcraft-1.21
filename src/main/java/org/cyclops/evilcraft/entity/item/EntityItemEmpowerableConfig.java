@@ -23,7 +23,6 @@ public class EntityItemEmpowerableConfig extends EntityConfig<EntityItemEmpowera
                 EvilCraft._instance,
                 "item_empowerable",
                 eConfig -> EntityType.Builder.<EntityItemEmpowerable>of(EntityItemEmpowerable::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

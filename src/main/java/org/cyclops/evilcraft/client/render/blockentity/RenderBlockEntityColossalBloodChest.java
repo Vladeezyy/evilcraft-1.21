@@ -27,13 +27,6 @@ public class RenderBlockEntityColossalBloodChest extends RenderBlockEntityChestB
         super(p_i226008_1_);
     }
 
-    @Override
-    public AABB getRenderBoundingBox(BlockEntityColossalBloodChest blockEntity) {
-        return new AABB(
-                Vec3.atLowerCornerOf(blockEntity.getBlockPos().subtract(new Vec3i(3, 3, 3))),
-                Vec3.atLowerCornerOf(blockEntity.getBlockPos().offset(3, 6, 3))
-        );
-    }
 
     @Override
     protected Material getMaterial(BlockEntityColossalBloodChest tile) {

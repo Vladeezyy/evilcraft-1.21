@@ -23,7 +23,6 @@ public class EntityItemUndespawnableConfig extends EntityConfig<EntityItemUndesp
                 EvilCraft._instance,
                 "item_undespawnable",
                 eConfig -> EntityType.Builder.<EntityItemUndespawnable>of(EntityItemUndespawnable::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

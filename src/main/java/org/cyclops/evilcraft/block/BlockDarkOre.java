@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -59,8 +60,11 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     }
 
     @Override
-    public int getExpDrop(BlockState state, LevelAccessor level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Entity breaker, ItemStack tool) {
-        return 1 + level.getRandom().nextInt(INCREASE_XP);
+    protected void spawnAfterBreak(BlockState state, ServerLevel level, BlockPos pos, ItemStack tool, boolean dropExperience) {
+        super.spawnAfterBreak(state, level, pos, tool, dropExperience);
+        if (dropExperience) {
+            this.tryDropExperience(level, pos, tool, UniformInt.of(1, INCREASE_XP));
+        }
     }
 
     @Override

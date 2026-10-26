@@ -23,7 +23,7 @@ public class ItemBloodPotash extends Item {
         boolean done = false;
         int attempts = 0;
         while (attempts < 2) {
-            done = BoneMealItem.applyBonemeal(itemStack.copy(), context.getLevel(), context.getClickedPos(), context.getPlayer()) | done;
+            done = BoneMealItem.growCrop(itemStack.copy(), context.getLevel(), context.getClickedPos()) | done;
             attempts++;
         }
         if (done) {

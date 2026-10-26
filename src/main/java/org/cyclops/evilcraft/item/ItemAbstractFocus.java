@@ -1,8 +1,8 @@
 package org.cyclops.evilcraft.item;
 
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -39,9 +39,9 @@ public abstract class ItemAbstractFocus extends Item {
 
     @Environment(EnvType.CLIENT)
     protected void registerProperties() {
-        ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pull"), new ItemPropertyFunction() {
+        ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pull"), new ClampedItemPropertyFunction() {
             @Environment(EnvType.CLIENT)
-            public float call(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
+            public float unclampedCall(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
                 if (entityIn == null) {
                     return 0.0F;
                 } else {
@@ -50,9 +50,9 @@ public abstract class ItemAbstractFocus extends Item {
                 }
             }
         });
-        ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pulling"), new ItemPropertyFunction() {
+        ItemProperties.register(this, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "pulling"), new ClampedItemPropertyFunction() {
             @Environment(EnvType.CLIENT)
-            public float call(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
+            public float unclampedCall(ItemStack stack, ClientLevel worldIn, LivingEntity entityIn, int id) {
                 return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
             }
         });

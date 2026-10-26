@@ -129,8 +129,9 @@ public class ItemBloodExtractor extends ItemBloodContainer {
     }
 
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return oldStack.getItem() != newStack.getItem();
+    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+        // No re-equip animation when only the fluid contents change
+        return false;
     }
 
     public void bloodObtainEvent(LivingDeathEvent event) {

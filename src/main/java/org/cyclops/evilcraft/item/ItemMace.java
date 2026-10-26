@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemLeftClickEntity;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
@@ -43,7 +44,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public abstract class ItemMace extends ItemBloodContainer {
+public abstract class ItemMace extends ItemBloodContainer implements IItemLeftClickEntity {
 
     private final int hitUsage;
     private final int maximumCharge;
@@ -262,7 +263,7 @@ public abstract class ItemMace extends ItemBloodContainer {
     }
 
     @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack itemStack) {
+    public ItemAttributeModifiers getDefaultAttributeModifiers() {
         return new ItemAttributeModifiers(Lists.newArrayList(
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_DAMAGE,

@@ -457,7 +457,7 @@ public abstract class ScreenInfoBook<T extends ContainerExtended> extends Abstra
     }
 
     public int getTick() {
-        return (int) getMinecraft().level.getGameTime();
+        return (int) this.minecraft.level.getGameTime();
     }
 
 

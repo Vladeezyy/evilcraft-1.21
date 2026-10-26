@@ -44,4 +44,8 @@ public class BuildCreativeModeTabContentsEvent {
     public void accept(ItemLike item) {
         entries.accept(item);
     }
+
+    public void acceptAll(java.util.Collection<ItemStack> stacks) {
+        entries.acceptAll(stacks);
+    }
 }

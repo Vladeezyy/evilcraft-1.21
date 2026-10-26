@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -46,7 +47,7 @@ import java.util.UUID;
  * @author rubensworks
  *
  */
-public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockRarityProvider {
+public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockRarityProvider, IDynamicLightBlock {
 
     public static final MapCodec<BlockBoxOfEternalClosure> CODEC = simpleCodec(BlockBoxOfEternalClosure::new);
 
@@ -171,7 +172,7 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource rand) {
-        if (!worldIn.isAreaLoaded(pos, 1))
+        if (!worldIn.hasChunksAt(pos.offset(-1, -1, -1), pos.offset(1, 1, 1)))
             return;
         if (!worldIn.getBlockState(pos.below()).isFaceSturdy(worldIn, pos.below(), Direction.UP)) {
             worldIn.destroyBlock(pos, true);
@@ -202,7 +203,7 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
         return BlockEntityHelpers.get(world, pos, BlockEntityBoxOfEternalClosure.class)
-                .map(tile -> tile.getLidAngle() > 0 ? LIGHT_LEVEL : super.getLightEmission(state, world, pos))
+                .map(tile -> tile.getLidAngle() > 0 ? LIGHT_LEVEL : state.getLightEmission())
                 .orElse(0);
     }
 

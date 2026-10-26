@@ -9,8 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
@@ -56,7 +56,7 @@ public class FurnaceRecipeAppendix extends RecipeAppendix<SmeltingRecipe> {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         int middle = (width - SLOT_SIZE) / 2;
         gui.drawArrowRight(guiGraphics, x + middle - 3, y + SLOT_OFFSET_Y + 2);

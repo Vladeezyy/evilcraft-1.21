@@ -28,7 +28,7 @@ import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ISectionCondi
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ItemSectionConditionHandler;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ModSectionConditionHandler;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.TagSectionConditionHandler;
-import org.cyclops.cyclopscore.infobook.pageelement.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -620,7 +620,7 @@ public class InfoBookParser {
                     String[] split = tagString.split(":");
                     modRecipe = ModBase.get(split[0]);
                     if (modRecipe == null) {
-                        throw new IllegalArgumentException("The mod " + split[0] + " could not be found as ModBase in " + ModBase.getMods().keySet());
+                        throw new IllegalArgumentException("The mod " + split[0] + " could not be found as ModBase in " + org.cyclops.cyclopscore.helper.ModBaseCommon.getCommonMods().keySet());
                     }
                     tagString = split[1];
                 }

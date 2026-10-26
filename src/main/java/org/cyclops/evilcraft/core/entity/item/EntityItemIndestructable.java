@@ -25,7 +25,7 @@ public abstract class EntityItemIndestructable extends EntityItemExtended {
 
     private void init() {
         if(isUndespawnable()) {
-            this.lifespan = Integer.MAX_VALUE;
+            this.setUnlimitedLifetime();
         }
     }
 

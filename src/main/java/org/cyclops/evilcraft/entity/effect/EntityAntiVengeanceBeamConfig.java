@@ -24,7 +24,6 @@ public class EntityAntiVengeanceBeamConfig extends EntityConfig<EntityAntiVengea
                 EvilCraft._instance,
                 "anti_vengeance_beam",
                 eConfig -> EntityType.Builder.<EntityAntiVengeanceBeam>of(EntityAntiVengeanceBeam::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

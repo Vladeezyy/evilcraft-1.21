@@ -10,9 +10,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCore;
+import net.fabricmc.api.EnvType;
+import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.RequestPlayerAdvancementUnlockedPacket;
 
 import java.util.Set;
@@ -36,11 +36,11 @@ public class AdvancementHelpers {
     }
 
     public static void requestAdvancementUnlockInfo(ResourceLocation advancementId) {
-        CyclopsCore._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
+        EvilCraft._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
     }
 
-    public static AdvancementHolder getAdvancement(Dist dist, ResourceLocation resourceLocation) {
-        if (dist.isClient()) {
+    public static AdvancementHolder getAdvancement(EnvType dist, ResourceLocation resourceLocation) {
+        if (dist == EnvType.CLIENT) {
             return getAdvancementManagerClient().get(resourceLocation);
         }
         return getAdvancementManagerServer().get(resourceLocation);

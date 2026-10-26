@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -19,10 +20,6 @@ public class ItemBurningGemStone extends Item {
         super(properties);
     }
 
-    @Override
-    public int getMaxDamage(ItemStack stack) {
-        return ItemBurningGemStoneConfig.maxDamage;
-    }
 
     /**
      * Try damaging a burning gem stone inside the given player's inventory.
@@ -38,7 +35,7 @@ public class ItemBurningGemStone extends Item {
             ItemStack itemStack = current.getRight();
             if(!itemStack.isEmpty() && itemStack.getItem() == RegistryEntries.ITEM_BURNING_GEM_STONE.get()) {
                 if(!simulate) {
-                    itemStack.hurtAndBreak(1 + swarmTier, (ServerLevel) player.level(), player, (i) -> {
+                    itemStack.hurtAndBreak(1 + swarmTier, (ServerLevel) player.level(), player instanceof ServerPlayer serverPlayer ? serverPlayer : null, (i) -> {
                         player.getInventory().setItem(current.getLeft(), ItemStack.EMPTY);
                     });
                     player.causeFoodExhaustion(10);

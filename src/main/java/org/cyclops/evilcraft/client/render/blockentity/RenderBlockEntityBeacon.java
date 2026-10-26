@@ -26,10 +26,6 @@ public abstract class RenderBlockEntityBeacon<T extends BlockEntityBeacon> imple
 
     }
 
-    @Override
-    public AABB getRenderBoundingBox(T blockEntity) {
-        return AABB.INFINITE;
-    }
 
     @Override
     public void render(T tileentity, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {

@@ -23,7 +23,6 @@ public class EntityNecromancersHeadConfig extends EntityConfig<EntityNecromancer
                 EvilCraft._instance,
                 "necromancers_head",
                 eConfig -> EntityType.Builder.<EntityNecromancersHead>of(EntityNecromancersHead::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

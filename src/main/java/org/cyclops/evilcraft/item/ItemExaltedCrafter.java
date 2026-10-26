@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.ICustomItemEntity;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.sounds.SoundEvents;
@@ -32,7 +33,7 @@ import java.util.Arrays;
  * @author rubensworks
  *
  */
-public class ItemExaltedCrafter extends ItemGui implements IItemEmpowerable {
+public class ItemExaltedCrafter extends ItemGui implements IItemEmpowerable, ICustomItemEntity {
 
     private final boolean wooden;
     private final boolean empowered;

@@ -8,8 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.client.gui.image.Images;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
@@ -112,7 +112,7 @@ public class AdvancementRewardsAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         requestAdvancementInfo();
 
@@ -127,7 +127,7 @@ public class AdvancementRewardsAppendix extends SectionAppendix {
         boolean allAchievementsValid = true;
         for (int i = 0; i < advancementRewards.getAdvancements().size(); i++) {
             ResourceLocation advancementId = advancementRewards.getAdvancements().get(i);
-            AdvancementHolder advancement = AdvancementHelpers.getAdvancement(Dist.CLIENT, advancementId);
+            AdvancementHolder advancement = AdvancementHelpers.getAdvancement(EnvType.CLIENT, advancementId);
             if (offsetX + SLOT_SIZE > MAX_WIDTH) {
                 offsetY += SLOT_SIZE + SLOT_PADDING * 2;
                 offsetX = 0;
@@ -180,12 +180,12 @@ public class AdvancementRewardsAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         renderToolTips(gui, guiGraphics, mx, my);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void renderToolTips(ScreenInfoBook gui, GuiGraphics guiGraphics, int mx, int my) {
         for(AdvancedButton button : renderButtonHolders.values()) {
             button.renderTooltip(guiGraphics, gui.getFont(), mx, my);

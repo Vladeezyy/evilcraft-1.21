@@ -204,6 +204,11 @@ public abstract class ModBase<T extends ModBase<T>> extends ModBaseFabric<T> {
 
 
 
+    @Nullable
+    public static ModBase<?> get(String modId) {
+        return ModBaseCommon.getCommon(modId) instanceof ModBase<?> mod ? mod : null;
+    }
+
     @Data
     public static class EnumReferenceKey<V> {
 

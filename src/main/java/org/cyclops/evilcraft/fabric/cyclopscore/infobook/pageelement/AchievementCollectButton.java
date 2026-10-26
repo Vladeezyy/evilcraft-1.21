@@ -14,8 +14,8 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * A button that can be clicked for reward collection.
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class AchievementCollectButton extends AdvancedButton {
 
     private final AdvancementRewards advancementRewards;

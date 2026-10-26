@@ -57,9 +57,6 @@ repositories {
 
 loom {
     accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
-    mixin {
-        defaultRefmapName = "${mod_id}.refmap.json"
-    }
     runs {
         client {
             client()

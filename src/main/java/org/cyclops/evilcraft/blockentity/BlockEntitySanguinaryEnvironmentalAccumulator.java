@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
 import org.cyclops.cyclopscore.helper.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSanguinaryEnvironmentalAccumulator;

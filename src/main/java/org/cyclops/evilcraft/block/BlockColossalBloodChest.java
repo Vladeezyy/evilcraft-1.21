@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import java.util.function.BiConsumer;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -89,7 +90,6 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
         return BlockHelpers.getSafeBlockStateProperty(blockState, ACTIVE, false);
     }
 
-    @Override
     public boolean shouldDisplayFluidOverlay(BlockState blockState, BlockAndTintGetter world, BlockPos pos, FluidState fluidState) {
         return true;
     }
@@ -132,7 +132,7 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
     @Override
     public void onPlace(BlockState blockStateNew, Level world, BlockPos blockPos, BlockState blockStateOld, boolean isMoving) {
         super.onPlace(blockStateNew, world, blockPos, blockStateOld, isMoving);
-        if(!world.captureBlockSnapshots && blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
+        if(blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
             triggerDetector(world, blockPos, true);
         }
     }
@@ -144,11 +144,9 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         if(BlockHelpers.getSafeBlockStateProperty(state, ACTIVE, false)) triggerDetector(world, pos, false);
-        // IForgeBlock.super.onBlockExploded(state, world, pos, explosion);
-        world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        wasExploded(world, pos, explosion);
+        super.onExplosionHit(state, world, pos, explosion, dropConsumer);
     }
 
     @Override

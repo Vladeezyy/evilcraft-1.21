@@ -66,11 +66,7 @@ public class AdvancementRewards {
             }
 
             // Set NBT
-            CompoundTag tag = org.cyclops.evilcraft.fabric.PersistentData.get(player);
-            if (!tag.contains(Player.PERSISTED_NBT_TAG)) {
-                tag.put(Player.PERSISTED_NBT_TAG, new CompoundTag());
-            }
-            CompoundTag persistedTag = tag.getCompound(Player.PERSISTED_NBT_TAG);
+            CompoundTag persistedTag = org.cyclops.evilcraft.fabric.PersistentData.getPersisted(player);
             persistedTag.putBoolean(getNbtTagKey(), true);
         }
     }

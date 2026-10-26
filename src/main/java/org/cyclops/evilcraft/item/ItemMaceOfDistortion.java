@@ -156,7 +156,7 @@ public class ItemMaceOfDistortion extends ItemMace {
     }
 
     @Override
-    public int getEnchantmentValue(ItemStack itemStack) {
+    public int getEnchantmentValue() {
         return 15;
     }
 

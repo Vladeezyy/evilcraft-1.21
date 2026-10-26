@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.item;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -32,7 +33,7 @@ import javax.annotation.Nullable;
 /**
  * @author rubensworks
  */
-public class ItemBloodContainer extends DamageIndicatedItemFluidContainer {
+public class ItemBloodContainer extends DamageIndicatedItemFluidContainer implements IItemUseFirst {
 
     protected boolean canPickUp = true;
     private boolean placeFluids = false;

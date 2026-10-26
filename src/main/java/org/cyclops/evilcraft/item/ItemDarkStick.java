@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.ICustomItemEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -12,7 +13,7 @@ import org.cyclops.evilcraft.entity.item.EntityItemDarkStick;
  * @author rubensworks
  *
  */
-public class ItemDarkStick extends Item {
+public class ItemDarkStick extends Item implements ICustomItemEntity {
 
     public ItemDarkStick(Item.Properties properties) {
         super(properties);

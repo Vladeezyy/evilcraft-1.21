@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.proxy;
 
+import org.cyclops.evilcraft.RegistryEntries;
 import net.minecraft.client.renderer.RenderType;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import org.cyclops.evilcraft.fabric.client.ModelRenderTypes;

@@ -19,10 +19,6 @@ public class GeometryBakingContextWrapper implements IGeometryBakingContext {
         this.wrapped = wrapped;
     }
 
-    @Override
-    public String getModelName() {
-        return this.wrapped.getModelName();
-    }
 
     @Override
     public boolean hasMaterial(String name) {
@@ -54,18 +50,6 @@ public class GeometryBakingContextWrapper implements IGeometryBakingContext {
         return this.wrapped.getTransforms();
     }
 
-    @Override
-    public Transformation getRootTransform() {
-        return this.wrapped.getRootTransform();
-    }
 
-    @Override
-    public @Nullable ResourceLocation getRenderTypeHint() {
-        return this.wrapped.getRenderTypeHint();
-    }
 
-    @Override
-    public boolean isComponentVisible(String component, boolean fallback) {
-        return this.wrapped.isComponentVisible(component, fallback);
-    }
 }

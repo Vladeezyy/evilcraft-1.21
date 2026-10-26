@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -73,7 +74,7 @@ public class BlockLightningBomb extends Block {
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos blockPos, Explosion explosion) {
+    public void wasExploded(Level world, BlockPos blockPos, Explosion explosion) {
         if (!world.isClientSide()) {
             EntityLightningBombPrimed entityprimed = new EntityLightningBombPrimed(world,
                     (double)((float)blockPos.getX() + 0.5F), (double)((float)blockPos.getY() + 0.5F),
@@ -116,7 +117,7 @@ public class BlockLightningBomb extends Block {
             this.primeBomb(world, blockPos, defaultBlockState().setValue(PRIMED, true), player);
             world.removeBlock(blockPos, false);
             if (world instanceof ServerLevel serverLevel) {
-                player.getItemInHand(hand).hurtAndBreak(1, serverLevel, player, (e) -> {});
+                player.getItemInHand(hand).hurtAndBreak(1, serverLevel, player instanceof ServerPlayer serverPlayer ? serverPlayer : null, (e) -> {});
             }
             return ItemInteractionResult.SUCCESS;
         }

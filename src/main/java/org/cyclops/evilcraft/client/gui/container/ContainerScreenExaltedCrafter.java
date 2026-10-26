@@ -53,7 +53,7 @@ public class ContainerScreenExaltedCrafter extends ContainerScreenExtended<Conta
 
     protected boolean handleKeyCode(int keyCode, int scanCode) {
         InputConstants.Key inputCode = InputConstants.getKey(keyCode, scanCode);
-        if (Keys.EXALTEDCRAFTING.isActiveAndMatches(inputCode)) {
+        if (Keys.EXALTEDCRAFTING.matches(keyCode, scanCode)) {
             if (MinecraftHelpers.isShifted()) {
                 this.buttonBalance.onPress();
             } else {
@@ -92,7 +92,7 @@ public class ContainerScreenExaltedCrafter extends ContainerScreenExtended<Conta
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
         // super.drawGuiContainerForegroundLayer(matrixStack, x, y);
-        ItemStack itemStack = container.getItemStack(getMinecraft().player);
+        ItemStack itemStack = container.getItemStack(this.minecraft.player);
         Component name = Component.translatable("gui.exalted_crafting");
         if(itemStack.has(DataComponents.CUSTOM_NAME)) {
             name = itemStack.getHoverName();

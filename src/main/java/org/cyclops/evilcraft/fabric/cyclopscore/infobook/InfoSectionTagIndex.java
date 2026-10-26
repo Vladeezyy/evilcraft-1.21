@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.gui.Font;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.SectionAppendix;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 
@@ -25,7 +25,7 @@ public class InfoSectionTagIndex extends InfoSection {
                 new ArrayList<SectionAppendix>(), new ArrayList<String>(), mod);
 
         // treemap to ensure order by localized tag
-        IModHelpersNeoForge modHelpers = infoBook.getMod().getModHelpers();
+        IModHelpers modHelpers = infoBook.getMod().getModHelpers();
         infoBook.setConfigLinks(Maps.<String, String, Pair<InfoSection, Integer>>newTreeMap(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {

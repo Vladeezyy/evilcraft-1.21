@@ -46,9 +46,9 @@ public class ModelBoxOfEternalClosure implements UnbakedModel {
         ModelBoxOfEternalClosureBaked bakedModel = new ModelBoxOfEternalClosureBaked();
 
         try {
-            ModelBoxOfEternalClosureBaked.boxModel = bakery.bake(boxModel, modelState, spriteGetter);
-            ModelBoxOfEternalClosureBaked.boxLidModel = bakery.bake(boxLidModel, modelState, spriteGetter);
-            ModelBoxOfEternalClosureBaked.boxLidRotatedModel = bakery.bake(boxLidRotatedModel, modelState, spriteGetter);
+            ModelBoxOfEternalClosureBaked.boxModel = bakery.bake(boxModel, modelState);
+            ModelBoxOfEternalClosureBaked.boxLidModel = bakery.bake(boxLidModel, modelState);
+            ModelBoxOfEternalClosureBaked.boxLidRotatedModel = bakery.bake(boxLidRotatedModel, modelState);
         } catch (Exception e) {
             e.printStackTrace();
         }

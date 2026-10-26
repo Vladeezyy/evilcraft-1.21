@@ -185,7 +185,6 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
         return ModelHelpers.DEFAULT_CAMERA_TRANSFORMS;
     }
 
-    @Override
     public TextureAtlasSprite getParticleIcon(@Nonnull ModelData data) {
         return handleDisplayStandType(ModelHelpers.getSafeProperty(data, BlockDisplayStand.TYPE, ItemStack.EMPTY), false)
                 .getParticleIcon();

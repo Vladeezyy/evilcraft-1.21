@@ -9,10 +9,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCore;
-import org.cyclops.cyclopscore.Reference;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.EvilCraft;
+import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;
@@ -45,19 +45,19 @@ public class RequestPlayerAdvancementUnlockedPacket extends PacketCodec<RequestP
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void actionClient(Level level, Player player) {
 
     }
 
     @Override
     public void actionServer(Level level, ServerPlayer player) {
-        AdvancementHolder advancement = AdvancementHelpers.getAdvancement(Dist.DEDICATED_SERVER, ResourceLocation.parse(advancementId));
+        AdvancementHolder advancement = AdvancementHelpers.getAdvancement(EnvType.SERVER, ResourceLocation.parse(advancementId));
         if (advancement == null) {
-            CyclopsCore.clog(org.apache.logging.log4j.Level.ERROR, "Received an invalid advancement " + advancementId + " from " + player.getName());
+            org.cyclops.evilcraft.EvilCraft.clog("Received an invalid advancement " + advancementId + " from " + player.getName(), org.apache.logging.log4j.Level.ERROR);
             return;
         }
-        CyclopsCore._instance.getPacketHandler().sendToPlayer(
+        EvilCraft._instance.getPacketHandler().sendToPlayer(
                 new SendPlayerAdvancementUnlockedPacket(advancementId, AdvancementHelpers
                         .hasAdvancementUnlocked(player, advancement)), player);
     }

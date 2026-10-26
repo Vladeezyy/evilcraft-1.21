@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.extensions.IItemDroppedByPlayer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
@@ -44,7 +46,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class ItemPrimedPendant extends ItemBloodContainer {
+public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppedByPlayer {
 
     private static final int TICK_MODULUS = MinecraftHelpers.SECOND_IN_TICKS / 2;
 
@@ -99,7 +101,7 @@ public class ItemPrimedPendant extends ItemBloodContainer {
                         if ((multiplier == null || multiplier >= 0) && canConsume(toDrain, itemStack, player)) {
                             player.addEffect(
                                     new MobEffectInstance(potionEffect.getEffect(), TICK_MODULUS * 27, potionEffect.getAmplifier(),
-                                            !potionEffect.getCures().isEmpty(), true));
+                                            true, true)); // NeoForge: ambient when the effect is curable, which all vanilla effects are
                             consume(toDrain, itemStack, player);
                         }
                     }
@@ -157,17 +159,17 @@ public class ItemPrimedPendant extends ItemBloodContainer {
 
     public boolean onDroppedByPlayer(ItemStack itemstack, Player player) {
         if (!itemstack.isEmpty() && player instanceof ServerPlayer && player.containerMenu != null && player.containerMenu.getClass() == this.getContainerClass(player.level(), player, itemstack)) {
-            player.closeContainer();
+            ((ServerPlayer) player).closeContainer();
         }
 
-        return super.onDroppedByPlayer(itemstack, player);
+        return true;
     }
 
     public void openScreenForItemIndex(Level world, ServerPlayer player, ItemLocation itemLocation) {
         if (!world.isClientSide()) {
             MenuProvider containerProvider = this.getContainer(world, player, itemLocation);
             if (containerProvider != null) {
-                player.openMenu(containerProvider, (packetBuffer) -> {
+                IModHelpers.get().getMinecraftHelpers().openMenu(player, containerProvider, (packetBuffer) -> {
                     this.writeExtraGuiData(packetBuffer, world, player, itemLocation);
                 });
                 Stat<ResourceLocation> openStat = this.getOpenStat();

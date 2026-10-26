@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot;
 
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.datafixers.util.Pair;
 
 
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +36,11 @@ public class SlotArmor extends Slot {
         super(inventory, index, x, y);
         this.armorType = armorType;
         this.player = player;
-        setBackground(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS.get(armorType));
+    }
+
+    @Override
+    public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+        return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS.get(armorType));
     }
 
     @Override
@@ -44,7 +50,7 @@ public class SlotArmor extends Slot {
 
     @Override
     public boolean mayPlace(ItemStack itemStack) {
-        return itemStack.getEquipmentSlot() == armorType
+        return player.getEquipmentSlotForItem(itemStack) == armorType
                 || (itemStack.getItem() instanceof ArmorItem && ((ArmorItem) itemStack.getItem()).getEquipmentSlot() == armorType);
     }
 

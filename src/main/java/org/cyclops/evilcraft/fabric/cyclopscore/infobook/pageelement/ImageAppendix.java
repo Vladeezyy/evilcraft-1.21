@@ -4,8 +4,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
@@ -45,14 +45,14 @@ public class ImageAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         guiGraphics.blit(resource, x, y, 0, 0, getWidth(), getHeight());
         gui.drawOuterBorder(guiGraphics, x, y, getWidth(), getHeight(), 0.5F, 0.5F, 0.5F, 0.4f);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
 
     }

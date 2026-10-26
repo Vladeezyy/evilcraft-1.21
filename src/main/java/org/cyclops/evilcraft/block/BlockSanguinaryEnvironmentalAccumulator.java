@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -28,7 +29,7 @@ import javax.annotation.Nullable;
  * @author rubensworks
  *
  */
-public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui {
+public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui implements IDynamicLightBlock {
 
     public static final MapCodec<BlockSanguinaryEnvironmentalAccumulator> CODEC = simpleCodec(BlockSanguinaryEnvironmentalAccumulator::new);
 
@@ -67,7 +68,7 @@ public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui 
         return BlockEntityHelpers.get(world, pos, BlockEntitySanguinaryEnvironmentalAccumulator.class)
                 .filter(BlockEntityWorking::isVisuallyWorking)
                 .map(tile -> 4)
-                .orElseGet(() -> super.getLightEmission(state, world, pos));
+                .orElseGet(() -> state.getLightEmission());
     }
 
     @Override

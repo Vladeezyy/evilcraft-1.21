@@ -33,8 +33,7 @@ public abstract class BlockWithEntity extends BlockWithEntityCommon {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader world,
-                                       BlockPos blockPos, Player player) {
-        return BlockWithEntityCommon.getCloneItemStack(this, () -> super.getCloneItemStack(state, target, world, blockPos, player), state, target, world, blockPos, player);
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos blockPos, BlockState state) {
+        return BlockWithEntityCommon.getCloneItemStack(this, () -> super.getCloneItemStack(world, blockPos, state), state, null, world, blockPos, null);
     }
 }

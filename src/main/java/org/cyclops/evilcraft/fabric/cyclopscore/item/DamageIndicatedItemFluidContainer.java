@@ -54,7 +54,7 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
         this.fluid = fluid;
         init();
 
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
     }
 
     private void registerCapability(RegisterCapabilitiesEvent event) {

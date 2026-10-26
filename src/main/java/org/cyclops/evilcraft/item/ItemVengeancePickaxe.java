@@ -30,8 +30,8 @@ public class ItemVengeancePickaxe extends PickaxeItem {
     public ItemStack getEnchantedItemStack(HolderLookup.Provider holders) {
         ItemStack pickaxe = new ItemStack(this);
         ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
-        enchantments.set(holders.holderOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse("minecraft:fortune"))), ItemVengeancePickaxeConfig.fortuneLevel);
-        enchantments.set(holders.holderOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse("evilcraft:vengeance"))), ItemVengeancePickaxeConfig.vengeanceLevel);
+        enchantments.set(holders.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse("minecraft:fortune"))), ItemVengeancePickaxeConfig.fortuneLevel);
+        enchantments.set(holders.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse("evilcraft:vengeance"))), ItemVengeancePickaxeConfig.vengeanceLevel);
         EnchantmentHelper.setEnchantments(pickaxe, enchantments.toImmutable());
         return pickaxe;
     }

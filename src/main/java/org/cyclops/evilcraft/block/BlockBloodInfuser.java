@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,7 +38,7 @@ import javax.annotation.Nullable;
  * @author rubensworks
  *
  */
-public class BlockBloodInfuser extends BlockWithEntityGuiTank {
+public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynamicLightBlock {
 
     public static final MapCodec<BlockBloodChest> CODEC = simpleCodec(BlockBloodChest::new);
 
@@ -91,17 +92,17 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank {
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
         return BlockEntityHelpers.get(world, pos, BlockEntityBloodInfuser.class)
-                .map(tile -> tile.isVisuallyWorking() ? 4 : super.getLightEmission(state, world, pos))
+                .map(tile -> tile.isVisuallyWorking() ? 4 : state.getLightEmission())
                 .orElse(0);
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         BlockEntityHelpers.get(world, pos, BlockEntityBloodInfuser.class)
                 .ifPresent(tile -> {
                     EntityHelpers.spawnXpAtPlayer(player.level(), player, (int) Math.floor(tile.getXp()));
                     tile.resetXp();
                 });
-        return super.onDestroyedByPlayer(state, world, pos, player, willHarvest, fluid);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 }

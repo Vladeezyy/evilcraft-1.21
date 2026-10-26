@@ -40,8 +40,8 @@ public class ModelEntangledChalice implements UnbakedModel {
         ModelEntangledChaliceBaked bakedModel = new ModelEntangledChaliceBaked();
 
         try {
-            ModelEntangledChaliceBaked.chaliceModel = bakery.bake(ModelEntangledChaliceBaked.chaliceModelName, modelState, spriteGetter);
-            ModelEntangledChaliceBaked.gemsModel = bakery.bake(ModelEntangledChaliceBaked.gemsModelName, modelState, spriteGetter);
+            ModelEntangledChaliceBaked.chaliceModel = bakery.bake(ModelEntangledChaliceBaked.chaliceModelName, modelState);
+            ModelEntangledChaliceBaked.gemsModel = bakery.bake(ModelEntangledChaliceBaked.gemsModelName, modelState);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -5,8 +5,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphics;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
@@ -23,7 +23,7 @@ public class KeyBindingAppendix extends SectionAppendix {
     public static final int WIDTH = 100;
     public static final int HEIGHT = 30;
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private KeyMapping keyBinding;
 
     public KeyBindingAppendix(IInfoBook infoBook, String keybindingName) throws InfoBookParser.InvalidAppendixException {
@@ -52,7 +52,7 @@ public class KeyBindingAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         gui.drawOuterBorder(guiGraphics, x - 1, y - 1, getWidth() + 2, getHeight() + 2, 0.5F, 0.5F, 0.5F, 0.4f);
         gui.drawTextBanner(guiGraphics, x + width / 2, y - 2);
@@ -68,7 +68,7 @@ public class KeyBindingAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
 
     }

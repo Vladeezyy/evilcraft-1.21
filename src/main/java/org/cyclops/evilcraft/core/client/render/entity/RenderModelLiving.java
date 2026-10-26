@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.client.render.entity;
 
+import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigCommon;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -20,7 +21,7 @@ public abstract class RenderModelLiving<T extends Mob, M extends EntityModel<T>>
 
     private ResourceLocation texture;
 
-    public RenderModelLiving(EntityRendererProvider.Context context, ExtendedConfig<?, ?> config, M model, float par2) {
+    public RenderModelLiving(EntityRendererProvider.Context context, ExtendedConfigCommon<?, ?, ?> config, M model, float par2) {
         super(context, model, par2);
         texture = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_ENTITIES + config.getNamedId() + ".png");
     }

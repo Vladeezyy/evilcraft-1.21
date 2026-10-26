@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import java.util.function.BiConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -60,7 +61,6 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
         return BlockHelpers.getSafeBlockStateProperty(blockState, ACTIVE, false);
     }
 
-    @Override
     public boolean shouldDisplayFluidOverlay(BlockState blockState, BlockAndTintGetter world, BlockPos pos, FluidState fluidState) {
         return true;
     }
@@ -68,7 +68,7 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        if(!world.captureBlockSnapshots) {
+        if(true) {
             BlockColossalBloodChest.triggerDetector(world, pos, true);
         }
     }
@@ -76,7 +76,7 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
     @Override
     public void onPlace(BlockState blockStateNew, Level world, BlockPos blockPos, BlockState blockStateOld, boolean isMoving) {
         super.onPlace(blockStateNew, world, blockPos, blockStateOld, isMoving);
-        if(!world.captureBlockSnapshots && blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
+        if(blockStateNew.getBlock() != blockStateOld.getBlock() && !blockStateNew.getValue(ACTIVE)) {
             BlockColossalBloodChest.triggerDetector(world, blockPos, true);
         }
     }
@@ -88,11 +88,9 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
     }
 
     @Override
-    public void onBlockExploded(BlockState state, Level world, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         if(BlockHelpers.getSafeBlockStateProperty(state, ACTIVE, false)) BlockColossalBloodChest.triggerDetector(world, pos, false);
-        // IForgeBlock.super.onBlockExploded(state, world, pos, explosion);
-        world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        wasExploded(world, pos, explosion);
+        super.onExplosionHit(state, world, pos, explosion, dropConsumer);
     }
 
     @Override

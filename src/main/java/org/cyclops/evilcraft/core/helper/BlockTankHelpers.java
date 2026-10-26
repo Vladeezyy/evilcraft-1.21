@@ -104,7 +104,6 @@ public class BlockTankHelpers {
         }
     }
 
-    @SubscribeEvent
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Force allow shift-right clicking with a fluid container passing through to this block
         if (!event.getItemStack().isEmpty()

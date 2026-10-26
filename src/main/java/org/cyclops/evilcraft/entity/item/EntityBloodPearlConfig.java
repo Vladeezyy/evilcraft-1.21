@@ -24,7 +24,6 @@ public class EntityBloodPearlConfig extends EntityConfig<EntityBloodPearl> {
                 "blood_pearl",
                 eConfig -> EntityType.Builder.<EntityBloodPearl>of(EntityBloodPearl::new, MobCategory.MISC)
                         .sized(0.6F, 1.8F)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

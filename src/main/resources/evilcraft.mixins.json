@@ -4,7 +4,12 @@
   "package": "org.cyclops.evilcraft.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BlockLightEngineMixin",
     "BucketItemAccessor",
+    "ItemEntityMixin",
+    "LevelAddEntityMixin",
+    "LightEngineAccessor",
+    "PlayerDropMixin",
     "LightningBoltMixin",
     "LivingEntityDamageMixin",
     "LivingEntityMixin",

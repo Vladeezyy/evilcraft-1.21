@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,7 +49,7 @@ import java.util.Locale;
  * @author rubensworks
  *
  */
-public class BlockDarkTank extends BlockWithEntity implements IBlockTank {
+public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynamicLightBlock {
 
     public static final MapCodec<BlockDarkTank> CODEC = simpleCodec(BlockDarkTank::new);
 
@@ -118,8 +119,7 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank {
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
         return BlockEntityHelpers.get(world, pos, BlockEntityDarkTank.class)
                 .map(tile -> tile.getTank().getFluidType() != null
-                        ? (int) Math.min(15, tile.getFillRatio() * tile.getTank().getFluidType()
-                            .getFluidType().getLightLevel(tile.getTank().getFluid()) * 15)
+                        ? (int) Math.min(15, tile.getFillRatio() * org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getLightLevel(tile.getTank().getFluidType()) * 15)
                         : 0)
                 .orElse(0);
     }

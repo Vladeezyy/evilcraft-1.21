@@ -25,7 +25,6 @@ public class EntityBiomeExtractConfig extends EntityConfig<EntityBiomeExtract> {
             "biome_extract",
                 eConfig -> EntityType.Builder.<EntityBiomeExtract>of(EntityBiomeExtract::new, MobCategory.MISC)
                         .sized(0.6F, 1.8F)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

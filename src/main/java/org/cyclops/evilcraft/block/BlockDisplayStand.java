@@ -151,7 +151,6 @@ public class BlockDisplayStand extends BlockWithEntity {
         }
     }
 
-    @Override
     public BlockState rotate(BlockState blockState, LevelAccessor world, BlockPos pos, Rotation direction) {
         return BlockEntityHelpers.get(world, pos, BlockEntityDisplayStand.class)
                 .map(tile -> {
@@ -265,7 +264,7 @@ public class BlockDisplayStand extends BlockWithEntity {
 
     @Override
     public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource rand) {
-        if (!worldIn.isAreaLoaded(pos, 1))
+        if (!worldIn.hasChunksAt(pos.offset(-1, -1, -1), pos.offset(1, 1, 1)))
             return;
         if (!state.canSurvive(worldIn, pos)) {
             worldIn.destroyBlock(pos, true);

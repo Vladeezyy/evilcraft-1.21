@@ -49,9 +49,9 @@ public class FluidHandlerItemCapacity extends FluidHandlerItemStack implements I
         // super.setFluid(fluid); // We override the implementation completely to avoid NBT saving for empty fluids
 
         if (fluid.isEmpty()) {
-            this.container.remove(this.componentType);
+            this.container.remove(this.componentType.get());
         } else {
-            this.container.set(this.componentType, SimpleFluidContent.copyOf(fluid));
+            this.container.set(this.componentType.get(), SimpleFluidContent.copyOf(fluid));
         }
     }
 

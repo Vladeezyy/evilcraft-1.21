@@ -46,7 +46,7 @@ public class EntityBloodPearl extends ThrowableProjectile implements ItemSupplie
             if (this.getOwner() != null && this.getOwner() instanceof ServerPlayer) {
                 ServerPlayer entityplayermp = (ServerPlayer)this.getOwner();
 
-                if (entityplayermp.connection.getConnection().isConnected() && entityplayermp.level() == this.level()) {
+                if (!entityplayermp.hasDisconnected() && entityplayermp.level() == this.level()) {
                     {
                         if (this.getOwner().isPassenger()) {
                             this.getOwner().stopRiding();

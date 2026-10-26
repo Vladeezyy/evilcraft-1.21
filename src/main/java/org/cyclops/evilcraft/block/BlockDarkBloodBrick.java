@@ -54,7 +54,7 @@ public class BlockDarkBloodBrick extends Block implements CubeDetector.IDetectio
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        if(!world.isClientSide() && !world.captureBlockSnapshots) {
+        if(!world.isClientSide()) {
             triggerDetector(world, pos, true);
         }
     }
@@ -62,7 +62,7 @@ public class BlockDarkBloodBrick extends Block implements CubeDetector.IDetectio
     @Override
     public void onPlace(BlockState blockStateNew, Level world, BlockPos blockPos, BlockState blockStateOld, boolean isMoving) {
         super.onPlace(blockStateNew, world, blockPos, blockStateOld, isMoving);
-        if(!world.isClientSide() && !world.captureBlockSnapshots && blockStateNew.getBlock() != blockStateOld.getBlock()) {
+        if(!world.isClientSide() && blockStateNew.getBlock() != blockStateOld.getBlock()) {
             triggerDetector(world, blockPos, true);
         }
     }

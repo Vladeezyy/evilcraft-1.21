@@ -23,17 +23,9 @@ public class CyclopsBlockEntity extends CyclopsBlockEntityCommon {
         super(type, blockPos, blockState);
     }
 
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider lookupProvider) {
-        super.onDataPacket(net, packet, lookupProvider);
-        CompoundTag tag = packet.getTag();
-        read(tag, lookupProvider);
-        onUpdateReceived();
-    }
-
     /**
      * This method is called when the block entity receives
-     * an update (ie a data packet) from the server.
+     * an update (ie a data packet) from the server (called by a client mixin).
      * If this block entity uses NBT, then the NBT will have
      * already been updated when this method is called.
      */

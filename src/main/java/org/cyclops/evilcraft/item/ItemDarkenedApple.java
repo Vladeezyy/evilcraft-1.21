@@ -28,7 +28,7 @@ public class ItemDarkenedApple extends Item {
                         .nutrition(0)
                         .saturationModifier(0)
                         .alwaysEdible()
-                        .effect(() -> new MobEffectInstance(RegistryEntries.POTION_PALING, POTION_DURATION * 20, POTION_AMPLIFIER), 1)
+                        .effect(new MobEffectInstance(RegistryEntries.POTION_PALING, POTION_DURATION * 20, POTION_AMPLIFIER), 1)
                         .build()));
         PlayerInteractEvent.EntityInteract.addListener(this::onInteract);
     }

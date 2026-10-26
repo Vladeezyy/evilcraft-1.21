@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemEntityUpdate;
+import org.cyclops.evilcraft.fabric.extensions.ICustomItemEntity;
 import com.google.common.base.Predicate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,7 +39,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class ItemKineticator extends ItemBloodContainer {
+public class ItemKineticator extends ItemBloodContainer implements ICustomItemEntity, IItemEntityUpdate {
 
     private static final int POWER_LEVELS = 5;
     private static final int RANGE_PER_LEVEL = 2;
@@ -112,7 +114,7 @@ public class ItemKineticator extends ItemBloodContainer {
     @Override
     public boolean onEntityItemUpdate(ItemStack itemStack, ItemEntity entityItem) {
         kineticate(itemStack, entityItem.level(), entityItem);
-        return super.onEntityItemUpdate(itemStack, entityItem);
+        return false;
     }
 
     @SuppressWarnings("unchecked")

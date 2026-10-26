@@ -24,7 +24,7 @@ public class ItemPromiseConfig extends ItemConfig {
             "promise_" + upgrade.getId() + "_" + upgrade.getTier(),
                 eConfig -> new ItemPromise(new Item.Properties()
                         .component(DataComponents.RARITY, upgrade.getTier() > 0 ? Rarity.RARE : Rarity.UNCOMMON)
-                        .stacksTo(4), upgrade)
+                        .stacksTo(upgrade.getTier() > 0 ? 1 : 4), upgrade) // All the 'tier' upgrades can only have StackSize 1.
         );
         if (MinecraftHelpers.isClientSide()) {
             RegisterColorHandlersEvent.Item.addListener(this::registerColors);

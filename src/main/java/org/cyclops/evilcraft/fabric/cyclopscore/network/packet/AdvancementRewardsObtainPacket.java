@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.cyclopscore.Reference;
+import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.AdvancementRewards;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;

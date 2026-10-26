@@ -121,8 +121,8 @@ public class ItemWerewolfFlesh extends Item {
                 world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.WOLF_HURT, SoundSource.HOSTILE, 0.5F,
                         world.random.nextFloat() * 0.1F + 0.9F);
             } else if (isPower(world)) {
-                int foodLevel = getFoodProperties(itemStack, entity).nutrition();
-                float saturationLevel = getFoodProperties(itemStack, entity).saturation();
+                int foodLevel = itemStack.get(DataComponents.FOOD).nutrition();
+                float saturationLevel = itemStack.get(DataComponents.FOOD).saturation();
                 player.getFoodData().eat(foodLevel, saturationLevel);
                 player.getFoodData().addExhaustion(20);
                 if (!world.isClientSide()) {

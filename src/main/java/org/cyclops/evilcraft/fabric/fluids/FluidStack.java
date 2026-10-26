@@ -128,7 +128,7 @@ public final class FluidStack {
     }
 
     public boolean isComponentsPatchEmpty() {
-        return isEmpty() || components.isPatchEmpty();
+        return isEmpty() || components.asPatch().isEmpty();
     }
 
     @Nullable

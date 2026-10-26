@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemEntityUpdate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -19,7 +20,7 @@ import javax.annotation.Nullable;
  * @author rubensworks
  *
  */
-public class ItemDarkGem extends Item {
+public class ItemDarkGem extends Item implements IItemEntityUpdate {
 
     private static final int REQUIRED_BLOOD_BLOCKS = 5;
     private static final int TICK_MODULUS = 5;

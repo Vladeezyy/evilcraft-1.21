@@ -9,8 +9,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
 import org.lwjgl.opengl.GL11;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * A button for the advancements, so they can be hovered.
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class AdvancementButton extends AdvancedButton {
 
     private final ResourceLocation advancementId;
@@ -40,7 +40,7 @@ public class AdvancementButton extends AdvancedButton {
         guiGraphics.pose().pushPose();
         if(mx >= getX() && my >= getY() && mx <= getX() + AdvancementRewardsAppendix.SLOT_SIZE && my <= getY() + AdvancementRewardsAppendix.SLOT_SIZE) {
             List<FormattedCharSequence> lines = Lists.newArrayList();
-            AdvancementHolder advancement = AdvancementHelpers.getAdvancement(Dist.CLIENT, advancementId);
+            AdvancementHolder advancement = AdvancementHelpers.getAdvancement(EnvType.CLIENT, advancementId);
             if (advancement != null) {
                 advancement.value().display().ifPresent(display -> {
                     lines.add(display.getTitle().getVisualOrderText());

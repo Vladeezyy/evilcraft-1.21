@@ -24,7 +24,6 @@ public class EntityWeatherContainerConfig extends EntityConfig<EntityWeatherCont
                 EvilCraft._instance,
             "weather_container",
                 eConfig -> EntityType.Builder.<EntityWeatherContainer>of(EntityWeatherContainer::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

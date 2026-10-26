@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -42,6 +43,7 @@ public class BlockEternalWater extends BlockWithEntity {
 
     public BlockEternalWater(Block.Properties properties) {
         super(properties, BlockEntityEternalWater::new);
+        PlayerBlockBreakEvents.AFTER.register(this::afterBreak);
     }
 
     @Override
@@ -99,15 +101,13 @@ public class BlockEternalWater extends BlockWithEntity {
         return super.useItemOn(pStack, pState, pLevel, pPos, pPlayer, pHand, pHitResult);
     }
 
-    @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
-        if (super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid)) {
-            if (!level.isClientSide()) {
-                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-            }
-            return true;
+    /**
+     * Breaking the block leaves its water (its fluid state) behind in vanilla, remove that.
+     */
+    protected void afterBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+        if (state.getBlock() == this && level.getBlockState(pos).is(Blocks.WATER)) {
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
-        return false;
     }
 
     @Override

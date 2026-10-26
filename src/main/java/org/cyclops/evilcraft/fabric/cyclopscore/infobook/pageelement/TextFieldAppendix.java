@@ -8,8 +8,8 @@ import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Style;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.StringUtils;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
@@ -73,7 +73,7 @@ public class TextFieldAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         int lineId = 0;
         for (String line : lines) {
@@ -95,7 +95,7 @@ public class TextFieldAppendix extends SectionAppendix {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
 
     }

@@ -22,17 +22,13 @@ public class ItemBowlOfPromises extends Item {
     }
 
     @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+    public ItemStack getRecipeRemainder(ItemStack itemStack) {
         if(type.isActive()) {
             return new ItemStack(RegistryEntries.ITEM_BOWL_OF_PROMISES_EMPTY);
         }
-        return super.getCraftingRemainingItem(itemStack);
+        return super.getRecipeRemainder(itemStack);
     }
 
-    @Override
-    public boolean hasCraftingRemainingItem(ItemStack itemStack) {
-        return type.isActive();
-    }
 
     @Environment(EnvType.CLIENT)
     public static class ItemColor implements net.minecraft.client.color.item.ItemColor {

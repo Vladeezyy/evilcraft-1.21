@@ -56,4 +56,10 @@ public final class IClientFluidTypeExtensions {
     public int getTintColor(FluidStack stack) {
         return FluidVariantRendering.getColor(stack.toVariant()) | 0xFF000000;
     }
+
+    public int getTintColor(net.minecraft.world.level.material.FluidState state, net.minecraft.world.level.BlockAndTintGetter level, net.minecraft.core.BlockPos pos) {
+        net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler handler =
+                net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry.INSTANCE.get(state.getType());
+        return handler == null ? 0xFFFFFFFF : handler.getFluidColor(level, pos, state) | 0xFF000000;
+    }
 }

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,19 +31,14 @@ import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
 /**
  * @author rubensworks
  */
-public class ItemBucketEternalWater extends BucketItem {
+public class ItemBucketEternalWater extends BucketItem implements IItemUseFirst {
     public ItemBucketEternalWater(Properties properties) {
         super(Fluids.WATER, properties);
     }
 
     @Override
-    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+    public ItemStack getRecipeRemainder(ItemStack itemStack) {
         return new ItemStack(this);
-    }
-
-    @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
-        return true;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class ItemBucketEternalWater extends BucketItem {
             handler.fill(new FluidStack(Fluids.WATER, FluidHelpers.BUCKET_VOLUME), IFluidHandler.FluidAction.EXECUTE);
             return InteractionResult.SUCCESS;
         }
-        return super.onItemUseFirst(stack, context);
+        return InteractionResult.PASS;
     }
 
     @Override

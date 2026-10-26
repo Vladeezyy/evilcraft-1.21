@@ -59,13 +59,6 @@ public class ItemPromise extends Item {
         this.upgrade = upgrade;
     }
 
-    @Override
-    public int getMaxStackSize(ItemStack itemStack) {
-        if(upgrade.getTier() > 0) { // All the 'tier' upgrades can only have StackSize 1.
-            return 1;
-        }
-        return super.getMaxStackSize(itemStack);
-    }
 
     @Override
     @Environment(EnvType.CLIENT)

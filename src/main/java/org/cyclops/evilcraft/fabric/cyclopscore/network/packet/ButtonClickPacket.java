@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.cyclops.cyclopscore.Reference;
+import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.button.IContainerButtonClickAcceptorServer;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;

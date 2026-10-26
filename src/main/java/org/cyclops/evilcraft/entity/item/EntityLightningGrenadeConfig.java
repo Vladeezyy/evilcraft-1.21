@@ -23,7 +23,6 @@ public class EntityLightningGrenadeConfig extends EntityConfig<EntityLightningGr
                 EvilCraft._instance,
             "lightning_grenade",
                 eConfig -> EntityType.Builder.<EntityLightningGrenade>of(EntityLightningGrenade::new, MobCategory.MISC)
-                        .setShouldReceiveVelocityUpdates(true)
         );
     }
 

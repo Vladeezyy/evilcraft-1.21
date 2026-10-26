@@ -113,7 +113,8 @@ public class ItemBlockFluidContainer extends ItemBlockNBT {
     }
 
     @Override
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return oldStack.getItem() != newStack.getItem() || slotChanged;
+    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+        // No re-equip animation when only the fluid contents change
+        return false;
     }
 }

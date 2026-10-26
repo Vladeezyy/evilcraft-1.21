@@ -74,14 +74,6 @@ public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpi
     @Override
     public void onRegistered() {
         super.onRegistered();
-        EvilCraft._instance.getImcHandler().registerAction(Reference.IMC_BLACKLIST_VENGEANCESPIRIT, message -> {
-            Object value = message.getMessageSupplier().get();
-            if (value instanceof String) {
-                EntityVengeanceSpirit.addToBlacklistIMC((String) value);
-                return true;
-            }
-            return false;
-        });
         LivingDeathEvent.addListener(EntityVengeanceSpirit::vengeanceEvent);
     }
 

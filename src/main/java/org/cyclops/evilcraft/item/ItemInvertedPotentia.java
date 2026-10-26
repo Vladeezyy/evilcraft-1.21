@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.ICustomItemEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -13,7 +14,7 @@ import org.cyclops.evilcraft.entity.item.EntityItemEmpowerable;
  * @author rubensworks
  *
  */
-public class ItemInvertedPotentia extends Item implements IItemEmpowerable {
+public class ItemInvertedPotentia extends Item implements IItemEmpowerable, ICustomItemEntity {
 
     private final boolean empowered;
 

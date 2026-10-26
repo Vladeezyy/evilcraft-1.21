@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.api.broom;
 
+import org.cyclops.evilcraft.fabric.event.BlockEvent;
+import org.cyclops.evilcraft.fabric.CommonHooks;
 import org.cyclops.evilcraft.core.broom.BroomModifierRegistry;
 import org.cyclops.evilcraft.core.broom.BroomPartRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -263,7 +265,7 @@ public class BroomModifiers {
                                                 if (!breakEvent.isCanceled()) {
                                                     // Block breaking sequence
                                                     block.playerWillDestroy(world, pos, blockState, player);
-                                                    if(block.onDestroyedByPlayer(blockState, world, pos, player, true, fluidState)) {
+                                                    if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
                                                         block.destroy(world, pos, blockState);
                                                         block.playerDestroy(world, player, pos, blockState, world.getBlockEntity(pos), ItemStack.EMPTY);
                                                     }
@@ -274,7 +276,7 @@ public class BroomModifiers {
                                             } else if (Minecraft.getInstance().hitResult.getType() == HitResult.Type.BLOCK) {
                                                 // Play sound and client-side block breaking sequence
                                                 world.globalLevelEvent(2001, pos, Block.getId(blockState));
-                                                if(block.onDestroyedByPlayer(blockState, world, pos, player, true, fluidState)) {
+                                                if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
                                                     block.destroy(world, pos, blockState);
                                                 }
 

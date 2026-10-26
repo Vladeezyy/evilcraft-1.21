@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.inventory;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,8 +33,10 @@ public class NBTCraftingGrid extends TransientCraftingContainer {
         ItemStack itemStack = itemLocation.getItemStack(player);
         ItemContainerContents contents = itemStack.get(DataComponents.CONTAINER);
         if (contents != null) {
-            for (int i = 0; i < contents.getSlots(); i++) {
-                setItem(i, contents.getStackInSlot(i));
+            NonNullList<ItemStack> items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
+            contents.copyInto(items);
+            for (int i = 0; i < items.size(); i++) {
+                setItem(i, items.get(i));
             }
         }
     }
