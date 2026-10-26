@@ -47,14 +47,12 @@ creatures of the night.
   <img src="docs/images/gui_blood_infuser.jpg" width="49%" alt="The Blood Infuser screen">
 </p>
 
-## 📦 Installation
+## 📦 Requirements
 
-1. Install **Fabric Loader 0.16.14** or newer for Minecraft **1.21.1**.
-2. Put into `mods`:
-   - `evilcraft-1.21.1-fabric-<version>.jar` from the [releases](../../releases);
-   - **[Fabric API](https://modrinth.com/mod/fabric-api)** 0.116.17 or newer;
-   - **[Cyclops Core](https://modrinth.com/mod/cyclops-core)** for **Fabric** 1.30.0 or newer;
-   - **[Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)** 21.1.6 or newer (the settings).
+- **Fabric Loader 0.16.14** or newer for Minecraft **1.21.1**.
+- **[Fabric API](https://modrinth.com/mod/fabric-api)** 0.116.17 or newer;
+- **[Cyclops Core](https://modrinth.com/mod/cyclops-core)** for **Fabric** 1.30.0 or newer;
+- **[Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)** 21.1.6 or newer (the settings).
 
 Required on the client and the server. Settings: `config/evilcraft-common.toml`, `config/evilcraft-client.toml`.
 
@@ -128,14 +126,12 @@ EvilCraft приносит в Minecraft тёмную магию: собирай�
 </details>
 
 <details>
-<summary><b>📦 Установка</b></summary>
+<summary><b>📦 Требования</b></summary>
 
-1. Установите **Fabric Loader 0.16.14** или новее для Minecraft **1.21.1**.
-2. Положите в `mods`:
-   - `evilcraft-1.21.1-fabric-<версия>.jar` из [релизов](../../releases);
-   - **[Fabric API](https://modrinth.com/mod/fabric-api)** 0.116.17 или новее;
-   - **[Cyclops Core](https://modrinth.com/mod/cyclops-core)** для **Fabric** 1.30.0 или новее;
-   - **[Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)** 21.1.6 или новее (настройки).
+- **Fabric Loader 0.16.14** или новее для Minecraft **1.21.1**.
+- **[Fabric API](https://modrinth.com/mod/fabric-api)** 0.116.17 или новее;
+- **[Cyclops Core](https://modrinth.com/mod/cyclops-core)** для **Fabric** 1.30.0 или новее;
+- **[Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)** 21.1.6 или новее (настройки).
 
 Нужен и на клиенте, и на сервере. Настройки: `config/evilcraft-common.toml`, `config/evilcraft-client.toml`.
 
