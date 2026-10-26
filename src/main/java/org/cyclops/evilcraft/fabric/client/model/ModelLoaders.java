@@ -89,22 +89,35 @@ public final class ModelLoaders {
     private static CompletableFuture<Map<ResourceLocation, UnbakedModel>> load(ResourceManager resourceManager, Executor executor, String namespace) {
         return CompletableFuture.supplyAsync(() -> {
             Map<ResourceLocation, UnbakedModel> models = Maps.newHashMap();
+            // Models (item models) that only name a custom model as parent: vanilla wants a BlockModel as parent,
+            // NeoForge inherits the custom geometry, so they get the custom model itself
+            Map<ResourceLocation, ResourceLocation> childOfCustom = Maps.newHashMap();
             Map<ResourceLocation, Resource> resources = resourceManager.listResources("models",
                     id -> id.getNamespace().equals(namespace) && id.getPath().endsWith(".json"));
             resources.forEach((file, resource) -> {
                 try (Reader reader = resource.openAsReader()) {
                     JsonElement json = JsonParser.parseReader(reader);
+                    String path = file.getPath();
+                    ResourceLocation modelId = file.withPath(path.substring("models/".length(), path.length() - ".json".length()));
+                    if (json.isJsonObject() && !json.getAsJsonObject().has("loader") && json.getAsJsonObject().has("parent")
+                            && json.getAsJsonObject().size() == 1) {
+                        childOfCustom.put(modelId, ResourceLocation.parse(json.getAsJsonObject().get("parent").getAsString()));
+                    }
                     if (json.isJsonObject() && json.getAsJsonObject().has("loader")) {
                         JsonObject object = json.getAsJsonObject();
                         IGeometryLoader<?> loader = LOADERS.get(ResourceLocation.parse(object.get("loader").getAsString()));
                         if (loader != null) {
-                            String path = file.getPath();
-                            ResourceLocation modelId = file.withPath(path.substring("models/".length(), path.length() - ".json".length()));
                             models.put(modelId, loader.read(object, CONTEXT));
                         }
                     }
                 } catch (Exception e) {
                     LOGGER.error("Could not load the custom model {}", file, e);
+                }
+            });
+            childOfCustom.forEach((child, parent) -> {
+                UnbakedModel custom = models.get(parent);
+                if (custom != null) {
+                    models.put(child, custom);
                 }
             });
             return models;

@@ -9,6 +9,7 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
+import org.cyclops.evilcraft.fabric.client.model.BlockModelBakingContext;
 import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
 
 import java.util.Collection;
@@ -43,7 +44,7 @@ public class ModelDisplayStand implements UnbakedModel {
 
     @Override
     public BakedModel bake(ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState) {
-        throw new UnsupportedOperationException("Use the other bake implementation!");
+        return bake(new BlockModelBakingContext(this.blockModel), bakery, spriteGetter, modelState, ItemOverrides.EMPTY);
     }
 
 }

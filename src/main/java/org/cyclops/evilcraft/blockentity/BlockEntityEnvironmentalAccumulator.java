@@ -333,7 +333,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 entity.setItem(this.getInventory().getItem(0));
             } else {
                 // Recipe found, throw back the result
-                entity.setItem(recipe.value().assemble(getInventory(), level.registryAccess()));
+                entity.setItem(recipe.value().assemble(getInventory().asRecipeInput(), level.registryAccess()));
 
                 // Change the weather to the resulting weather
                 WeatherType weatherSource = recipe.value().getInputWeather();
@@ -512,7 +512,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         return bossInfo;
     }
 
-    public static class Inventory extends SimpleInventory implements RecipeEnvironmentalAccumulator.Inventory {
+    public static class Inventory extends SimpleInventory {
         private final BlockEntityEnvironmentalAccumulator tile;
 
         public Inventory(BlockEntityEnvironmentalAccumulator tile) {
@@ -520,19 +520,8 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
             this.tile = tile;
         }
 
-        @Override
-        public Level getWorld() {
-            return this.tile.getLevel();
-        }
-
-        @Override
-        public BlockPos getPos() {
-            return this.tile.getBlockPos();
-        }
-
-        @Override
-        public int size() {
-            return getContainerSize();
+        public RecipeEnvironmentalAccumulator.Inventory asRecipeInput() {
+            return new RecipeEnvironmentalAccumulator.InventoryView(this, () -> this.tile.getLevel(), () -> this.tile.getBlockPos());
         }
     }
 

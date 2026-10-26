@@ -55,7 +55,23 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    // Development test scene (screenshots and checks), a separate mod in dev runs; not in the jar
+    scene {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+
 loom {
+    mods {
+        evilcraft {
+            sourceSet sourceSets.main
+        }
+        evilcraft_scene {
+            sourceSet sourceSets.scene
+        }
+    }
     accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
     runs {
         client {
@@ -65,6 +81,14 @@ loom {
         server {
             server()
             runDir 'run-server'
+        }
+        scene {
+            client()
+            name 'Scene'
+            source sourceSets.scene
+            vmArg '-Devilcraft.scene=true'
+            vmArg "-Devilcraft.scene.lang=${project.findProperty('scene_lang') ?: 'en_us'}"
+            runDir 'run'
         }
     }
 }
@@ -111,7 +135,37 @@ processResources {
 }
 
 jar {
-    from('LICENSE.txt') {
-        rename { "${it}_${mod_name}" }
-    }
+    from('LICENSE') { rename { "LICENSE_${mod_id}" } }
+    from('licenses') { into "licenses/${mod_id}" }
+}
+
+// Production runs (tools/prodtest.sh): Minecraft with intermediary names, as players have it. The release jar on a
+// real Fabric server; the release jar plus the scene mod (remapped) on a production client
+configurations {
+    productionMods { transitive = false }
+}
+dependencies {
+    productionMods "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    productionMods "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeconfigapiport_version}"
+    productionMods "maven.modrinth:cyclops-core:${cyclopscore_modrinth_version}"
+}
+var sceneJar = tasks.register('sceneJar', Jar) {
+    from sourceSets.scene.output
+    archiveClassifier = 'scene-dev'
+}
+var remapSceneJar = tasks.register('remapSceneJar', net.fabricmc.loom.task.RemapJarTask) {
+    inputFile = sceneJar.flatMap { it.archiveFile }
+    archiveClassifier = 'scene'
+    addNestedDependencies = false
+    // The scene calls inherited Minecraft methods on classes of the mod: the remapper needs their hierarchy
+    classpath.from(sourceSets.main.output)
+}
+tasks.register('prodScene', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    mods.setFrom(tasks.named('remapJar'), remapSceneJar, configurations.productionMods)
+    jvmArgs.add('-Devilcraft.scene=true')
+    runDir = file('run-prod')
+}
+tasks.register('prodServer', net.fabricmc.loom.task.prod.ServerProductionRunTask) {
+    mods.setFrom(tasks.named('remapJar'), configurations.productionMods)
+    runDir = file('run-prod-server')
 }

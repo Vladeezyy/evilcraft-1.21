@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.proxy;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import org.cyclops.evilcraft.RegistryEntries;
 import net.minecraft.client.renderer.RenderType;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -10,7 +11,6 @@ import org.cyclops.evilcraft.fabric.client.model.ModelLoaders;
 import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
@@ -63,8 +63,6 @@ public class ClientProxy extends ClientProxyComponent {
 
     @Override
     public void registerKeyBindings(IKeyRegistry keyRegistry, RegisterKeyMappingsEvent event) {
-        Options settings = Minecraft.getInstance().options;
-
         for (KeyMapping key : Keys.KEYS)
             event.register(key);
 
@@ -73,7 +71,8 @@ public class ClientProxy extends ClientProxyComponent {
 
         keyRegistry.addKeyHandler(Keys.FART, fartKeyHandler);
         keyRegistry.addKeyHandler(Keys.EXALTEDCRAFTING, new ExaltedCrafterKeyHandler());
-        keyRegistry.addKeyHandler(settings.keyShift, fartKeyHandler);
+        // The options do not exist yet when Fabric runs the entrypoints
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> keyRegistry.addKeyHandler(client.options.keyShift, fartKeyHandler));
 
         EvilCraft.clog("Registered key bindings");
     }
@@ -99,7 +98,7 @@ public class ClientProxy extends ClientProxyComponent {
         ModelLoaders.registerAdditionalModels(() -> List.of(ModelBoxOfEternalClosure.boxModel,
                 ModelBoxOfEternalClosure.boxLidModel, ModelBoxOfEternalClosure.boxLidRotatedModel));
         // Broom
-        ModelLoaders.registerAdditionalModels(BroomParts.REGISTRY::getPartModels);
+        ModelLoaders.registerAdditionalModels(() -> BroomParts.REGISTRY.getPartModels());
         // Entangled chalice
         ModelLoaders.registerAdditionalModels(() -> List.of(ModelEntangledChaliceBaked.chaliceModelName,
                 ModelEntangledChaliceBaked.gemsModelName));

@@ -24,6 +24,10 @@ import java.util.Map;
  * @author rubensworks
  */
 public class ConfigHandler extends ConfigHandlerFabric {
+
+    private boolean registriesFilled;
+    private boolean setupPending;
+
     public ConfigHandler(ModBase<?> mod) {
         super(mod);
     }
@@ -34,6 +38,20 @@ public class ConfigHandler extends ConfigHandlerFabric {
             getDictionary().put(e.getNamedId(), e);
         }
         super.addToConfigDictionary(e);
+    }
+
+    /**
+     * Cyclops Core on Fabric runs the setup (and {@link ExtendedConfigCommon#onRegistered()}) before registering the
+     * entries; on NeoForge the setup comes after the registries are filled, which configs rely on (block entity
+     * renderers get their block entity type), so it is postponed until then.
+     */
+    @Override
+    public void loadSetup() {
+        if (!registriesFilled) {
+            setupPending = true;
+            return;
+        }
+        super.loadSetup();
     }
 
     /**
@@ -68,6 +86,11 @@ public class ConfigHandler extends ConfigHandlerFabric {
             eConfig.getConfigurableType().getConfigurableTypeAction().onRegisterForgeFilled(eConfig);
         }
         BlockActionFabric.registerPendingItems();
+        registriesFilled = true;
+        if (setupPending) {
+            setupPending = false;
+            super.loadSetup();
+        }
     }
 
     private static int rank(ExtendedConfigCommon<?, ?, ?> config, Map<ResourceLocation, Integer> ranks, int last) {

@@ -152,7 +152,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
                     public Optional<RecipeEnvironmentalAccumulator> getNewValue(Triple<ItemStack, FluidStack, WeatherType> key) {
                         Inventory recipeInput = new Inventory(1, 64, BlockEntitySanguinaryEnvironmentalAccumulator.this);
                         recipeInput.setItem(0, key.getLeft());;
-                        return CraftingHelpers.findServerRecipe(getRegistry(), recipeInput, getLevel()).map(RecipeHolder::value);
+                        return CraftingHelpers.findServerRecipe(getRegistry(), recipeInput.asRecipeInput(), getLevel()).map(RecipeHolder::value);
                     }
 
                     @Override
@@ -196,7 +196,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
             @Override
             public boolean canPlaceItem(int slot, ItemStack itemStack) {
                 if(slot == SLOT_ACCUMULATE) {
-                    return getTileWorkingMetadata().canConsume(itemStack, getWorld());
+                    return getTileWorkingMetadata().canConsume(itemStack, getLevel());
                 }
                 return super.canPlaceItem(slot, itemStack);
             }
@@ -354,25 +354,14 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         return Component.translatable("block.evilcraft.sanguinary_environmental_accumulator");
     }
 
-    public static class Inventory extends BlockEntityWorking.Inventory<BlockEntitySanguinaryEnvironmentalAccumulator> implements RecipeEnvironmentalAccumulator.Inventory {
+    public static class Inventory extends BlockEntityWorking.Inventory<BlockEntitySanguinaryEnvironmentalAccumulator> {
 
         public Inventory(int size, int stackLimit, BlockEntitySanguinaryEnvironmentalAccumulator tile) {
             super(size, stackLimit, tile);
         }
 
-        @Override
-        public Level getWorld() {
-            return tile.getLevel();
-        }
-
-        @Override
-        public BlockPos getPos() {
-            return tile.getBlockPos();
-        }
-
-        @Override
-        public int size() {
-            return getContainerSize();
+        public RecipeEnvironmentalAccumulator.Inventory asRecipeInput() {
+            return new RecipeEnvironmentalAccumulator.InventoryView(this, () -> tile.getLevel(), () -> tile.getBlockPos());
         }
     }
 

@@ -150,6 +150,42 @@ public class RecipeEnvironmentalAccumulator implements Recipe<RecipeEnvironmenta
         public BlockPos getPos();
     }
 
+    /**
+     * The recipe input of a machine inventory. The inventories are no recipe inputs themselves on Fabric: a class that is
+     * both a Container and a RecipeInput cannot be remapped to intermediary names.
+     */
+    public static class InventoryView implements Inventory {
+        private final net.minecraft.world.Container container;
+        private final java.util.function.Supplier<Level> world;
+        private final java.util.function.Supplier<BlockPos> pos;
+
+        public InventoryView(net.minecraft.world.Container container, java.util.function.Supplier<Level> world, java.util.function.Supplier<BlockPos> pos) {
+            this.container = container;
+            this.world = world;
+            this.pos = pos;
+        }
+
+        @Override
+        public Level getWorld() {
+            return world.get();
+        }
+
+        @Override
+        public BlockPos getPos() {
+            return pos.get();
+        }
+
+        @Override
+        public ItemStack getItem(int i) {
+            return container.getItem(i);
+        }
+
+        @Override
+        public int size() {
+            return container.getContainerSize();
+        }
+    }
+
     public static class InventoryDummy implements Inventory {
         private final List<ItemStack> itemStacks;
 

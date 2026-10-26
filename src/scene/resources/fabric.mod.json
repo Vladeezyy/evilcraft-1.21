@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "evilcraft_scene",
+  "version": "1.0.0",
+  "name": "EvilCraft test scene",
+  "description": "Development client scene of the Fabric port (screenshots and checks); not part of the mod jar.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["org.cyclops.evilcraft.scene.SceneHooks"]
+  },
+  "depends": {
+    "evilcraft": "*"
+  }
+}

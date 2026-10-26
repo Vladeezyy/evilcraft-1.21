@@ -31,3 +31,5 @@ changelog.txt
 /run-server
 /run-prod
 /run-prod-server
+/buildSrc/.gradle
+/buildSrc/build

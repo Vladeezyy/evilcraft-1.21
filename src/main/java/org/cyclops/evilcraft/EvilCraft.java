@@ -7,6 +7,7 @@ import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import org.cyclops.evilcraft.fabric.world.NeoForgeBiomeModifiers;
 import org.cyclops.evilcraft.fabric.extensions.ItemExtensions;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import org.cyclops.evilcraft.fabric.cyclopscore.persist.nbt.NBTClassTypesFabric;
 import org.cyclops.evilcraft.fabric.PersistentData;
 import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentInventoryConfig;
 import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentFluidContentConfig;
@@ -117,6 +118,7 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
 
         // Fabric: capability lookups, entity data attachments, item hooks, world generation and composting
         Capabilities.load();
+        NBTClassTypesFabric.load();
         PersistentData.load();
         ItemExtensions.register();
         NeoForgeBiomeModifiers.register(Reference.MOD_ID);

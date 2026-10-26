@@ -51,7 +51,7 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
         Optional<RecipeEnvironmentalAccumulator> optionalRecipe = getRecipe(tile);
         if(optionalRecipe.isPresent() && tick >= getRequiredTicks(tile, optionalRecipe.get())) {
             RecipeEnvironmentalAccumulator recipe = optionalRecipe.get();
-            ItemStack result = recipe.assemble(tile.getInventory(), tile.getLevel().registryAccess());
+            ItemStack result = recipe.assemble(tile.getInventory().asRecipeInput(), tile.getLevel().registryAccess());
             if(addToProduceSlot(tile, result)) {
                 tile.getInventory().removeItem(tile.getTileWorkingMetadata().getConsumeSlot(), 1);
                 tile.getVirtualTank().drain(getRequiredFluidAmount(tile, recipe), IFluidHandler.FluidAction.EXECUTE);
@@ -92,7 +92,7 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
     }
 
     protected ItemStack willProduceItem(BlockEntitySanguinaryEnvironmentalAccumulator tile, RecipeEnvironmentalAccumulator recipe) {
-        return recipe.assemble(tile.getInventory(), tile.getLevel().registryAccess());
+        return recipe.assemble(tile.getInventory().asRecipeInput(), tile.getLevel().registryAccess());
     }
 
     /**

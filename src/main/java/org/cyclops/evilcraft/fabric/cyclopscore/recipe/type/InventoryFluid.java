@@ -3,9 +3,6 @@ package org.cyclops.evilcraft.fabric.cyclopscore.recipe.type;
 
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
@@ -15,25 +12,17 @@ import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidTank;
  * Default implementation of {@link IInventoryFluid}.
  * @author rubensworks
  */
-public class InventoryFluid extends TransientCraftingContainer implements IInventoryFluid {
+public class InventoryFluid implements IInventoryFluid {
 
+    // Not a Container (as in Cyclops Core on NeoForge): a class that is both a Container and a RecipeInput cannot be
+    // remapped to intermediary names (isEmpty, getItem have different names in the two interfaces)
+    private final NonNullList<ItemStack> itemStacks;
     private final IFluidHandler fluidHandler;
 
     public InventoryFluid(NonNullList<ItemStack> itemStacks, NonNullList<FluidStack> fluidStacks) {
-        super(new AbstractContainerMenu(null, 0) {
-            @Override
-            public ItemStack quickMoveStack(Player p_38941_, int p_38942_) {
-                return ItemStack.EMPTY;
-            }
-
-            @Override
-            public boolean stillValid(Player playerIn) {
-                return false;
-            }
-        }, itemStacks.size(), 1);
-        int slot = 0;
-        for (ItemStack itemStack : itemStacks) {
-            setItem(slot++, itemStack);
+        this.itemStacks = NonNullList.withSize(itemStacks.size(), ItemStack.EMPTY);
+        for (int slot = 0; slot < itemStacks.size(); slot++) {
+            this.itemStacks.set(slot, itemStacks.get(slot));
         }
         if (fluidStacks.size() == 1) {
             this.fluidHandler = new FluidTank(Integer.MAX_VALUE);
@@ -50,7 +39,12 @@ public class InventoryFluid extends TransientCraftingContainer implements IInven
                 return false;
             }
         }
-        return super.isEmpty();
+        for (ItemStack itemStack : itemStacks) {
+            if (!itemStack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -59,7 +53,12 @@ public class InventoryFluid extends TransientCraftingContainer implements IInven
     }
 
     @Override
+    public ItemStack getItem(int index) {
+        return itemStacks.get(index);
+    }
+
+    @Override
     public int size() {
-        return getContainerSize();
+        return itemStacks.size();
     }
 }

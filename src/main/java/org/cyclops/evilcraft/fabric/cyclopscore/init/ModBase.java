@@ -5,10 +5,14 @@ import com.google.common.collect.Maps;
 import lombok.Data;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.Level;
+import org.cyclops.cyclopscore.CyclopsCoreFabric;
 import org.cyclops.cyclopscore.config.ConfigHandlerCommon;
+import org.cyclops.cyclopscore.helper.CyclopsCoreInstance;
 import org.cyclops.cyclopscore.helper.ModBaseCommon;
 import org.cyclops.cyclopscore.init.ModBaseFabric;
 import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
@@ -50,7 +54,22 @@ public abstract class ModBase<T extends ModBase<T>> extends ModBaseFabric<T> {
     private ModContainer container;
 
     public ModBase(String modId, Consumer<T> instanceSetter) {
-        super(modId, instanceSetter);
+        super(constructCyclopsCore(modId), instanceSetter);
+    }
+
+    /**
+     * Fabric does not run the entrypoints of dependencies first (in dev this mod comes before Cyclops Core), while this
+     * mod uses Cyclops Core from its constructor on: create Cyclops Core's entrypoint first (Fabric caches the instance).
+     */
+    private static String constructCyclopsCore(String modId) {
+        if (CyclopsCoreInstance.MOD == null) {
+            for (EntrypointContainer<ModInitializer> container : FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class)) {
+                if (container.getProvider().getMetadata().getId().equals("cyclopscore")) {
+                    container.getEntrypoint();
+                }
+            }
+        }
+        return modId;
     }
 
     @Override
@@ -65,6 +84,10 @@ public abstract class ModBase<T extends ModBase<T>> extends ModBaseFabric<T> {
 
     @Override
     public void onInitialize() {
+        // Cyclops Core registers its own data components and hooks there; its second call is skipped (CyclopsCoreFabricMixin)
+        if (CyclopsCoreFabric._instance != null && !CyclopsCoreFabric._instance.isLoaded()) {
+            CyclopsCoreFabric._instance.onInitialize();
+        }
         super.onInitialize();
 
         ServerLifecycleEvents.SERVER_STARTING.register(this::onServerAboutToStart);

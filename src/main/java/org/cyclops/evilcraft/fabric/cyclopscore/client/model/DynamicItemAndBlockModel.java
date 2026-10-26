@@ -2,6 +2,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.client.model;
 
 
 
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
@@ -94,10 +96,19 @@ public abstract class DynamicItemAndBlockModel extends DynamicBaseModel {
         for (int i = 0; i <= 6; i++) {
             Direction side = i == 6 ? null : Direction.from3DDataValue(i);
             for (BakedQuad quad : getQuads(state, side, randomSupplier.get(), modelData, null)) {
-                emitter.fromVanilla(quad, null, side);
+                emitter.fromVanilla(quad, defaultMaterial(), side);
                 emitter.emit();
             }
         }
+    }
+
+    private static RenderMaterial defaultMaterial;
+
+    private static RenderMaterial defaultMaterial() {
+        if (defaultMaterial == null) {
+            defaultMaterial = RendererAccess.INSTANCE.getRenderer().materialFinder().find();
+        }
+        return defaultMaterial;
     }
 
     public List<BakedQuad> getGeneralQuads() {
