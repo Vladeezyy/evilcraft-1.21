@@ -49,7 +49,7 @@ Needed on both the client and the server.
 - **Fabric Loader** 0.16.14+ for Minecraft **1.21.1**
 - **[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)** 0.116.17+
 - **[Cyclops Core](https://www.curseforge.com/minecraft/mc-mods/cyclops-core)** for **Fabric** 1.30.0+
-- **[Forge Config API Port](https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric)** 21.1.6+
+- **[Forge Config API Port](https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port)** 21.1.6+
 - Optional: **[JEI](https://www.curseforge.com/minecraft/mc-mods/jei)** (with MezzConfig) and
   **[Jade](https://www.curseforge.com/minecraft/mc-mods/jade)**
 
