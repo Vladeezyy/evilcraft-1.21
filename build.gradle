@@ -3,9 +3,10 @@ plugins {
     id 'maven-publish'
 }
 
-version = "${mod_version}"
+// evilcraft-fabric-<version>+<minecraft>.jar, as the other ports (the upload script reads both from the name)
+version = "${mod_version}+${minecraft_version}"
 base {
-    archivesName = "${mod_id}-${minecraft_version}-fabric"
+    archivesName = "${mod_id}-fabric"
 }
 
 java {

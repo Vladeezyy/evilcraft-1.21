@@ -58,6 +58,9 @@ creatures of the night.
 
 Required on the client and the server. Settings: `config/evilcraft-common.toml`, `config/evilcraft-client.toml`.
 
+Optional, client side: **[JEI](https://modrinth.com/mod/jei)** 19.x for Fabric 1.21.1 (with
+**[MezzConfig](https://modrinth.com/mod/mezzconfig)**, which JEI needs on Fabric) and **[Jade](https://modrinth.com/mod/jade)** 15.x.
+
 ## 🔧 Notes on the port
 
 - Content, recipes, loot and numbers are those of the original (NeoForge 1.21.1, branch `master-1.21-lts`).
@@ -153,6 +156,9 @@ EvilCraft приносит в Minecraft тёмную магию: собирай�
 - **[Forge Config API Port](https://modrinth.com/mod/forge-config-api-port)** 21.1.6 или новее (настройки).
 
 Нужен и на клиенте, и на сервере. Настройки: `config/evilcraft-common.toml`, `config/evilcraft-client.toml`.
+
+Необязательно, на клиенте: **[JEI](https://modrinth.com/mod/jei)** 19.x для Fabric 1.21.1 (с
+**[MezzConfig](https://modrinth.com/mod/mezzconfig)**, он нужен JEI на Fabric) и **[Jade](https://modrinth.com/mod/jade)** 15.x.
 
 </details>
 
