@@ -15,7 +15,9 @@
   "icon": "logo.png",
   "environment": "*",
   "entrypoints": {
-    "main": ["org.cyclops.evilcraft.EvilCraft"]
+    "main": ["org.cyclops.evilcraft.EvilCraft"],
+    "jei_mod_plugin": ["org.cyclops.evilcraftcompat.modcompat.jei.JEIEvilCraftConfig"],
+    "jade": ["org.cyclops.evilcraftcompat.modcompat.jade.JadeEvilCraftConfig"]
   },
   "accessWidener": "${mod_id}.accesswidener",
   "mixins": ["${mod_id}.mixins.json"],
@@ -26,5 +28,9 @@
     "java": ">=21",
     "cyclopscore": ">=${cyclopscore_version}",
     "forgeconfigapiport": "*"
+  },
+  "suggests": {
+    "jei": "*",
+    "jade": "*"
   }
 }

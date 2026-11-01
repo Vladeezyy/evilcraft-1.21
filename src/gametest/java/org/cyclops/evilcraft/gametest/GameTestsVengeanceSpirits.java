@@ -15,8 +15,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
@@ -26,11 +24,9 @@ import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
 import java.util.List;
 import java.util.UUID;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsVengeanceSpirits {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 300, batch = "vengeance_spirits_0")

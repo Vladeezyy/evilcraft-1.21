@@ -9,17 +9,13 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.item.EntityItemEmpowerable;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsItemEmpowering {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 1, 2);
 
     protected EntityItemEmpowerable dropInvertedPotentia(GameTestHelper helper, int count) {

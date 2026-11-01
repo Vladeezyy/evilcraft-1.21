@@ -33,3 +33,4 @@ changelog.txt
 /run-prod-server
 /buildSrc/.gradle
 /buildSrc/build
+/run-gametest

@@ -9,7 +9,9 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 public class SceneHooks implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        if (System.getProperty("evilcraft.scene") != null) {
+        if (System.getProperty("evilcraft.perf") != null) {
+            PerfScene.register();
+        } else if (System.getProperty("evilcraft.scene") != null) {
             ClientTickEvents.END_CLIENT_TICK.register(client -> DevScene.onTick());
         }
     }

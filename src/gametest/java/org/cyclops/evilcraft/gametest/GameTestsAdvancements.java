@@ -14,13 +14,10 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import java.util.List;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import org.cyclops.cyclopscore.events.IItemPickupEvent;
+import org.cyclops.cyclopscore.events.IItemCraftedEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -32,11 +29,9 @@ import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
  * Game tests for all EvilCraft advancements.
  * @author rubensworks
  */
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsAdvancements {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     private static AdvancementHolder getAdvancement(GameTestHelper helper, String id) {
@@ -69,7 +64,7 @@ public class GameTestsAdvancements {
                         helper.absolutePos(POS).getY(),
                         helper.absolutePos(POS).getZ(),
                         darkGemStack);
-        NeoForge.EVENT_BUS.post(new ItemEntityPickupEvent.Post(player, itemEntity, darkGemStack.copy()));
+        IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -96,8 +91,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement second_age should exist");
 
         // Simulate crafting the blood_extractor, which fires the item_crafted trigger
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -233,8 +227,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement power_crafting should exist");
 
         // Simulate crafting the exalted_crafter, which fires the item_crafted trigger
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.ITEM_EXALTED_CRAFTER.get()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_EXALTED_CRAFTER.get()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -247,8 +240,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement spirit_cooker should exist");
 
         // Simulate crafting the spirit_furnace, which fires the item_crafted trigger
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.BLOCK_SPIRIT_FURNACE.get().asItem()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.BLOCK_SPIRIT_FURNACE.get().asItem()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -268,7 +260,7 @@ public class GameTestsAdvancements {
                         helper.absolutePos(POS).getY(),
                         helper.absolutePos(POS).getZ(),
                         dirtStack);
-        NeoForge.EVENT_BUS.post(new ItemEntityPickupEvent.Post(player, itemEntity, dirtStack.copy()));
+        IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -295,8 +287,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement second_age should exist");
 
         // Simulate crafting dark_gem (not blood_extractor), which should NOT trigger the second_age advancement
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -418,8 +409,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement power_crafting should exist");
 
         // Simulate crafting dark_gem (not exalted_crafter), which should NOT trigger the power_crafting advancement
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -432,8 +422,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement spirit_cooker should exist");
 
         // Simulate crafting blood_extractor (not spirit_furnace), which should NOT trigger the spirit_cooker advancement
-        NeoForge.EVENT_BUS.post(new PlayerEvent.ItemCraftedEvent(player,
-                new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()), player.getInventory()));
+        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();

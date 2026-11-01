@@ -17,8 +17,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -28,17 +26,15 @@ import org.cyclops.evilcraft.blockentity.BlockEntityPurifier;
 import java.util.List;
 import java.util.Map;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsPurifier {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     private static ItemStack createEnchantedSword(HolderLookup.Provider holders, String enchantmentId, int level) {
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
-        enchantments.set(holders.holderOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse(enchantmentId))), level);
+        enchantments.set(holders.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.parse(enchantmentId))), level);
         EnchantmentHelper.setEnchantments(sword, enchantments.toImmutable());
         return sword;
     }

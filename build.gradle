@@ -61,6 +61,11 @@ sourceSets {
         compileClasspath += main.compileClasspath + main.output
         runtimeClasspath += main.runtimeClasspath + main.output
     }
+    // The GameTests of the original (Fabric GameTest API), a separate mod in the gametest run; not in the jar
+    gametest {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
 }
 
 loom {
@@ -70,6 +75,9 @@ loom {
         }
         evilcraft_scene {
             sourceSet sourceSets.scene
+        }
+        evilcraft_gametest {
+            sourceSet sourceSets.gametest
         }
     }
     accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
@@ -90,6 +98,26 @@ loom {
             vmArg "-Devilcraft.scene.lang=${project.findProperty('scene_lang') ?: 'en_us'}"
             runDir 'run'
         }
+        // ./gradlew runPerf (tools/perf.sh): the stress test of src/scene (PerfScene); -Pjfr records run/perf.jfr
+        perf {
+            client()
+            name 'Perf'
+            source sourceSets.scene
+            vmArg '-Devilcraft.perf=true'
+            if (project.hasProperty('jfr')) {
+                vmArg "-XX:StartFlightRecording=filename=${file('run/perf.jfr')},settings=profile"
+            }
+            runDir 'run'
+        }
+        // ./gradlew runGametest (tools/gametest.sh): a server that runs all GameTests on start, then exits
+        gametest {
+            server()
+            name 'Game Test'
+            source sourceSets.gametest
+            vmArg '-Dfabric-api.gametest'
+            vmArg "-Dfabric-api.gametest.report-file=${file('build/gametest/junit.xml')}"
+            runDir 'run-gametest'
+        }
     }
 }
 
@@ -104,6 +132,16 @@ dependencies {
 
     modImplementation "maven.modrinth:cyclops-core:${cyclopscore_modrinth_version}"
     modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeconfigapiport_version}"
+
+    // Optional integrations of EvilCraft-Compat (bundled into EvilCraft by the original): JEI and Jade
+    modCompileOnly "maven.modrinth:jei:${jei_modrinth_version}"
+    modCompileOnly "maven.modrinth:jade:${jade_modrinth_version}"
+    if (!project.hasProperty('no_compat_runtime')) {
+        modLocalRuntime "maven.modrinth:jei:${jei_modrinth_version}"
+        // JEI on Fabric needs MezzConfig (players install it with JEI)
+        modLocalRuntime "maven.modrinth:mezzconfig:${mezzconfig_modrinth_version}"
+        modLocalRuntime "maven.modrinth:jade:${jade_modrinth_version}"
+    }
 
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     compileOnly 'org.projectlombok:lombok:1.18.36'

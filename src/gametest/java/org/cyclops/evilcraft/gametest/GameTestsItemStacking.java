@@ -11,17 +11,13 @@ import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
 import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
 import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsItemStacking {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY)

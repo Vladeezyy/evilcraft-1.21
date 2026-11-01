@@ -1,7 +1,5 @@
 package org.cyclops.evilcraft.blockentity;
 
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -180,20 +178,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
                     (blockEntity, direction) -> {
                         if (direction == Direction.UP || direction == Direction.DOWN) {
                             // Expose drop slots; any extraction should un-halt the furnace
-                            return new ItemHandlerSlotMasked(blockEntity.getInventory(), SLOTS_DROP) {
-                                @Override
-                                public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
-                                    long extracted = super.extract(resource, maxAmount, transaction);
-                                    if (extracted > 0) {
-                                        transaction.addOuterCloseCallback(result -> {
-                                            if (result.wasCommitted()) {
-                                                blockEntity.resetWork(false);
-                                            }
-                                        });
-                                    }
-                                    return extracted;
-                                }
-                            };
+                            return new ItemHandlerSlotMasked(blockEntity.getInventory(), () -> blockEntity.resetWork(false), SLOTS_DROP);
                         }
                         // Expose input slots (box + container); extraction does not affect work state
                         return new ItemHandlerSlotMasked(blockEntity.getInventory(), new int[]{SLOT_BOX, SLOT_CONTAINER});

@@ -45,6 +45,8 @@ creatures of the night.
   <img src="docs/images/creative_tab.jpg" width="49%" alt="The creative tab">
   <img src="docs/images/nature.jpg" width="49%" alt="Blood and poison, undead tree, Dark Ore">
   <img src="docs/images/gui_blood_infuser.jpg" width="49%" alt="The Blood Infuser screen">
+  <img src="docs/images/jei_blood_infuser.jpg" width="49%" alt="Blood Infuser recipes in JEI">
+  <img src="docs/images/jade_box_of_eternal_closure.jpg" width="49%" alt="Jade tooltip of the Box of Eternal Closure">
 </p>
 
 ## 📦 Requirements
@@ -61,17 +63,34 @@ Required on the client and the server. Settings: `config/evilcraft-common.toml`,
 - Content, recipes, loot and numbers are those of the original (NeoForge 1.21.1, branch `master-1.21-lts`).
 - Fluids work with Fabric's transfer API: Dark Tanks, the Blood Infuser and the other blood machines connect to the
   pipes and tanks of other Fabric mods.
-- Not ported (yet): the integrations with JEI and other mods, the original's GameTests.
+- **JEI and Jade** (optional, from the original's EvilCraft-Compat): JEI shows the recipes of the Blood Infuser, the
+  Environmental Accumulator, the Sanguinary Environmental Accumulator, the Spirit Reanimator and the Spirit Furnace (its
+  mob drops come from the server, which does not need JEI), click areas in the machine screens and recipe transfer;
+  Jade shows the contents of the Box of Eternal Closure and the parts of a broom. JEI on Fabric also needs
+  [MezzConfig](https://modrinth.com/mod/mezzconfig).
+- **Fixed in 1.2.99.1**: blood put into tanks and machines by the mod itself (not through pipes) was not saved with the
+  chunk; villagers never took the Werewolf profession; a hopper under a halted Spirit Furnace did not restart it.
+- Not ported: the integrations of mods that do not exist on Fabric 1.21.1 (Blood Magic, Common Capabilities, ...).
 
 ## ✅ Tested
 
-- A client test scene (Fabric Loader 0.16.14, Fabric API 0.116.17, 22 checks): world creation, the blocks, fluids,
+On every push (GitHub Actions): the build, a dev server on a fresh world, **the 87 GameTests of the original** (blood
+machines, the Spirit Furnace and Reanimator, the Purifier, eternal water, vengeance spirits, werewolf villagers,
+recipes, advancements, ...) on the Fabric GameTest API, and the release jar on a production Fabric server.
+
+- A client test scene (Fabric Loader 0.16.14, Fabric API 0.116.17, 28 checks): world creation, the blocks, fluids,
   machines and mobs of the mod on screen, the creative tab, the Blood Infuser screen, the Origins of Darkness book;
   fluid transfer through Fabric's API (insert, extract, aborted transactions, buckets and tank items), tanks synced to
   the client and saved, Blood Infuser processing, recipes with Fabric's ingredients and load conditions, world
-  generation of Dark Ore, the dungeon loot of the mod.
-- The release jar on a production (intermediary-mapped) Fabric server, and the same scene on a production client
-  (22 of 22 checks).
+  generation of Dark Ore, the dungeon loot of the mod; with JEI and Jade: the recipes of all five JEI categories (the
+  Spirit Furnace ones from the server) and the Jade tooltip.
+- The release jar on a production (intermediary-mapped) Fabric server, and the scene on a production client without
+  JEI and Jade.
+- Performance (`tools/perf.sh`, one world, 600 ticks per window): a vanilla base (40 cows) against the same base plus 72
+  working blocks of the mod (16 Blood Infusers fed from Dark Tanks, Blood Chests repairing tools, tanks, accumulators,
+  purifiers) and 24 of its mobs: server tick +0.3 to +1.0 ms over two runs (3.81 → 4.10 ms in the uncapped run), FPS
+  213 → 195. EvilCraft's own code is 13.5% of the server thread's samples (JFR), the largest part is the flight of the
+  Poisonous Libelles.
 
 ## ❤️ Credits
 
@@ -143,7 +162,15 @@ EvilCraft приносит в Minecraft тёмную магию: собирай�
 - Содержимое, рецепты, добыча и числа — как в оригинале (NeoForge 1.21.1, ветка `master-1.21-lts`).
 - Жидкости работают через transfer API Fabric: Тёмные резервуары, Кровавый инфузор и другие машины соединяются с
   трубами и баками других Fabric-модов.
-- Пока не перенесено: интеграции с JEI и другими модами, GameTest'ы оригинала.
+- **JEI и Jade** (необязательно, из EvilCraft-Compat оригинала): JEI показывает рецепты Кровавого инфузора,
+  Накопителя окружения, Кровавого накопителя окружения, Реаниматора духов и Духовной печи (добычу с мобов присылает
+  сервер, JEI на сервере не нужен), области клика в окнах машин и перенос рецептов; Jade показывает содержимое Ящика
+  вечного заточения и детали метлы. JEI на Fabric нужен ещё [MezzConfig](https://modrinth.com/mod/mezzconfig).
+- **Исправлено в 1.2.99.1**: кровь, которую мод сам заливал в баки и машины (не через трубы), не сохранялась с
+  чанком; жители никогда не становились оборотнями; воронка под остановленной Духовной печью не запускала её снова.
+- Проверено: 87 GameTest'ов оригинала, тестовая сцена (28 проверок), production-сервер и клиент; нагрузка: 72 работающих блока мода и 24 его моба добавляют к тику
+  сервера 0,3–1,0 мс (3,81 → 4,10 мс), FPS 213 → 195.
+- Не перенесено: интеграции модов, которых нет на Fabric 1.21.1 (Blood Magic, Common Capabilities, ...).
 
 </details>
 

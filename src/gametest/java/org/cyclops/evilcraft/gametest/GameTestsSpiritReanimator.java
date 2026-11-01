@@ -7,18 +7,14 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritReanimator;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsSpiritReanimator {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 150)
@@ -37,7 +33,7 @@ public class GameTestsSpiritReanimator {
         tank.setEnabled(true);
 
         helper.succeedWhen(() -> {
-            helper.assertFalse(reanimator.getInventory().getItem(BlockEntitySpiritReanimator.SLOT_BOX).has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA), "Box has not been cleared");
+            helper.assertFalse(reanimator.getInventory().getItem(BlockEntitySpiritReanimator.SLOT_BOX).has(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get()), "Box has not been cleared");
             helper.assertTrue(reanimator.getInventory().getItem(BlockEntitySpiritReanimator.SLOT_EGG).isEmpty(), "Egg has not been consumed");
             helper.assertFalse(reanimator.getInventory().getItem(BlockEntitySpiritReanimator.SLOTS_OUTPUT).isEmpty(), "Output is not present");
             helper.assertValueEqual(reanimator.getInventory().getItem(BlockEntitySpiritReanimator.SLOTS_OUTPUT).getItem(), Items.CHICKEN_SPAWN_EGG, "Output is not a chicken spawn egg");

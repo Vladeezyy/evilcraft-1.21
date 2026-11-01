@@ -1,6 +1,7 @@
 package org.cyclops.evilcraft.scene;
 
 import com.mojang.datafixers.util.Pair;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -129,7 +130,22 @@ public final class DevScene {
         at(805, mc -> server(mc, DevScene::checkData));
         at(810, mc -> server(mc, p -> look(p, stage.offset(0, 1, 0), 15)));
         at(840, mc -> shot(mc, "blocks_after"));
-        at(850, mc -> {
+        // EvilCraft-Compat: JEI recipe categories and the Jade tooltip (only with JEI and Jade, as in runScene)
+        if (FabricLoader.getInstance().isModLoaded("jei")) {
+            at(850, mc -> SceneCompat.checkJei());
+            at(855, mc -> { mc.options.hideGui = false; SceneCompat.showJei("blood_infuser"); });
+            at(880, mc -> shot(mc, "jei_blood_infuser"));
+            at(885, mc -> SceneCompat.showJei("environmental_accumulator"));
+            at(910, mc -> shot(mc, "jei_environmental_accumulator"));
+            at(915, mc -> SceneCompat.showJei("spirit_furnace"));
+            at(940, mc -> shot(mc, "jei_spirit_furnace"));
+            at(945, mc -> mc.setScreen(null));
+        }
+        if (FabricLoader.getInstance().isModLoaded("jade")) {
+            at(950, mc -> { mc.options.hideGui = false; server(mc, p -> look(p, stage.offset(2, 1, 0), 30, 2.5)); });
+            at(990, mc -> shot(mc, "jade_box_of_eternal_closure"));
+        }
+        at(1000, mc -> {
             LOGGER.info("[scene] DONE, failed checks: " + failures);
             mc.stop();
         });
@@ -194,7 +210,7 @@ public final class DevScene {
         }
     }
 
-    private static void check(String name, boolean ok, Object detail) {
+    static void check(String name, boolean ok, Object detail) {
         if (!ok) {
             failures++;
         }

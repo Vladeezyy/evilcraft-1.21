@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section name="info_book.evilcraftcompat.mod_integrations">
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.baubles">
+        <tag type="mod">baubles</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.baubles.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.ee3">
+        <tag type="mod">ee3</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.ee3.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.enderio">
+        <tag type="mod">enderio</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.enderio.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.forestry">
+        <tag type="mod">forestry</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.forestry.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.ic2">
+        <tag type="mod">ic2</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.ic2.text</paragraph>
+    </section-disabled>
+    <section name="info_book.evilcraftcompat.mod_integrations.jei">
+        <tag type="mod">jei</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.jei.text</paragraph>
+    </section>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.immersiveengineering">
+        <tag type="mod">immersiveengineering</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.immersiveengineering.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.thaumcraft">
+        <tag type="mod">thaumcraft</tag>
+        <tag>veined_scribing_tools</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.thaumcraft.text</paragraph>
+        <appendix type="crafting_recipe" index="0">evilcraft:veined_scribing_tools</appendix>
+        <appendix type="crafting_recipe" index="1">evilcraft:veined_scribing_tools</appendix>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.thermal_expansion">
+        <tag type="mod">thermalexpansion</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.thermal_expansion.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.tinkers_construct">
+        <tag type="mod">tconstruct</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.tinkers_construct.text</paragraph>
+    </section-disabled>
+    <section-disabled name="info_book.evilcraftcompat.mod_integrations.jade">
+        <tag type="mod">jade</tag>
+        <paragraph>info_book.evilcraftcompat.mod_integrations.jade.text</paragraph>
+    </section-disabled>
+</section>

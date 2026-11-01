@@ -6,7 +6,8 @@
   "description": "Development client scene of the Fabric port (screenshots and checks); not part of the mod jar.",
   "environment": "client",
   "entrypoints": {
-    "client": ["org.cyclops.evilcraft.scene.SceneHooks"]
+    "client": ["org.cyclops.evilcraft.scene.SceneHooks"],
+    "jei_mod_plugin": ["org.cyclops.evilcraft.scene.SceneJei"]
   },
   "depends": {
     "evilcraft": "*"

@@ -81,6 +81,7 @@ import org.cyclops.evilcraft.sound.*;
 import org.cyclops.evilcraft.world.gen.feature.WorldFeatureEvilDungeonConfig;
 import org.cyclops.evilcraft.world.gen.structure.WorldStructureDarkTempleConfig;
 import org.cyclops.evilcraft.world.gen.structure.WorldStructurePieceDarkTempleConfig;
+import org.cyclops.evilcraftcompat.EvilCraftCompat;
 
 /**
  * The main mod class of EvilCraft.
@@ -123,6 +124,9 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         ItemExtensions.register();
         NeoForgeBiomeModifiers.register(Reference.MOD_ID);
         ModLifecycle.afterRegistries(() -> CompostingChanceRegistry.INSTANCE.add(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 0.3F));
+
+        // EvilCraft-Compat (JEI, Jade), bundled as in the original
+        EvilCraftCompat.load();
     }
 
     @Override
@@ -141,6 +145,10 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         // Initialize info book
         getRegistryManager().getRegistry(IInfoBookRegistry.class).registerInfoBook(
                 OriginsOfDarknessBook.getInstance(), "/data/" + Reference.MOD_ID + "/info/book.xml");
+        // EvilCraft-Compat's section of the book
+        getRegistryManager().getRegistry(IInfoBookRegistry.class).registerSection(this,
+                OriginsOfDarknessBook.getInstance(), "info_book.evilcraft.section.main",
+                "/data/" + org.cyclops.evilcraftcompat.Reference.MOD_ID + "/info/modcompat.xml");
     }
 
     @Override

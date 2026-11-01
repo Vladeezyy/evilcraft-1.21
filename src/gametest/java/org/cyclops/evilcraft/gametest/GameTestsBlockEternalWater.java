@@ -11,18 +11,14 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
 import org.cyclops.evilcraft.blockentity.BlockEntityEternalWater;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsBlockEternalWater {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 200)

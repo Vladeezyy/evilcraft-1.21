@@ -11,8 +11,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDarkBloodBrick;
@@ -22,11 +20,9 @@ import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
 
 import java.util.Set;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsSpiritFurnace {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY)
@@ -135,7 +131,7 @@ public class GameTestsSpiritFurnace {
         spiritDummy.setInnerEntityType(entityType);
         CompoundTag tag = new CompoundTag();
         spiritDummy.getData().writeNBT(tag);
-        stack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, tag);
+        stack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), tag);
         return stack;
     }
 

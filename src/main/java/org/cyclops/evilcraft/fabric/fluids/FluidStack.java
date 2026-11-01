@@ -183,7 +183,9 @@ public final class FluidStack {
     }
 
     public Holder<Fluid> getFluidHolder() {
-        return fluid;
+        // The registry's own holder: the codecs reject the mod's DeferredHolder ("Unregistered holder"), which
+        // new FluidStack(RegistryEntries.FLUID_BLOOD, ...) passes in (NeoForge's DeferredHolder is accepted)
+        return getFluid().builtInRegistryHolder();
     }
 
     public boolean is(TagKey<Fluid> tag) {

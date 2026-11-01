@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.gametest;
 
+import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -16,17 +18,13 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsItemEternalWater {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY)
@@ -109,7 +107,7 @@ public class GameTestsItemEternalWater {
         helper.setBlock(POS, RegistryEntries.BLOCK_DARK_TANK.get());
 
         // Right click with bucket as player
-        InteractionResult result = itemStack.onItemUseFirst(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
+        InteractionResult result = ((IItemUseFirst) itemStack.getItem()).onItemUseFirst(itemStack, new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
 
         helper.succeedWhen(() -> {
             // Check result

@@ -43,3 +43,8 @@ accessible field net/minecraft/server/network/ServerGamePacketListenerImpl above
 accessible method net/minecraft/client/resources/model/SimpleBakedModel$Builder <init> (ZZZLnet/minecraft/client/renderer/block/model/ItemTransforms;Lnet/minecraft/client/renderer/block/model/ItemOverrides;)V
 extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 accessible field net/minecraft/world/level/block/LiquidBlock fluid Lnet/minecraft/world/level/material/FlowingFluid;
+# EvilCraft-Compat (JEI Spirit Furnace recipes): mob drops from the loot table entries
+accessible field net/minecraft/world/level/storage/loot/LootTable pools Ljava/util/List;
+accessible field net/minecraft/world/level/storage/loot/LootPool entries Ljava/util/List;
+# A registered POI type is only found by its blocks once its block states are in PoiTypes (NeoForge does this itself)
+accessible method net/minecraft/world/entity/ai/village/poi/PoiTypes registerBlockStates (Lnet/minecraft/core/Holder;Ljava/util/Set;)V

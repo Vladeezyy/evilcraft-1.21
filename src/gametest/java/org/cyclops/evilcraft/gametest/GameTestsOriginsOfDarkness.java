@@ -12,10 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -23,11 +20,9 @@ import org.cyclops.evilcraft.RegistryEntries;
  * Game tests for the Origins of Darkness book production mechanic.
  * @author rubensworks
  */
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsOriginsOfDarkness {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(4, 1, 4);
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 300)
@@ -59,7 +54,7 @@ public class GameTestsOriginsOfDarkness {
         ServerPlayer player = helper.makeMockServerPlayerInLevel();
         player.setItemInHand(InteractionHand.MAIN_HAND,
                 new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse("evilcraft:darkened_apple"))));
-        NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, pig));
+        UseEntityCallback.EVENT.invoker().interact(player, player.level(), InteractionHand.MAIN_HAND, pig, null);
 
         // The spirit portal is placed at a shuffled random position within 1 block of the pig's
         // death position (pig.blockPosition() + (0,1,0) = POS.above().above()).
