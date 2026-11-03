@@ -1,15 +1,14 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 import org.cyclops.evilcraft.entity.effect.EntityNecromancersHead;
 
@@ -29,8 +28,9 @@ public class ItemNecromancerStaff extends ItemBloodContainer {
     }
 
     protected void throwNecromancersHead(LivingEntity entityLiving, Class<? extends Mob> mobType) {
-        EntityNecromancersHead head = new EntityNecromancersHead(entityLiving.level(), entityLiving);
+        EntityNecromancersHead head = new EntityNecromancersHead(entityLiving.level(), entityLiving.getX(), entityLiving.getEyeY(), entityLiving.getZ());
         if(!entityLiving.level().isClientSide()) {
+            head.setOwner(entityLiving);
             head.setMobType(mobType);
             // Last three params: pitch offset, velocity, inaccuracy
             // MCP: shoot
@@ -40,13 +40,13 @@ public class ItemNecromancerStaff extends ItemBloodContainer {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if(canConsume(ItemNecromancerStaffConfig.usage, itemStack, player)) {
             consume(ItemNecromancerStaffConfig.usage, itemStack, player);
             Class<? extends Mob> mobType = Zombie.class; // Other types might be allowed in the future.
             throwNecromancersHead(player, mobType);
-            return MinecraftHelpers.successAction(itemStack);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
         }
         return super.use(world, player, hand);
     }

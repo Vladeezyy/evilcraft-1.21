@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "evilcraft:broom_part",
+    "tints": [
+      {
+        "type": "evilcraft:broom_part"
+      }
+    ]
+  }
+}

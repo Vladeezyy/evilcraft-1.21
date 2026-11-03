@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -13,14 +13,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.cyclops.cyclopscore.block.BlockWithEntityGui;
 import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.helper.BlockTankHelpers;
@@ -45,16 +41,16 @@ public abstract class BlockWithEntityGuiTank extends BlockWithEntityGui implemen
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level world, BlockPos blockPos) {
+    public int getAnalogOutputSignal(BlockState blockState, Level world, BlockPos blockPos, Direction direction) {
         BlockEntityTankInventory tile = (BlockEntityTankInventory) world.getBlockEntity(blockPos);
         float output = (float) tile.getTank().getFluidAmount() / (float) tile.getTank().getCapacity();
-        return (int)Math.ceil(MinecraftHelpers.COMPARATOR_MULTIPLIER * output);
+        return (int)Math.ceil(IModHelpers.get().getMinecraftHelpers().getComparatorMultiplier() * output);
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHitResult) {
+    protected InteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHitResult) {
         if (FluidUtil.interactWithFluidHandler(pPlayer, pHand, pLevel, pPos, Direction.UP)) {
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         return super.useItemOn(pStack, pState, pLevel, pPos, pPlayer, pHand, pHitResult);
     }
@@ -65,7 +61,6 @@ public abstract class BlockWithEntityGuiTank extends BlockWithEntityGui implemen
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag iTooltipFlag) {
 
     }
@@ -83,14 +78,5 @@ public abstract class BlockWithEntityGuiTank extends BlockWithEntityGui implemen
     @Override
     public boolean isActivated(ItemStack itemStack, Item.TooltipContext context) {
         return false;
-    }
-
-    @Override
-    public void onRemove(BlockState oldState, Level world, BlockPos blockPos, BlockState newState, boolean isMoving) {
-        if (!world.isClientSide() && oldState.getBlock() != newState.getBlock()) {
-            BlockEntityHelpers.get(world, blockPos, BlockEntityTankInventory.class)
-                    .ifPresent(tile -> InventoryHelpers.dropItems(world, tile.getInventory(), blockPos));
-        }
-        super.onRemove(oldState, world, blockPos, newState, isMoving);
     }
 }

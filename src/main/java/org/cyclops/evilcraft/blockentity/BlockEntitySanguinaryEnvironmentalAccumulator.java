@@ -1,8 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,16 +19,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
-import org.cyclops.cyclopscore.helper.*;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSanguinaryEnvironmentalAccumulator;
@@ -83,7 +82,6 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
     private SingleCache<Triple<ItemStack, FluidStack, WeatherType>, Optional<RecipeEnvironmentalAccumulator>> recipeCache;
     private VirtualTank virtualTank;
     private boolean forceLoadTanks;
-    @Getter
     private List<BlockPos> invalidLocations = Lists.newArrayList();
 
     private static final Map<Class<?>, ITickAction<BlockEntitySanguinaryEnvironmentalAccumulator>> ACCUMULATE_TICK_ACTIONS = new LinkedHashMap<Class<?>, ITickAction<BlockEntitySanguinaryEnvironmentalAccumulator>>();
@@ -151,7 +149,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
                     public Optional<RecipeEnvironmentalAccumulator> getNewValue(Triple<ItemStack, FluidStack, WeatherType> key) {
                         Inventory recipeInput = new Inventory(1, 64, BlockEntitySanguinaryEnvironmentalAccumulator.this);
                         recipeInput.setItem(0, key.getLeft());;
-                        return CraftingHelpers.findServerRecipe(getRegistry(), recipeInput, getLevel()).map(RecipeHolder::value);
+                        return IModHelpers.get().getCraftingHelpers().findRecipe(getRegistry(), recipeInput, getLevel()).map(RecipeHolder::value);
                     }
 
                     @Override
@@ -175,11 +173,11 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
-                    (blockEntity, direction) -> new ItemHandlerSlotMasked(
+                    net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
+                    (blockEntity, direction) -> VanillaContainerWrapper.of(new InventorySlotMasked(
                             blockEntity.getInventory(),
                             direction == Direction.DOWN ? SLOT_ACCUMULATE_RESULT : SLOT_ACCUMULATE
-                    )
+                    ))
             );
         }
 
@@ -187,6 +185,10 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         public void registerTankInventoryCapabilitiesFluid() {
             // Do not expose dummy tank
         }
+    }
+
+    public List<BlockPos> getInvalidLocations() {
+        return invalidLocations;
     }
 
     @Override
@@ -223,14 +225,12 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
         return RegistryEntries.RECIPETYPE_ENVIRONMENTAL_ACCUMULATOR.get();
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected void showAccumulatingParticles() {
         BlockEntityEnvironmentalAccumulator.showAccumulatingParticles(level, getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.5F, getBlockPos().getZ() + 0.5F, BlockEntityEnvironmentalAccumulator.SPREAD);
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected void showTankBeams() {
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         BlockPos target = getBlockPos();
         for (int j = 0; j < tankOffsets.length; j++) {
             BlockPos offset = tankOffsets[j];
@@ -239,8 +239,8 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
             double y = location.getY() + 0.5;
             double z = location.getZ() + 0.5;
 
-            float rotationYaw = (float) LocationHelpers.getYaw(location, target);
-            float rotationPitch = (float) LocationHelpers.getPitch(location, target);
+            float rotationYaw = (float) IModHelpers.get().getLocationHelpers().getYaw(location, target);
+            float rotationPitch = (float) IModHelpers.get().getLocationHelpers().getPitch(location, target);
 
             for (int i = 0; i < 1 + random.nextInt(5); i++) {
                 double particleX = x - 0.2 + random.nextDouble() * 0.4;
@@ -253,17 +253,16 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
                 double particleMotionY = Mth.cos(rotationPitch / 180.0F * (float) Math.PI) * -speed;
                 double particleMotionZ = Mth.sin(rotationPitch / 180.0F * (float) Math.PI) * Mth.sin(rotationYaw / 180.0F * (float) Math.PI) * speed;
 
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        RegistryEntries.PARTICLE_BLOOD_BUBBLE.get(), false,
+                level.addParticle(
+                        RegistryEntries.PARTICLE_BLOOD_BUBBLE.get(),
                         particleX, particleY, particleZ, particleMotionX, particleMotionY, particleMotionZ);
             }
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected void showMissingTanks() {
         if(level.getGameTime() % 10 == 0) {
-            RandomSource random = level.random;
+            RandomSource random = level.getRandom();
             for (BlockPos location : invalidLocations) {
                 double x = location.getX() + 0.5;
                 double y = location.getY() + 0.5;
@@ -274,8 +273,8 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
                     double particleY = y - 0.2 + random.nextDouble() * 0.4;
                     double particleZ = z - 0.2 + random.nextDouble() * 0.4;
 
-                    Minecraft.getInstance().levelRenderer.addParticle(
-                            ParticleTypes.SMOKE, false,
+                    level.addParticle(
+                            ParticleTypes.SMOKE,
                             particleX, particleY, particleZ, 0, 0, 0);
                 }
             }
@@ -286,7 +285,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
     public void onStateChanged() {
         BlockState blockState = level.getBlockState(getBlockPos()).setValue(BlockSanguinaryEnvironmentalAccumulator.ON, isWorking());
         level.setBlockAndUpdate(getBlockPos(), blockState);
-        level.sendBlockUpdated(getBlockPos(), blockState, blockState, MinecraftHelpers.BLOCK_NOTIFY | MinecraftHelpers.BLOCK_NOTIFY_CLIENT); // Update light
+        level.sendBlockUpdated(getBlockPos(), blockState, blockState, IModHelpers.get().getMinecraftHelpers().getBlockNotify() | IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient()); // Update light
     }
 
     @Override
@@ -296,7 +295,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
 
     @Override
     public boolean canWork() {
-        if(!forceLoadTanks && invalidLocations != null && (level.isClientSide() || !WorldHelpers.efficientTick(level, TANK_CHECK_TICK_OFFSET, getBlockPos()))) {
+        if(!forceLoadTanks && invalidLocations != null && (level.isClientSide() || !IModHelpers.get().getWorldHelpers().efficientTick(level, TANK_CHECK_TICK_OFFSET, getBlockPos()))) {
             return invalidLocations.isEmpty();
         }
         forceLoadTanks = false;
@@ -314,18 +313,18 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
 
     @Nullable
     @Override
-    public IFluidHandler[] getVirtualTankChildren() {
-        IFluidHandler[] tanks = new IFluidHandler[tankOffsets.length];
+    public ResourceHandler<FluidResource>[] getVirtualTankChildren() {
+        ResourceHandler<FluidResource>[] tanks = new ResourceHandler[tankOffsets.length];
         invalidLocations.clear();
         for (int i = 0; i < tankOffsets.length; i++) {
             BlockPos offset = tankOffsets[i];
             BlockPos location = getBlockPos().offset(offset);
-            IFluidHandler handler = BlockEntityHelpers.getCapability(getLevel(), location, Direction.UP, net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
+            ResourceHandler<FluidResource> handler = IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(getLevel(), location, Direction.UP, net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK).orElse(null);
             boolean oneValid = false;
             if (handler != null) {
-                int tankAmount = handler.getTanks();
+                int tankAmount = handler.size();
                 for (int tank = 0; tank < tankAmount; tank++) {
-                    if (!handler.getFluidInTank(tank).isEmpty() && handler.getFluidInTank(tank).getFluid() == RegistryEntries.FLUID_BLOOD.get()) {
+                    if (!handler.getResource(tank).isEmpty() && handler.getResource(tank).getFluid() == RegistryEntries.FLUID_BLOOD.get()) {
                         oneValid = true;
                         break;
                     }
@@ -387,11 +386,13 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
 
         @Override
         public boolean canConsume(ItemStack itemStack, Level world) {
-            // Valid custom recipe
-            RecipeEnvironmentalAccumulator.Inventory recipeInput = new RecipeEnvironmentalAccumulator.InventoryDummy(itemStack);
-            return world.getRecipeManager()
-                    .getRecipeFor(RegistryEntries.RECIPETYPE_ENVIRONMENTAL_ACCUMULATOR.get(), recipeInput, world)
-                    .isPresent();
+            return true;
+            // We can't easily check recipes client-side anymore...
+//            // Valid custom recipe
+//            RecipeEnvironmentalAccumulator.Inventory recipeInput = new RecipeEnvironmentalAccumulator.InventoryDummy(itemStack);
+//            return world.getRecipeManager()
+//                    .getRecipeFor(RegistryEntries.RECIPETYPE_ENVIRONMENTAL_ACCUMULATOR.get(), recipeInput, world)
+//                    .isPresent();
         }
 
         @Override

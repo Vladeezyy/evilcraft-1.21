@@ -7,6 +7,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,17 +19,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.cyclopscore.block.multi.AllowedBlock;
-import org.cyclops.cyclopscore.block.multi.CubeDetector;
-import org.cyclops.cyclopscore.block.multi.HollowCubeDetector;
-import org.cyclops.cyclopscore.block.multi.MaximumBlockCountValidator;
-import org.cyclops.cyclopscore.block.multi.MinimumSizeValidator;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import org.cyclops.cyclopscore.block.multi.*;
 import org.cyclops.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.EntityHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.LocationHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
@@ -81,7 +81,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = FluidHelpers.BUCKET_VOLUME * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     protected static final MinimumSizeValidator minimumSizeValidator = new MinimumSizeValidator(new Vec3i(2, 2, 2));
 
@@ -102,7 +102,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
     public static final Upgrades.UpgradeEventType UPGRADEEVENT_BLOODUSAGE = Upgrades.newUpgradeEventType();
 
     @NBTPersist(useDefaultValue = false)
-    private Vec3i size = LocationHelpers.copyLocation(Vec3i.ZERO);
+    private Vec3i size = IModHelpers.get().getLocationHelpers().copyLocation(Vec3i.ZERO);
     @NBTPersist
     private Boolean forceHalt = false;
     @NBTPersist
@@ -174,23 +174,40 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
                     (blockEntity, direction) -> {
                         if (direction == Direction.UP || direction == Direction.DOWN) {
-                            // Expose drop slots; any extraction should un-halt the furnace
-                            return new ItemHandlerSlotMasked(blockEntity.getInventory(), SLOTS_DROP) {
+                            return VanillaContainerWrapper.of(new InventorySlotMasked(
+                                    blockEntity.getInventory(),
+                                    SLOTS_DROP
+                            ) {
                                 @Override
-                                public ItemStack extractItem(int slot, int amount, boolean simulate) {
-                                    ItemStack extracted = super.extractItem(slot, amount, simulate);
-                                    if (!extracted.isEmpty() && !simulate) {
-                                        blockEntity.resetWork(false);
+                                public void onTransfer(int slot, int amountChange, TransactionContext transaction) {
+                                    super.onTransfer(slot, amountChange, transaction);
+                                    if (amountChange != 0) {
+                                        new SnapshotJournal<Void>() {
+
+                                            @Override
+                                            protected Void createSnapshot() {
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void revertToSnapshot(Void o) {
+
+                                            }
+
+                                            @Override
+                                            protected void onRootCommit(Void originalState) {
+                                                super.onRootCommit(originalState);
+                                                blockEntity.resetWork(false);
+                                            }
+                                        }.updateSnapshots(transaction);
                                     }
-                                    return extracted;
                                 }
-                            };
+                            });
                         }
-                        // Expose input slots (box + container); extraction does not affect work state
-                        return new ItemHandlerSlotMasked(blockEntity.getInventory(), new int[]{SLOT_BOX, SLOT_CONTAINER});
+                        return VanillaContainerWrapper.of(new InventorySlotMasked(blockEntity.getInventory(), SLOT_BOX, SLOT_CONTAINER));
                     }
             );
         }
@@ -243,7 +260,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
                 if(boxEntityCache != null && id == boxEntityCache.getType()) {
                     return boxEntityCache;
                 } else {
-                    Entity entity = id.create(level);
+                    Entity entity = id.create(level, EntitySpawnReason.MOB_SUMMONED);
                     boxEntityCache = entity;
                     return entity;
                 }
@@ -370,7 +387,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
      * @return the actual inner size.
      */
     public Vec3i getInnerSize() {
-        return LocationHelpers.subtract(getSize(), new Vec3i(1, 1, 1));
+        return IModHelpers.get().getLocationHelpers().subtract(getSize(), new Vec3i(1, 1, 1));
     }
 
     /**

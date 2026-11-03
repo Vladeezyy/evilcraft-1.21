@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import org.cyclops.cyclopscore.helper.LocationHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.degradation.IDegradable;
 import org.cyclops.evilcraft.api.degradation.IDegradationEffect;
@@ -42,7 +42,7 @@ public class BiomeDegradation implements IDegradationEffect, OrganicSpread.IOrga
     public void runServerSide(IDegradable degradable) {
         OrganicSpread spread =
                 new OrganicSpread(degradable.getDegradationWorld(), DIMENSIONS, degradable.getRadius(), this);
-        spread.spreadTick(LocationHelpers.copyLocation(degradable.getLocation()));
+        spread.spreadTick(IModHelpers.get().getLocationHelpers().copyLocation(degradable.getLocation()));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class BiomeDegradation implements IDegradationEffect, OrganicSpread.IOrga
     public void spreadTo(Level world, BlockPos location) {
         if (!world.isClientSide()) {
             EntityBiomeExtract.setBiome((ServerLevel) world, location, BiomeDegradation.getBiome(world));
-            EntityBiomeExtract.updateChunkAfterBiomeChange(world, new ChunkPos(location));
+            EntityBiomeExtract.updateChunkAfterBiomeChange(world, new ChunkPos(location.getX() >> 4, location.getZ() >> 4));
         }
     }
 

@@ -1,20 +1,16 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
-import org.cyclops.cyclopscore.helper.Helpers;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerCapacity;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -28,7 +24,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
     private final int maxCapacity;
 
     public RecipeFluidContainerCombination(CraftingBookCategory category, Ingredient fluidContainer, int maxCapacity) {
-        super(category);
+        super();
         this.fluidContainer = fluidContainer;
         this.maxCapacity = maxCapacity;
     }
@@ -43,12 +39,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid, world.registryAccess()).isEmpty();
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
-        return fluidContainer.getItems()[0];
+        return !assemble(grid).isEmpty();
     }
 
     @Override
@@ -57,21 +48,23 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
 
         for (int i = 0; i < aitemstack.size(); ++i) {
             ItemStack itemstack = inventory.getItem(i);
-            aitemstack.set(i, CommonHooks.getCraftingRemainingItem(itemstack));
+            net.minecraft.world.item.ItemStackTemplate remainder = itemstack.getCraftingRemainder();
+            aitemstack.set(i, remainder != null ? remainder.create() : ItemStack.EMPTY);
         }
 
         return aitemstack;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return RegistryEntries.RECIPESERIALIZER_FLUIDCONTAINER_COMBINATION.get();
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
-        ItemStack output = getResultItem(registryAccess).copy();
-        IFluidHandlerItemCapacity fluidHandlerOutput = FluidHelpers.getFluidHandlerItemCapacity(output).orElse(null);
+    public ItemStack assemble(CraftingInput grid) {
+        ItemStack output = new ItemStack(fluidContainer.items().findFirst().get());
+        ItemAccess outputItemAccess = ItemAccess.forStack(output);
+        IFluidHandlerCapacity fluidHandlerOutput = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);
 
         FluidStack commonFluid = null;
         int totalCapacity = 0;
@@ -83,18 +76,18 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
             ItemStack element = grid.getItem(j).copy().split(1);
             if(!element.isEmpty()) {
                 if(fluidContainer.test(element)) {
-                    IFluidHandlerItemCapacity fluidHandler = FluidHelpers.getFluidHandlerItemCapacity(element).orElse(null);
+                    IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element)).orElse(null);
                     inputItems++;
-                    FluidStack fluidStack = FluidHelpers.getFluid(fluidHandler);
+                    FluidStack fluidStack = IModHelpersNeoForge.get().getFluidHelpers().getFluid(fluidHandler);
                     if(!fluidStack.isEmpty()) {
                         if(commonFluid == null) {
                             commonFluid = fluidStack;
                         } else if(!FluidStack.isSameFluidSameComponents(commonFluid, fluidStack)) {
                             return ItemStack.EMPTY;
                         }
-                        totalContent = Helpers.addSafe(totalContent, fluidStack.getAmount() * element.getCount());
+                        totalContent = IModHelpers.get().getBaseHelpers().addSafe(totalContent, fluidStack.getAmount() * element.getCount());
                     }
-                    totalCapacity = Helpers.addSafe(totalCapacity, fluidHandler.getCapacity() * element.getCount());
+                    totalCapacity = IModHelpers.get().getBaseHelpers().addSafe(totalCapacity, fluidHandler.getTankCapacity(0) * element.getCount());
                 } else {
                     return ItemStack.EMPTY;
                 }
@@ -106,17 +99,15 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
         }
 
         // Set capacity and fill fluid into output.
-        fluidHandlerOutput.setCapacity(totalCapacity);
-        if(commonFluid != null) {
-            fluidHandlerOutput.fill(new FluidStack(commonFluid.getFluidHolder(), totalContent), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            fluidHandlerOutput.setTankCapacity(0, totalCapacity, tx);
+            if(commonFluid != null) {
+                fluidHandlerOutput.insert(FluidResource.of(commonFluid), totalContent, tx);
+            }
+            tx.commit();
         }
-        output = fluidHandlerOutput.getContainer();
+        output = outputItemAccess.getResource().toStack(outputItemAccess.getAmount());
 
         return output;
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 1;
     }
 }

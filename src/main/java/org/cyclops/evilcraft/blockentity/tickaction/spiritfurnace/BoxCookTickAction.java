@@ -3,27 +3,25 @@ package org.cyclops.evilcraft.blockentity.tickaction.spiritfurnace;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -31,9 +29,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.cyclopscore.helper.ItemStackHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.item.WeightedItemStack;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
@@ -44,10 +43,10 @@ import org.cyclops.evilcraft.core.blockentity.upgrade.UpgradeSensitiveEvent;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;
 import org.cyclops.evilcraft.core.helper.MathHelpers;
 
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * {@link ITickAction} that is able to cook boxes with spirits.
@@ -149,12 +148,7 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
 
     protected ItemStack getPlayerSkull(UUID playerId) {
         ItemStack itemStack = new ItemStack(Items.PLAYER_HEAD);
-        try {
-            Optional<GameProfile> optionalGameProfile = SkullBlockEntity.fetchGameProfile(playerId).get(1, TimeUnit.SECONDS);
-            optionalGameProfile.ifPresent(gameProfile -> itemStack.set(DataComponents.PROFILE, new ResolvableProfile(gameProfile)));
-        } catch (InterruptedException | ExecutionException | NullPointerException | TimeoutException e) {
-            e.printStackTrace();
-        }
+        itemStack.set(DataComponents.PROFILE, ResolvableProfile.createUnresolved(playerId));
         return itemStack;
     }
 
@@ -172,7 +166,7 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
             SoundEvent deathSound = entity.getDeathSound();
             if(BlockSpiritFurnaceConfig.mobDeathSounds && deathSound != null) {
                 BlockPos pos = tile.getBlockPos();
-                world.playSound(null, pos, deathSound, entity.getSoundSource(), 0.5F + world.random.nextFloat() * 0.2F, 1.0F);
+                world.playSound(null, pos, deathSound, entity.getSoundSource(), 0.5F + world.getRandom().nextFloat() * 0.2F, 1.0F);
             }
 
             if(tile.isPlayer()) {
@@ -190,26 +184,26 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
                 if(!BlockBoxOfEternalClosure.FORGOTTEN_PLAYER.equals(tile.getPlayerName())) {
                     possibleDrops.add(new WeightedItemStack(getPlayerSkull(UUID.fromString(tile.getPlayerId())), 1));
                 }
-                WeightedItemStack weightedItemStack = WeightedItemStack.getRandomWeightedItemStack(possibleDrops, world.random);
-                ItemStack drop = weightedItemStack.getItemStackWithRandomizedSize(world.random);
+                WeightedItemStack weightedItemStack = WeightedItemStack.getRandomWeightedItemStack(possibleDrops, world.getRandom());
+                ItemStack drop = weightedItemStack.getItemStackWithRandomizedSize(world.getRandom());
                 if (!drop.isEmpty()) {
                     tile.onItemDrop(drop);
                 }
             } else {
                 if (MOBDROP_OVERRIDES.containsKey(entity.getClass())) {
                     List<WeightedItemStack> possibleDrops = MOBDROP_OVERRIDES.get(entity.getClass());
-                    WeightedItemStack weightedItemStack = WeightedItemStack.getRandomWeightedItemStack(possibleDrops, world.random);
-                    ItemStack drop = weightedItemStack.getItemStackWithRandomizedSize(world.random);
+                    WeightedItemStack weightedItemStack = WeightedItemStack.getRandomWeightedItemStack(possibleDrops, world.getRandom());
+                    ItemStack drop = weightedItemStack.getItemStackWithRandomizedSize(world.getRandom());
                     if (!drop.isEmpty()) {
                         tile.onItemDrop(drop);
                     }
                 } else {
                     ResourceKey<LootTable> deathLootTable;
-                    Map<EntityType<?>, ResourceLocation> mobDropTablesOverrides = getMobDropTablesOverrides();
+                    Map<EntityType<?>, Identifier> mobDropTablesOverrides = getMobDropTablesOverrides();
                     if (mobDropTablesOverrides.containsKey(entity.getType())) {
                         deathLootTable = ResourceKey.create(Registries.LOOT_TABLE, mobDropTablesOverrides.get(entity.getType()));
                     } else {
-                        deathLootTable = entity.getLootTable();
+                        deathLootTable = entity.getLootTable().orElse(null);
                     }
                     if(deathLootTable != null) {
                         LootTable loottable = tile.getLevel().getServer().reloadableRegistries().getLootTable(deathLootTable);
@@ -228,7 +222,9 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
                         }*/
 
                         for (ItemStack itemstack : loottable.getRandomItems(lootcontext$builder.create(LootContextParamSets.ENTITY))) {
-                            tile.onItemDrop(itemstack);
+                            if (!itemstack.isEmpty()) {
+                                tile.onItemDrop(itemstack);
+                            }
                         }
                     }
                 }
@@ -258,7 +254,7 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
                     continue;
                 }
                 try {
-                    ItemStack itemStack = ItemStackHelpers.parseItemStack(split[1]);
+                    ItemStack itemStack = IModHelpers.get().getItemStackHelpers().parseItemStack(split[1]);
                     map.put(playerId, Lists.newArrayList(new WeightedItemStack(itemStack, 1)));
                 } catch (IllegalArgumentException e) {
                     EvilCraft.clog("Invalid item '" + split[1] + "' in "
@@ -272,22 +268,22 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
         return map;
     }
 
-    private Map<EntityType<?>, ResourceLocation> getMobDropTablesOverrides() {
-        Map<EntityType<?>, ResourceLocation> map = Maps.newIdentityHashMap();
+    private Map<EntityType<?>, Identifier> getMobDropTablesOverrides() {
+        Map<EntityType<?>, Identifier> map = Maps.newIdentityHashMap();
         for(String line : BlockSpiritFurnaceConfig.mobDrops) {
             String[] split = line.split(BlockSpiritFurnaceConfig.DELIMITER);
             if(split.length != 2) {
                 throw new IllegalArgumentException("Invalid line '" + line + "' found for "
                         + "a Spirit Furnace mob drop config.");
             }
-            ResourceLocation entityName = ResourceLocation.parse(split[0]);
+            Identifier entityName = Identifier.parse(split[0]);
             if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entityName)) {
                 EvilCraft.clog("Invalid line '" + line + "' found for "
                         + "a Spirit Furnace mob drop config: " + split[0] + " does not refer to a valid entity name; skipping.");
                 continue;
             }
-            ResourceLocation resourceLocation = ResourceLocation.parse(split[1]);
-            map.put(BuiltInRegistries.ENTITY_TYPE.get(entityName), resourceLocation);
+            Identifier resourceLocation = Identifier.parse(split[1]);
+            map.put(BuiltInRegistries.ENTITY_TYPE.getValue(entityName), resourceLocation);
         }
         return map;
     }
@@ -296,7 +292,7 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
         int baseUsage;
         if(tile.isPlayer()) {
             baseUsage = BlockSpiritFurnaceConfig.playerMBPerTick;
-        } else if (tile.getEntity() != null && !tile.getEntity().canChangeDimensions(tile.getLevel(), tile.getLevel())) {
+        } else if (tile.getEntity() != null && !tile.getEntity().canTeleport(tile.getLevel(), tile.getLevel())) {
             baseUsage = BlockSpiritFurnaceConfig.bossMBPerTick;
         } else {
             baseUsage = BlockSpiritFurnaceConfig.mBPerTick;
@@ -310,7 +306,10 @@ public class BoxCookTickAction implements ITickAction<BlockEntitySpiritFurnace> 
     public void onTick(BlockEntitySpiritFurnace tile, ItemStack itemStack, int slot,
                        int tick) {
         // Drain the tank a bit.
-        tile.getTank().drain(getRequiredMb(tile, tick), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            tile.getTank().extract(FluidResource.of(tile.getTank().getAcceptedFluid()), getRequiredMb(tile, tick), tx);
+            tx.commit();
+        }
         if(tick >= getRequiredTicks(tile, slot, tick)) {
             doNextDrop(tile);
         }

@@ -11,11 +11,11 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
  * Recipe serializer for fluid container clear recipes.
  * @author rubensworks
  */
-public class RecipeSerializerFluidContainerClear implements RecipeSerializer<RecipeFluidContainerClear> {
+public class RecipeSerializerFluidContainerClear {
 
     public static final MapCodec<RecipeFluidContainerClear> CODEC = RecordCodecBuilder.mapCodec(
             builder -> builder.group(
-                            Ingredient.CODEC_NONEMPTY.fieldOf("item").forGetter(RecipeFluidContainerClear::getInputIngredient)
+                            Ingredient.CODEC.fieldOf("item").forGetter(RecipeFluidContainerClear::getInputIngredient)
                     )
                     .apply(builder, RecipeFluidContainerClear::new)
     );
@@ -24,13 +24,5 @@ public class RecipeSerializerFluidContainerClear implements RecipeSerializer<Rec
             RecipeFluidContainerClear::new
     );
 
-    @Override
-    public MapCodec<RecipeFluidContainerClear> codec() {
-        return CODEC;
-    }
-
-    @Override
-    public StreamCodec<RegistryFriendlyByteBuf, RecipeFluidContainerClear> streamCodec() {
-        return STREAM_CODEC;
-    }
+    public static final RecipeSerializer<RecipeFluidContainerClear> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
 }

@@ -1,6 +1,5 @@
 package org.cyclops.evilcraft.entity.effect;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -15,8 +14,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
@@ -42,12 +39,14 @@ public class EntityAntiVengeanceBeam extends ThrowableProjectile {
     }
 
     public EntityAntiVengeanceBeam(EntityType<? extends EntityAntiVengeanceBeam> type, Level world, LivingEntity entity) {
-        super(type, entity, world);
+        super(type, entity.getX(), entity.getEyeY(), entity.getZ(), world);
         setDeltaMovement(getDeltaMovement().multiply(0.25, 0.25, 0.25));
+        setOwner(entity);
     }
 
     public EntityAntiVengeanceBeam(Level world, LivingEntity entity) {
-        super(RegistryEntries.ENTITY_ANTI_VENGEANCE_BEAM.get(), entity, world);
+        super(RegistryEntries.ENTITY_ANTI_VENGEANCE_BEAM.get(), entity.getX(), entity.getEyeY(), entity.getZ(), world);
+        setOwner(entity);
     }
 
     @Override
@@ -107,14 +106,14 @@ public class EntityAntiVengeanceBeam extends ThrowableProjectile {
                 entityRayTraceResult = new EntityHitResult(entity);
             }
         } else {
-            for(int i = 0; i < level().random.nextInt(5) + 5; i++) {
+            for(int i = 0; i < level().getRandom().nextInt(5) + 5; i++) {
                 showNewBlurParticle();
             }
             if(soundTick == 1) {
                 // Play beam sound
                 level().playLocalSound(getX(), getY(), getZ(),
                         RegistryEntries.SOUNDEVENT_EFFECT_VENGEANCEBEAM_BASE.get(), SoundSource.NEUTRAL,
-                        0.5F + level().random.nextFloat() * 0.2F, 1.0F, false);
+                        0.5F + level().getRandom().nextFloat() * 0.2F, 1.0F, false);
             }
         }
 
@@ -129,7 +128,6 @@ public class EntityAntiVengeanceBeam extends ThrowableProjectile {
         super.tick();
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected void showNewBlurParticle() {
         float scale = 0.6F - random.nextFloat() * 0.3F;
         float red = random.nextFloat() * 0.03F + 0.01F;
@@ -138,8 +136,8 @@ public class EntityAntiVengeanceBeam extends ThrowableProjectile {
         float ageMultiplier = (float) (random.nextDouble() * 6.5D + 4D);
         Vec3 motion = getDeltaMovement();
 
-        Minecraft.getInstance().levelRenderer.addParticle(
-                new ParticleBlurData(red, green, blue, scale, ageMultiplier), false,
+        level().addParticle(
+                new ParticleBlurData(red, green, blue, scale, ageMultiplier),
                 getX(), getY(), getZ(),
                 deriveMotion(motion.x), deriveMotion(motion.y), deriveMotion(motion.z));
     }

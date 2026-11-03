@@ -3,23 +3,24 @@ package org.cyclops.evilcraft.blockentity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
 import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
@@ -78,7 +79,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = FluidHelpers.BUCKET_VOLUME * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     private static final Map<Class<?>, ITickAction<BlockEntitySpiritReanimator>> REANIMATE_COOK_TICK_ACTIONS = new LinkedHashMap<Class<?>, ITickAction<BlockEntitySpiritReanimator>>();
     static {
@@ -151,7 +152,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
                     (blockEntity, direction) -> {
                         int slots[];
                         if (direction == Direction.UP) {
@@ -161,7 +162,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
                         } else {
                             slots = new int[]{SLOT_CONTAINER, SLOT_BOX};
                         }
-                        return new ItemHandlerSlotMasked(blockEntity.getInventory(), slots);
+                        return VanillaContainerWrapper.of(new InventorySlotMasked(blockEntity.getInventory(), slots));
                     }
             );
         }
@@ -175,7 +176,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
                 if(slot == SLOT_BOX)
                     return getTileWorkingMetadata().canConsume(itemStack, getLevel());
                 if(slot == SLOT_EGG)
-                    return itemStack.getItem() == Items.EGG
+                    return itemStack.is(ItemTags.EGGS)
                             /*&& ResurgenceEgg.getInstance().isEmpty(itemStack) also enable in acceptance slot in container*/;
                 if(slot == SLOT_CONTAINER)
                     return SlotFluidContainer.checkIsItemValid(itemStack, RegistryEntries.FLUID_BLOOD.get());
@@ -186,7 +187,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
 
     @Override
     public Direction getRotation() {
-        return BlockHelpers.getSafeBlockStateProperty(getLevel().getBlockState(getBlockPos()), BlockSpiritReanimator.FACING, Direction.NORTH).getOpposite();
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(getLevel().getBlockState(getBlockPos()), BlockSpiritReanimator.FACING, Direction.NORTH).getOpposite();
     }
 
     @Override
@@ -241,7 +242,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
         boolean validNameStack = entityType != null
                 && (outputStack.isEmpty() ||
                     (outputStack.getMaxStackSize() > outputStack.getCount()
-                        && SpawnEggItem.byId(entityType) == outputStack.getItem()));
+                        && SpawnEggItem.spawnsEntity(outputStack, entityType)));
         return !eggStack.isEmpty() && validNameStack;
     }
 

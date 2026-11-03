@@ -4,13 +4,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,13 +19,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.api.broom.BroomModifiers;
@@ -99,11 +98,9 @@ public class EntityBroom extends Entity {
      * that was set by this broom during its last
      * update.
      */
-    @OnlyIn(Dist.CLIENT)
     private double oldHoverOffset;
 
     private Map<BroomModifier, Float> cachedModifiers = null;
-    private boolean isChangingDimensions;
 
     public EntityBroom(EntityType<? extends EntityBroom> type, Level world) {
         this(type, world, 0.0, 0.0, 0.0);
@@ -144,7 +141,7 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, net.minecraft.world.phys.Vec3 vec3) {
         if (!this.level().isClientSide() && !isVehicle() && !player.isCrouching()) {
             player.startRiding(this);
             lastMounted = player;
@@ -170,19 +167,6 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements) {
-        posRotationIncrements += 6;
-
-        //this.yOffset = 0.0F;
-        this.newPosX = x;
-        this.newPosY = y;
-        this.newPosZ = z;
-        this.newRotationYaw = (double)yaw;
-        this.newRotationPitch = (double)pitch;
-        this.newPosRotationIncrements = posRotationIncrements;
-    }
-
-    @Override
     @Nullable
     public LivingEntity getControllingPassenger() {
         Entity entity = getControllingPassengerRaw();
@@ -195,11 +179,8 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (!this.level().isClientSide() && this.isAlive()) {
-            if (this.isInvulnerableTo(source)) {
-                return false;
-            }
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        if (this.isAlive()) {
             if (source.getEntity() instanceof Player && source.getEntity() != lastMounted) {
                 if (isVehicle()) {
                     this.stopRiding();
@@ -208,7 +189,7 @@ public class EntityBroom extends Entity {
                     Player player = (Player) source.getEntity();
                     if (!player.isCreative()) {
                         ItemStack itemStack = getBroomStack().copy();
-                        this.spawnAtLocation(itemStack, 0.0F);
+                        this.spawnAtLocation(level, itemStack, 0.0F);
                     }
                 }
             }
@@ -266,7 +247,7 @@ public class EntityBroom extends Entity {
                 updateMountedClient();
             }
 
-            if(MinecraftHelpers.isClientSide() && getModifier(BroomModifiers.PARTICLES) > 0) {
+            if(IModHelpers.get().getMinecraftHelpers().isClientSide() && getModifier(BroomModifiers.PARTICLES) > 0) {
                 showParticles(this);
             }
 
@@ -303,21 +284,13 @@ public class EntityBroom extends Entity {
         }
     }
 
-    @Override
-    public @org.jetbrains.annotations.Nullable Entity changeDimension(DimensionTransition pTransition) {
-        this.isChangingDimensions = true;
-        Entity ret = super.changeDimension(pTransition);
-        this.isChangingDimensions = false;
-        return ret;
-    }
-
     private void onDismount() {
         // The player dismounted, give him his broom back if he's not in creative mode
         if (lastMounted instanceof Player) {
             stopAllowFlying(lastMounted);
             Player player = (Player) lastMounted;
             // Return to inventory if we have space and the player is not dead, otherwise drop it on the ground
-            if (!this.isChangingDimensions && player.isAlive() && (!MinecraftHelpers.isPlayerInventoryFull(player) || player.isCreative())) {
+            if (player.isAlive() && (!IModHelpers.get().getMinecraftHelpers().isPlayerInventoryFull(player) || player.isCreative())) {
                 // Return to inventory if he's not in creative mode
                 if (!player.isCreative()) {
                     player.getInventory().add(getBroomStack());
@@ -336,16 +309,15 @@ public class EntityBroom extends Entity {
 
     @Override
     protected void removePassenger(Entity passenger) {
-        if (!getCommandSenderWorld().isClientSide() && getControllingPassengerRaw() == passenger) {
+        if (!level().isClientSide() && getControllingPassengerRaw() == passenger) {
             onDismount();
         }
         super.removePassenger(passenger);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void showParticles(EntityBroom broom) {
         Level world = broom.level();
-        if (world.isClientSide() && broom.lastMounted.zza != 0) {
+        if (world.isClientSide() && broom.getForwardInput(broom.lastMounted) != 0) {
             // Emit particles
             int particles = (int) (broom.getModifier(BroomModifiers.PARTICLES) * (float) broom.getLastPlayerSpeed());
             Triple<Float, Float, Float> color = BroomModifier.getAverageColor(broom.getModifiers());
@@ -354,8 +326,8 @@ public class EntityBroom extends Entity {
                 float g = color.getMiddle();
                 float b = color.getRight();
                 Vec3 motion = broom.getDeltaMovement();
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        new ParticleColoredSmokeData(r, g, b), false,
+                world.addParticle(
+                        new ParticleColoredSmokeData(r, g, b),
                         broom.getX() - motion.x * 1.5D + Math.random() * 0.4D - 0.2D,
                         broom.getY() - motion.y * 1.5D + Math.random() * 0.4D - 0.2D,
                         broom.getZ() - motion.z * 1.5D + Math.random() * 0.4D - 0.2D,
@@ -393,6 +365,20 @@ public class EntityBroom extends Entity {
         move(MoverType.SELF, new Vec3(0, getHoverOffset(), 0));
     }
 
+    /**
+     * Get the forward movement input for a living entity.
+     * For server players, reads from the last client input (since zza is no longer set from packets
+     * when riding a vehicle in newer Minecraft versions). For other entities, falls back to zza.
+     */
+    public float getForwardInput(LivingEntity entity) {
+        if (entity instanceof ServerPlayer serverPlayer) {
+            Input input = serverPlayer.getLastClientInput();
+            if (input.forward() == input.backward()) return 0.0F;
+            return input.forward() ? 1.0F : -1.0F;
+        }
+        return entity.zza;
+    }
+
     public boolean canConsume(int amount, LivingEntity entityLiving) {
         ItemStack broomStack = getBroomStack();
         return broomStack != null && broomStack.getItem() instanceof IBroom
@@ -401,7 +387,7 @@ public class EntityBroom extends Entity {
 
     public void consume(int amount, LivingEntity entityLiving) {
         float efficiencyFactor = Math.min(0.9F, Math.max(0.0F, getModifier(BroomModifiers.EFFICIENCY) / BroomModifiers.EFFICIENCY.getMaxTierValue()));
-        if(level().random.nextFloat() > efficiencyFactor) {
+        if(level().getRandom().nextFloat() > efficiencyFactor) {
             ItemStack broomStack = getBroomStack();
             ((IBroom) broomStack.getItem()).consumeBroom(amount, broomStack, entityLiving);
             setBroomStack(broomStack);
@@ -470,7 +456,8 @@ public class EntityBroom extends Entity {
         playerSpeed += getModifier(BroomModifiers.SPEED) / 100;
         int amount = ItemBroomConfig.bloodUsage;
         LivingEntity currentRidingEntity = getControllingPassenger();
-        float moveForward = canConsume(amount, currentRidingEntity) ? lastMounted.zza : lastMounted.zza / 10F;
+        float forwardInput = getForwardInput(lastMounted);
+        float moveForward = canConsume(amount, currentRidingEntity) ? forwardInput : forwardInput / 10F;
         playerSpeed *= moveForward;
         if(moveForward != 0) {
             consume(amount, currentRidingEntity);
@@ -538,7 +525,7 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource damageSource) {
+    public boolean causeFallDamage(double fallDistance, float damageMultiplier, DamageSource damageSource) {
         // Makes sure the player doesn't get any fall damage when on the broom
         return false;
     }
@@ -554,12 +541,12 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag nbttagcompound) {
+    protected void readAdditionalSaveData(ValueInput p_422333_) {
 
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag nbttagcompound) {
+    protected void addAdditionalSaveData(ValueOutput p_421996_) {
 
     }
 
@@ -609,17 +596,15 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public CompoundTag saveWithoutId(CompoundTag tag) {
-        tag = super.saveWithoutId(tag);
-        Tag broomItemTag = getBroomStack().save(registryAccess());
-        tag.put("broomItem", broomItemTag);
-        return tag;
+    public void saveWithoutId(ValueOutput valueOutput) {
+        super.saveWithoutId(valueOutput);
+        valueOutput.store("broomItem", ItemStack.OPTIONAL_CODEC, getBroomStack());
     }
 
     @Override
-    public void load(CompoundTag tagCompound) {
-        super.load(tagCompound);
-        ItemStack broomStack = ItemStack.parseOptional(registryAccess(), tagCompound.getCompound("broomItem"));
+    public void load(ValueInput valueInput) {
+        super.load(valueInput);
+        ItemStack broomStack = valueInput.read("broomItem", ItemStack.OPTIONAL_CODEC).orElseThrow();
         if (!broomStack.isEmpty()) {
             setBroomStack(broomStack);
         }

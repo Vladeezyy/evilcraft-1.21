@@ -4,10 +4,9 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -20,16 +19,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.capability.item.ItemHandlerSlotMasked;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
 import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -83,7 +85,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = FluidHelpers.BUCKET_VOLUME * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     public static Metadata METADATA = new Metadata();
 
@@ -152,7 +154,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
                                 key.getRight());
 
                         // Make sure we always pick the highest tier when there are multiple matches
-                        return level.getRecipeManager().getRecipesFor(getRegistry(), recipeInput, getLevel()).stream()
+                        return ((ServerLevel) level).recipeAccess().recipeMap().getRecipesFor(getRegistry(), recipeInput, getLevel())
                                 .map(RecipeHolder::value)
                                 .max(Comparator.comparingInt(r -> r.getInputTier().orElse(0)));
                     }
@@ -175,7 +177,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK,
+                    net.neoforged.neoforge.capabilities.Capabilities.Item.BLOCK,
                     (blockEntity, direction) -> {
                         int slot = SLOT_CONTAINER;
                         if (direction == Direction.UP) {
@@ -184,7 +186,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
                         if (direction == Direction.DOWN) {
                             slot = SLOT_INFUSE_RESULT;
                         }
-                        return new ItemHandlerSlotMasked(blockEntity.getInventory(), slot);
+                        return VanillaContainerWrapper.of(new InventorySlotMasked(blockEntity.getInventory(), slot));
                     }
             );
         }
@@ -196,20 +198,20 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
     }
 
     @Override
-    public void saveAdditional(CompoundTag data, HolderLookup.Provider holderLookupProvider) {
-        data.putFloat("xp", xp);
-        super.saveAdditional(data, holderLookupProvider);
+    public void saveAdditional(ValueOutput valueOutput) {
+        valueOutput.putFloat("xp", xp);
+        super.saveAdditional(valueOutput);
     }
 
     @Override
-    public void read(CompoundTag data, HolderLookup.Provider holderLookupProvider) {
-        this.xp = data.getFloat("xp");
-        super.read(data, holderLookupProvider);
+    public void read(ValueInput valueInput) {
+        this.xp = valueInput.getFloatOr("xp", 0);
+        super.read(valueInput);
     }
 
     @Override
     public Direction getRotation() {
-        return BlockHelpers.getSafeBlockStateProperty(getBlockState(), BlockBloodInfuser.FACING, Direction.NORTH).getOpposite();
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(getBlockState(), BlockBloodInfuser.FACING, Direction.NORTH).getOpposite();
     }
 
     @Override
@@ -228,7 +230,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
     public void onStateChanged() {
         sendUpdate();
         level.setBlockAndUpdate(getBlockPos(), getBlockState().setValue(BlockBloodInfuser.ON, isWorking()));
-        BlockHelpers.markForUpdate(getLevel(), getBlockPos());
+        IModHelpers.get().getBlockHelpers().markForUpdate(getLevel(), getBlockPos());
     }
 
     @Override
@@ -287,20 +289,20 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
         public boolean canConsume(ItemStack itemStack, Level world) {
             // Valid fluid handler
             if (!itemStack.isEmpty()) {
-                Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(itemStack.copy().split(1));
-                if (fluidHandler.isPresent()) {
+                if (ItemAccess.forStack(itemStack).getCapability(Capabilities.Fluid.ITEM) != null) {
                     return true;
                 }
             }
 
-            // Valid custom recipe
-            IInventoryFluidTier recipeInput = new InventoryFluidTier(
-                    NonNullList.of(ItemStack.EMPTY, itemStack),
-                    NonNullList.of(FluidStack.EMPTY, new FluidStack(RegistryEntries.FLUID_BLOOD, Integer.MAX_VALUE)),
-                    Upgrades.TIERS);
-            return world.getRecipeManager()
-                    .getRecipeFor(RegistryEntries.RECIPETYPE_BLOOD_INFUSER.get(), recipeInput, world)
-                    .isPresent();
+            // Not easily possible anymore to validate recipe validity client-side, so we just accept all.
+//            // Valid custom recipe
+//            IInventoryFluidTier recipeInput = new InventoryFluidTier(
+//                    NonNullList.of(ItemStack.EMPTY, itemStack),
+//                    NonNullList.of(FluidStack.EMPTY, new FluidStack(RegistryEntries.FLUID_BLOOD, Integer.MAX_VALUE)),
+//                    Upgrades.TIERS);
+//            return IModHelpers.get().getCraftingHelpers().findRecipe(RegistryEntries.RECIPETYPE_BLOOD_INFUSER.get(), recipeInput, world)
+//                    .isPresent();
+            return true;
         }
 
         @Override

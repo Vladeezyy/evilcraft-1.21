@@ -10,12 +10,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.ExtendedDamageSources;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
@@ -44,7 +41,7 @@ public class ItemMaceOfDistortion extends ItemMace {
     private static final int MAXIMUM_CHARGE = 100;
     private static final float MELEE_DAMAGE = 7.0F;
     private static final float RADIAL_DAMAGE = 3.0F;
-    private static final int CONTAINER_SIZE = FluidHelpers.BUCKET_VOLUME * 4;
+    private static final int CONTAINER_SIZE = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 4;
     private static final int HIT_USAGE = 5;
     private static final int POWER_LEVELS = 5;
 
@@ -130,34 +127,28 @@ public class ItemMaceOfDistortion extends ItemMace {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void showEntityDistored(Level world, LivingEntity initiator, Entity entity, int power) {
         // Play a nice sound with the volume depending on the power.
-        world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, (float) (power + 1) / (float) POWER_LEVELS, 0.4F / (world.random.nextFloat() * 0.4F + 0.8F));
+        world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, (float) (power + 1) / (float) POWER_LEVELS, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
         if(initiator != null) {
-            world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, (float) (power + 1) / (float) POWER_LEVELS, 0.4F / (world.random.nextFloat() * 0.4F + 0.8F));
+            world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, (float) (power + 1) / (float) POWER_LEVELS, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
         }
         // Fake explosion effect.
-        world.addParticle(ParticleTypes.EXPLOSION, entity.getX(), entity.getY() + world.random.nextFloat(), entity.getZ(), 1.0D, 0.0D, 0.0D);
+        world.addParticle(ParticleTypes.EXPLOSION, entity.getX(), entity.getY() + world.getRandom().nextFloat(), entity.getZ(), 1.0D, 0.0D, 0.0D);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    protected void animateOutOfEnergy(Level world, Player player) {
+    @Override
+    protected void animateOutOfEnergy(Level world, LivingEntity player) {
         double xCoord = player.getX();
         double yCoord = player.getY();
         double zCoord = player.getZ();
 
-        float particleMotionX = world.random.nextFloat() * 0.2F - 0.1F;
+        float particleMotionX = world.getRandom().nextFloat() * 0.2F - 0.1F;
         float particleMotionY = 0.2F;
-        float particleMotionZ = world.random.nextFloat() * 0.2F - 0.1F;
+        float particleMotionZ = world.getRandom().nextFloat() * 0.2F - 0.1F;
         world.addParticle(ParticleTypes.SMOKE, xCoord, yCoord, zCoord, particleMotionX, particleMotionY, particleMotionZ);
 
-        world.playSound(player, xCoord, yCoord, zCoord, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, 0.5F, 0.4F / (world.random.nextFloat() * 0.4F + 0.8F));
-    }
-
-    @Override
-    public int getEnchantmentValue(ItemStack itemStack) {
-        return 15;
+        world.playSound(player, xCoord, yCoord, zCoord, SoundEvents.NOTE_BLOCK_BASEDRUM.value(), SoundSource.RECORDS, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 
     @Override

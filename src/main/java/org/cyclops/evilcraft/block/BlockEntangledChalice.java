@@ -7,7 +7,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +28,14 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.model.data.ModelProperty;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
-import org.cyclops.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityEntangledChalice;
@@ -81,7 +81,7 @@ public class BlockEntangledChalice extends BlockWithEntity implements IInformati
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_ENTANGLED_CHALICE.get(), new BlockEntityEntangledChalice.TickerServer());
+        return level.isClientSide() ? null : createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_ENTANGLED_CHALICE.get(), new BlockEntityEntangledChalice.TickerServer());
     }
 
     @Override
@@ -100,16 +100,16 @@ public class BlockEntangledChalice extends BlockWithEntity implements IInformati
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHitResult) {
+    protected InteractionResult useItemOn(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHitResult) {
         if (FluidUtil.interactWithFluidHandler(pPlayer, pHand, pLevel, pPos, Direction.UP)) {
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         if (pLevel.isClientSide()) {
-            String tankId = BlockEntityHelpers.get(pLevel, pPos, BlockEntityEntangledChalice.class)
+            String tankId = IModHelpers.get().getBlockEntityHelpers().get(pLevel, pPos, BlockEntityEntangledChalice.class)
                     .map(BlockEntityEntangledChalice::getWorldTankId)
                     .orElse("null");
-            pPlayer.displayClientMessage(Component.translatable(L10NHelpers.localize(
-                    "block.evilcraft.entangled_chalice.info.id", ItemEntangledChalice.tankIdToNameParts(tankId))), true);
+            pPlayer.sendOverlayMessage(Component.translatable(IModHelpers.get().getL10NHelpers().localize(
+                    "block.evilcraft.entangled_chalice.info.id", ItemEntangledChalice.tankIdToNameParts(tankId))));
         }
         return super.useItemOn(pStack, pState, pLevel, pPos, pPlayer, pHand, pHitResult);
     }
@@ -120,7 +120,6 @@ public class BlockEntangledChalice extends BlockWithEntity implements IInformati
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag iTooltipFlag) {
 
     }
@@ -167,10 +166,13 @@ public class BlockEntangledChalice extends BlockWithEntity implements IInformati
     }
 
     public void fillItemCategory(NonNullList<ItemStack> list) {
-        ItemStack itemStack = new ItemStack(this);
-        ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) FluidUtil.getFluidHandler(itemStack).orElse(null);
-        fluidHandler.setTankID("creative");
-        list.add(itemStack);
+        ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(this));
+        ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) itemAccess.getCapability(Capabilities.Fluid.ITEM);
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.setTankID("creative", tx);
+            tx.commit();
+        }
+        list.add(itemAccess.getResource().toStack());
     }
 
     @Override

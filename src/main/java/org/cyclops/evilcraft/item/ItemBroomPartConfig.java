@@ -2,15 +2,13 @@ package org.cyclops.evilcraft.item;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,28 +18,24 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemBroomPartConfig extends ItemConfig {
+public class ItemBroomPartConfig extends ItemConfigCommon<ModBaseNeoForge<?>> {
 
     public ItemBroomPartConfig() {
         super(
             EvilCraft._instance,
             "broom_part",
-                eConfig -> new ItemBroomPart(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemBroomPart(properties)
         );
         EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
-        if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void registerColors(RegisterColorHandlersEvent.Item event) {
-        event.register(new ItemBroomPart.ItemColor(), getInstance());
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public @Nullable ItemClientConfig<ModBaseNeoForge<?>> constructItemClientConfig() {
+        return new ItemBroomPartConfigClient(this);
+    }
+
+    @Override
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

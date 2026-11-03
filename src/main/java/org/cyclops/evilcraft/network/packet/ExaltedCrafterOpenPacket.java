@@ -2,13 +2,11 @@ package org.cyclops.evilcraft.network.packet;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;
@@ -22,7 +20,7 @@ import org.cyclops.evilcraft.item.ItemExaltedCrafter;
  */
 public class ExaltedCrafterOpenPacket extends PacketCodec<ExaltedCrafterOpenPacket> {
 
-    public static final Type<ExaltedCrafterOpenPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "exalted_crafter_open"));
+    public static final Type<ExaltedCrafterOpenPacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "exalted_crafter_open"));
     public static final StreamCodec<RegistryFriendlyByteBuf, ExaltedCrafterOpenPacket> CODEC = getCodec(ExaltedCrafterOpenPacket::new);
 
     @CodecField
@@ -46,7 +44,6 @@ public class ExaltedCrafterOpenPacket extends PacketCodec<ExaltedCrafterOpenPack
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void actionClient(Level world, Player player) {
 
     }

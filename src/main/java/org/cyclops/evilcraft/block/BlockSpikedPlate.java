@@ -15,9 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import org.cyclops.cyclopscore.helper.BlockHelpers;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.ExtendedDamageSources;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntitySanguinaryPedestal;
@@ -61,17 +61,19 @@ public class BlockSpikedPlate extends BlockPressurePlate {
             float damage = (float) BlockSpikedPlateConfig.damage;
 
             // To make sure the entity actually will drop something.
-            ((LivingEntity) entity).lastHurtByPlayerTime = 100;
+            ((LivingEntity) entity).lastHurtByPlayerMemoryTime = 100;
 
-            if(entity.hurt(ExtendedDamageSources.spikedDamage(world, blockPos), damage)) {
-                BlockEntity tile = world.getBlockEntity(blockPos.offset(0, -1, 0));
-                if(tile != null && tile instanceof BlockEntitySanguinaryPedestal) {
-                    int amount = Mth.floor(damage * (float) BlockSpikedPlateConfig.mobMultiplier);
+            entity.hurt(ExtendedDamageSources.spikedDamage(world, blockPos), damage);
+            BlockEntity tile = world.getBlockEntity(blockPos.offset(0, -1, 0));
+            if(tile != null && tile instanceof BlockEntitySanguinaryPedestal) {
+                int amount = Mth.floor(damage * (float) BlockSpikedPlateConfig.mobMultiplier);
+                try (var tx = Transaction.openRoot()) {
                     ((BlockEntitySanguinaryPedestal) tile).getBonusFluidHandler()
-                            .fill(new FluidStack(RegistryEntries.FLUID_BLOOD, amount), IFluidHandler.FluidAction.EXECUTE);
+                            .insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), amount, tx);
+                    tx.commit();
                 }
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -95,7 +97,7 @@ public class BlockSpikedPlate extends BlockPressurePlate {
     }
 
     protected int getSignalForState(BlockState blockState) {
-        return BlockHelpers.getSafeBlockStateProperty(blockState, POWERED, false) ? 15 : 0;
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(blockState, POWERED, false) ? 15 : 0;
     }
 
     protected BlockState setSignalForState(BlockState blockState, int meta) {

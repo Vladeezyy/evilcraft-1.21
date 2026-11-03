@@ -1,8 +1,8 @@
 plugins {
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
-    id 'net.darkhax.curseforgegradle' version '1.1.15'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'net.darkhax.curseforgegradle' version '1.1.28'
 	id 'com.github.kt3k.coveralls' version '2.10.2'
-    id 'com.diffplug.spotless' version '6.25.0'
+    id 'com.diffplug.spotless' version '7.2.1'
     id 'com.gradleup.shadow' version '8.3.8'
 	id 'com.modrinth.minotaur' version '2.+'
 }
@@ -12,7 +12,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'jacoco'
 
-import net.neoforged.gradle.common.tasks.PotentiallySignJar
+
 import net.darkhax.curseforgegradle.Constants
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
@@ -71,7 +71,20 @@ def getChangelog() {
     if (System.getenv().RELEASE) {
         return file("./CHANGELOG-${project.minecraft_version}.md").getText();
     } else {
-        return "Changes since last release: ${project.github_url}/compare/${project.minecraft_version}-${project.mod_version}...${System.getenv().GITHUB_SHA}"
+        // Check if any release tag exists for this Minecraft version.
+        // Uses providers.exec so the process is not started during configuration,
+        // which would be incompatible with the configuration cache.
+        def tags = providers.exec {
+            workingDir = project.rootProject.projectDir
+            commandLine 'git', 'tag', '--list', "${project.minecraft_version}-*"
+        }.standardOutput.asText.get().trim()
+        if (tags) {
+            return "Changes since last release: ${project.github_url}/compare/${project.minecraft_version}-${project.mod_version}...${System.getenv().GITHUB_SHA}"
+        } else {
+            // No release has been made yet for this Minecraft version, link to all commits on the branch
+            def branch = System.getenv().GITHUB_REF_NAME ?: 'HEAD'
+            return "Changes since last release: ${project.github_url}/commits/${branch}"
+        }
     }
 }
 //ext {
@@ -112,13 +125,19 @@ repositories {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${project.neoforge_version}"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'
+    testImplementation 'org.junit.platform:junit-platform-suite-api:1.14.1'
+    testImplementation 'org.hamcrest:hamcrest:2.1'
+    testImplementation "org.mockito:mockito-core:2.+"
+    testRuntimeOnly 'org.junit.platform:junit-platform-suite-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // Add something like 'cyclopscore_version_local=0.1.0-DEV' to your secrets.properties if you want to use a custom local CyclopsCore version.
     if(secrets.cyclopscore_version_local) {
-        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${secrets.cyclopscore_version_local}:deobf"
+        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${secrets.cyclopscore_version_local}"
     } else {
-        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${project.cyclopscore_version}:deobf"
+        implementation "org.cyclops.cyclopscore:cyclopscore-${project.minecraft_version}-neoforge:${project.cyclopscore_version}"
     }
 
     // Add something like 'evilcraftcompat_version_local=0.1.0-DEV' to your secrets.properties if you want to use a custom local EvilCraft Compat version.
@@ -127,56 +146,53 @@ dependencies {
             transitive = false
         }
     } else {
-        shadow("org.cyclops.evilcraftcompat:evilcraftcompat-${project.minecraft_version}-neoforge:${project.evilcraftcompat_version}") {
+        shadow("org.cyclops.evilcraftcompat:evilcraftcompat-${project.evilcraftcompat_version}") {
             transitive = false
         }
     }
-
-    // Project lombok
-	compileOnly 'org.projectlombok:lombok:1.18.30'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
-	testCompileOnly 'org.projectlombok:lombok:1.18.30'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
-	
-	testImplementation "junit:junit:4.12"
 }
 
-minecraft {
-    accessTransformers {
-        file('src/main/resources/META-INF/accesstransformer.cfg')
-    }
+test {
+    useJUnitPlatform()
 }
 
-subsystems {
-    parchment {
-        minecraftVersion = "${project.parchment_minecraft_version}"
-        mappingsVersion = "${project.parchment_version}"
-    }
-}
+neoForge {
+    version = "${neoforge_version}"
 
-runs {
-    configureEach {
-		systemProperty 'forge.logging.markers', 'REGISTRIES'
-        systemProperty 'forge.logging.console.level', 'debug'
-        systemProperty 'forge.logging.console.level', 'debug'
-        modSource project.sourceSets.main
-    }
-	
-    client {
-        systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers = [ at.absolutePath ]
     }
 
-    server {
-        systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
-        programArgument '--nogui'
+    validateAccessTransformers = true
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+        gameTestServer {
+            type = "gameTestServer"
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+            systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
+        }
     }
 
-    gameTestServer {
-        systemProperty 'neoforge.enabledGameTestNamespaces', "cyclopscore,${mod_id}"
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
     }
 
-    data {
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    unitTest {
+        enable()
+        testedMod = mods.evilcraft
     }
 }
 
@@ -200,38 +216,6 @@ javadoc {
     source = [sourceSets.main.allJava]
     // prevent java 8's strict doclint for javadocs from failing builds
     options.addStringOption('Xdoclint:accessibility,html,reference,syntax', '-quiet')
-}
-
-task signJar(type: PotentiallySignJar, dependsOn: jar) {
-	dependsOn(tasks.jar)
-
-    onlyIf {
-        System.getenv().SIGN_KEYSTORE
-    }
-
-    keyStore = System.getenv().SIGN_KEYSTORE
-    alias = System.getenv().SIGN_ALIAS
-    storePass = System.getenv().SIGN_STOREPASS
-    keyPass = System.getenv().SIGN_KEYPASS
-    input = jar.archivePath
-    output = jar.archivePath
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    archiveClassifier.set('deobf')
-    manifest {
-        attributes([
-                "FMLAT": "accesstransformer.cfg",
-                "Specification-Title": "${project.name}",
-                "Specification-Vendor": "rubensworks",
-                "Specification-Version": "${project.mod_version}",
-                "Implementation-Title": "${project.name}",
-                "Implementation-Version": "${project.mod_version}",
-                "Implementation-Vendor" :"rubensworks",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
 }
 
 task sourcesJar(type: Jar) {
@@ -259,7 +243,6 @@ jar {
 
 artifacts {
 	archives shadowJar
-    archives deobfJar
     archives sourcesJar
     archives javadocJar
 }
@@ -267,7 +250,7 @@ artifacts {
 // Replace properties in files
 processResources {
     def expandProps = [
-            'mod_version'                           : mod_version,
+            'mod_version'                           : project.version,
             'group'                                 : project.group, //Else we target the task's group.
             'minecraft_version'                     : minecraft_version,
             'mod_name'                              : mod_name,
@@ -347,8 +330,8 @@ publishing {
 
     publications { PublicationContainer publicationContainer ->
         publicationContainer.register("maven", MavenPublication) { MavenPublication publication ->
-            publication.artifacts = [shadowJar, javadocJar, deobfJar, sourcesJar]
-            publication.artifactId = project.archivesBaseName.toLowerCase() // GH can't handle uppercase...
+            publication.artifacts = [shadowJar, javadocJar, sourcesJar, jar]
+            publication.artifactId = project.base.archivesName.get().toLowerCase() // GH can't handle uppercase...
         }
     }
 }
@@ -374,14 +357,10 @@ jacocoTestReport {
 }
 
 // Also measure coverage for game tests
-tasks.whenTaskAdded { task ->
-    if (task.name.equals('runGameTestServer')) {
-        jacocoTestReport.dependsOn test, task
-        jacoco {
-            toolVersion = "0.8.12"
-            applyTo task
-        }
-    }
+jacocoTestReport.dependsOn test, runGameTestServer
+jacoco {
+    toolVersion = "0.8.14"
+    applyTo runGameTestServer
 }
 
 spotless {
@@ -391,7 +370,7 @@ spotless {
         endWithNewline()
         trimTrailingWhitespace()
         removeUnusedImports()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
 }
 

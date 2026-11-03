@@ -1,0 +1,13 @@
+As always, don't forget to backup your world before updating!
+Requires CyclopsCore version 1.25.5 or higher.
+
+Changes:
+* Restore JEI mod compat
+* Optimize images (#1184)
+
+Fixes:
+* Fix singleton recipe instances
+* Fix crash when equipping spectral glasses
+* Fix broken spectral glasses texture when equipped
+* Fix CME in EntityVengeanceSpirit.canSpawnNew during dimension unload (#1182), Closes #1180
+* Fix IllegalStateException when BiomeExtract contains a biome from a removed/updated mod (#1179), Closes #1178

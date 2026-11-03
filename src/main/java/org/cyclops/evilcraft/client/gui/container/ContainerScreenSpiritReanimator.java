@@ -1,10 +1,11 @@
 package org.cyclops.evilcraft.client.gui.container;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
@@ -104,12 +105,12 @@ public class ContainerScreenSpiritReanimator extends ContainerScreenTileWorking<
     }
 
     @Override
-    public ResourceLocation constructGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "spirit_reanimator_gui.png");
+    public Identifier constructGuiTexture() {
+        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "spirit_reanimator_gui.png");
     }
 
     @Override
-    protected void drawAdditionalForeground(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected void drawAdditionalForeground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         String prefix = RegistryEntries.BLOCK_SPIRIT_REANIMATOR.get().getDescriptionId() + ".help.invalid";
         List<Component> lines = Lists.newArrayList();
         lines.add(Component.translatable(prefix));
@@ -122,18 +123,16 @@ public class ContainerScreenSpiritReanimator extends ContainerScreenTileWorking<
         else {
             ItemStack outputStack = getMenu().getContainerInventory().getItem(BlockEntitySpiritReanimator.SLOTS_OUTPUT);
             if (!outputStack.isEmpty() && outputStack.getItem() instanceof SpawnEggItem
-                    && ((SpawnEggItem) outputStack.getItem()).getType(outputStack) != BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(entityName))) {
+                    && ((SpawnEggItem) outputStack.getItem()).getType(outputStack) != BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(entityName))) {
                 lines.add(Component.translatable(prefix + ".different_egg"));
             }
         }
         if(lines.size() > 1) {
-            guiGraphics.blit(getGuiTexture(), PROGRESSTARGETX + offsetX, PROGRESSTARGETY + offsetY, PROGRESS_INVALIDX,
-                    PROGRESS_INVALIDY, PROGRESSWIDTH, PROGRESSHEIGHT);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, getGuiTexture(), PROGRESSTARGETX + offsetX, PROGRESSTARGETY + offsetY, PROGRESS_INVALIDX,
+                    PROGRESS_INVALIDY, PROGRESSWIDTH, PROGRESSHEIGHT, 256, 256);
             if(isHovering(PROGRESSTARGETX + offsetX, PROGRESSTARGETY + offsetY, PROGRESSWIDTH, PROGRESSHEIGHT,
                     mouseX, mouseY)) {
-                mouseX -= leftPos;
-                mouseY -= topPos;
-                drawTooltip(lines, guiGraphics.pose(), mouseX, mouseY);
+                drawTooltip(lines, guiGraphics, mouseX, mouseY);
             }
         }
     }

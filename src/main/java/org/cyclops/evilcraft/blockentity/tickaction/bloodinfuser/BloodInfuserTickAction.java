@@ -1,8 +1,10 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodinfuser;
 
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;
 import org.cyclops.evilcraft.core.blockentity.upgrade.UpgradeSensitiveEvent;
@@ -44,6 +46,15 @@ public abstract class BloodInfuserTickAction implements ITickAction<BlockEntityB
     }
 
     /**
+     * Get the item access for the infusion slot.
+     * @param tile The tile to check the slot for.
+     * @return The item in that slot.
+     */
+    public ItemAccess getInfuseItemAccess(BlockEntityBloodInfuser tile) {
+        return ItemAccess.forHandlerIndex(VanillaContainerWrapper.of(tile.getInventory()), tile.getTileWorkingMetadata().getConsumeSlot()).oneByOne();
+    }
+
+    /**
      * Get the item of the item that will be produced after infusion.
      * @param tile The tile that performs the infusion.
      * @return The item.
@@ -57,7 +68,7 @@ public abstract class BloodInfuserTickAction implements ITickAction<BlockEntityB
      * @return If the item could be added or joined in the production slot.
      */
     public boolean addToProduceSlot(BlockEntityBloodInfuser tile, ItemStack itemStack) {
-        return InventoryHelpers.addToSlot(tile.getInventory(), tile.getTileWorkingMetadata().getProduceSlot(), itemStack);
+        return IModHelpers.get().getInventoryHelpers().addToSlot(tile.getInventory(), tile.getTileWorkingMetadata().getProduceSlot(), itemStack);
     }
 
     /**

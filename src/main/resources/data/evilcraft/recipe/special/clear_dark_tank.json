@@ -1,6 +1,4 @@
 {
   "type": "evilcraft:crafting_special_fluidcontainer_clear",
-  "item": {
-    "item": "evilcraft:dark_tank"
-  }
+  "item": "evilcraft:dark_tank"
 }

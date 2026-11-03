@@ -2,12 +2,11 @@ package org.cyclops.evilcraft.entity.monster;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,18 +18,20 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.animal.wolf.WolfSoundVariants;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerType;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import org.cyclops.evilcraft.Reference;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -75,12 +76,12 @@ public class EntityWerewolf extends Monster {
     public static void transformWerewolfVillager(EntityTickEvent.Post event) {
         if(event.getEntity() instanceof Villager && !event.getEntity().level().isClientSide()) {
             Villager villager = (Villager) event.getEntity();
-            if (villager.getVillagerData().getProfession() == RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.get()) {
+            if (villager.getVillagerData().profession().value() == RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.get()) {
                 // Villagers that obtained this profession from a POI start at level 1, which has no trades.
-                if (villager.getVillagerData().getLevel() < 2) {
+                if (villager.getVillagerData().level() < 2) {
                     EntityWerewolf.initializeWerewolfVillagerData(villager);
                 }
-                if(EntityWerewolf.isWerewolfTime(event.getEntity().level())
+                if(EntityWerewolf.isWerewolfTime((ServerLevel) event.getEntity().level(), event.getEntity().getOnPos())
                         && villager.level().getBrightness(LightLayer.SKY, villager.blockPosition()) > 0) {
                     EntityWerewolf.replaceVillager(villager);
                 }
@@ -94,17 +95,17 @@ public class EntityWerewolf extends Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag NBTTagCompound) {
-        super.addAdditionalSaveData(NBTTagCompound);
-        NBTTagCompound.put("villager", villagerNBTTagCompound);
-        NBTTagCompound.putBoolean("fromVillager", fromVillager);
+    public void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.store("villager", ExtraCodecs.NBT, villagerNBTTagCompound);
+        valueOutput.putBoolean("fromVillager", fromVillager);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag NBTTagCompound) {
-        super.readAdditionalSaveData(NBTTagCompound);
-        this.villagerNBTTagCompound = NBTTagCompound.getCompound("villager");
-        this.fromVillager = NBTTagCompound.getBoolean("fromVillager");
+    public void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+        this.villagerNBTTagCompound = (CompoundTag) valueInput.read("villager", ExtraCodecs.NBT).orElseThrow();
+        this.fromVillager = valueInput.getBooleanOr("fromVillager", false);
     }
 
     /**
@@ -112,9 +113,9 @@ public class EntityWerewolf extends Monster {
      * @param world The world.
      * @return If it is werewolf party time.
      */
-    public static boolean isWerewolfTime(Level world) {
-        return world.getMoonBrightness() == 1.0
-                && !world.isDay()
+    public static boolean isWerewolfTime(ServerLevel world, BlockPos pos) {
+        return world.getMoonBrightness(pos) == 1.0
+                && world.isDarkOutside()
                 && world.getDifficulty() != Difficulty.PEACEFUL;
     }
 
@@ -135,7 +136,7 @@ public class EntityWerewolf extends Monster {
         initializeWerewolfVillagerData(villager);
         replaceEntity(this, villager, this.level());
         try {
-            villager.readAdditionalSaveData(villagerNBTTagCompound);
+            IModHelpers.get().getMinecraftHelpers().valueInputFromNbtVoid(villagerNBTTagCompound, level().registryAccess(), villager::readAdditionalSaveData);
         } catch (RuntimeException e) {
             e.printStackTrace();
         }
@@ -144,8 +145,8 @@ public class EntityWerewolf extends Monster {
     public static void initializeWerewolfVillagerData(Villager villager) {
         villager.setVillagerData(villager
                 .getVillagerData()
-                .setLevel(2)
-                .setProfession(RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.get()));
+                .withLevel(2)
+                .withProfession(RegistryEntries.VILLAGER_PROFESSION_WEREWOLF));
     }
 
     /**
@@ -154,25 +155,29 @@ public class EntityWerewolf extends Monster {
      */
     public static void replaceVillager(Villager villager) {
         EntityWerewolf werewolf = new EntityWerewolf(villager.level());
-        villager.addAdditionalSaveData(werewolf.getVillagerNBTTagCompound());
+        werewolf.setVillagerNBTTagCompound(IModHelpers.get().getMinecraftHelpers().valueOutputToNbt(villager::addAdditionalSaveData, villager.level().registryAccess()));
         werewolf.setFromVillager(true);
         replaceEntity(villager, werewolf, villager.level());
     }
 
+    private void setVillagerNBTTagCompound(CompoundTag compoundTag) {
+        this.villagerNBTTagCompound = compoundTag;
+    }
+
     @Override
     public void aiStep() {
-        if(!level().isClientSide() && (!isWerewolfTime(level()) || level().getDifficulty() == Difficulty.PEACEFUL)) {
+        if(!level().isClientSide() && (!isWerewolfTime((ServerLevel) level(), getOnPos()) || level().getDifficulty() == Difficulty.PEACEFUL)) {
             replaceWithVillager();
         } else {
             super.aiStep();
         }
 
         // Random barking
-        RandomSource random = level().random;
+        RandomSource random = level().getRandom();
         if(random.nextInt(BARKCHANCE) == 0 && barkprogress == -1) {
             barkprogress++;
         } else if(barkprogress > -1) {
-            playSound(SoundEvents.WOLF_GROWL, 0.15F, 1.0F);
+            playSound(SoundEvents.WOLF_SOUNDS.get(WolfSoundVariants.SoundSet.ANGRY).adultSounds().ambientSound().value(), 0.15F, 1.0F);
             barkprogress++;
             if(barkprogress > BARKLENGTH) {
                 barkprogress = -1;
@@ -193,23 +198,18 @@ public class EntityWerewolf extends Monster {
     }
 
     @Override
-    public ResourceKey<LootTable> getDefaultLootTable() {
-        return ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "entities/werewolf"));
-    }
-
-    @Override
     public SoundEvent getAmbientSound() {
-        return SoundEvents.WOLF_GROWL;
+        return SoundEvents.WOLF_SOUNDS.get(WolfSoundVariants.SoundSet.GRUMPY).adultSounds().ambientSound().value();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return SoundEvents.WOLF_HURT;
+        return SoundEvents.WOLF_SOUNDS.get(WolfSoundVariants.SoundSet.ANGRY).adultSounds().hurtSound().value();
     }
 
     @Override
     public SoundEvent getDeathSound() {
-        return SoundEvents.WOLF_DEATH;
+        return SoundEvents.WOLF_SOUNDS.get(WolfSoundVariants.SoundSet.GRUMPY).adultSounds().deathSound().value();
     }
 
     @Override

@@ -1,0 +1,8 @@
+{
+  "model": {
+    "type": "evilcraft:box_of_eternal_closure",
+    "box": "evilcraft:block/box",
+    "box_lid": "evilcraft:block/box_lid",
+    "box_lid_rotated": "evilcraft:block/box_lid_rotated"
+  }
+}

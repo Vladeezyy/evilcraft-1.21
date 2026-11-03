@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.client.gui.container;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.block.BlockColossalBloodChest;
@@ -93,8 +93,8 @@ public class ContainerScreenColossalBloodChest extends ContainerScreenTileWorkin
     }
 
     @Override
-    public ResourceLocation constructGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "colossal_blood_chest_gui.png");
+    public Identifier constructGuiTexture() {
+        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "colossal_blood_chest_gui.png");
     }
 
     @Override
@@ -103,19 +103,17 @@ public class ContainerScreenColossalBloodChest extends ContainerScreenTileWorkin
     }
 
     @Override
-    protected void drawForgegroundString(GuiGraphics guiGraphics) {
-        // MCP: drawString
-        font.drawInBatch(getName(), 8 + offsetX, 4 + offsetY, 4210752, false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+    protected void drawForgegroundString(GuiGraphicsExtractor guiGraphics) {
+        guiGraphics.text(font, getName(), 8 + offsetX, 4 + offsetY, 4210752, false);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
+        super.extractLabels(guiGraphics, mouseX, mouseY);
 
         int minusFactor = (int) (((float) (BlockEntityColossalBloodChest.MAX_EFFICIENCY - ((ContainerColossalBloodChest) getMenu()).getEfficiency()) * EFFICIENCYBARHEIGHT) / BlockEntityColossalBloodChest.MAX_EFFICIENCY);
-        guiGraphics.blit(texture, EFFICIENCYBARTARGETX + offsetX, EFFICIENCYBARTARGETY - EFFICIENCYBARHEIGHT + minusFactor,
-                EFFICIENCYBARX, EFFICIENCYBARY + minusFactor, EFFICIENCYBARWIDTH, EFFICIENCYBARHEIGHT - minusFactor);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, EFFICIENCYBARTARGETX + offsetX, EFFICIENCYBARTARGETY - EFFICIENCYBARHEIGHT + minusFactor,
+                EFFICIENCYBARX, EFFICIENCYBARY + minusFactor, EFFICIENCYBARWIDTH, EFFICIENCYBARHEIGHT - minusFactor, 256, 256);
     }
 
 }

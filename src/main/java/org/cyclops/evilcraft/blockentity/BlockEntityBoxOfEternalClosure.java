@@ -1,7 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -14,11 +13,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.AABB;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.cyclopscore.helper.WorldHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
@@ -201,14 +200,14 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
     }
 
     private EntityVengeanceSpirit createNewVengeanceSpirit() {
-        RandomSource rand = level.random;
+        RandomSource rand = level.getRandom();
 
         EntityVengeanceSpirit spirit = EntityVengeanceSpirit.fromNBT(getLevel(), getSpiritTag());
         spirit.setPos(getBlockPos().getX() + rand.nextDouble(), getBlockPos().getY() + rand.nextDouble(),
                 getBlockPos().getZ() + rand.nextDouble());
         spirit.setFrozenDuration(0);
         spirit.setGlobalVengeance(true);
-        spirit.setRemainingLife(Mth.nextInt(level.random,
+        spirit.setRemainingLife(Mth.nextInt(level.getRandom(),
                 EntityVengeanceSpirit.REMAININGLIFE_MIN, EntityVengeanceSpirit.REMAININGLIFE_MAX));
 
         return spirit;
@@ -223,7 +222,7 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
     }
 
     private float randomFloat(float min, float max) {
-        return min + level.random.nextFloat() * max;
+        return min + level.getRandom().nextFloat() * max;
     }
 
     private void playSound(SoundEvent sound, SoundSource category, float volume, float pitch) {
@@ -258,7 +257,7 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
     }
 
     private void setSpirit(EntityVengeanceSpirit spirit) {
-        spirit.getData().writeNBT(getSpiritTag());
+        setSpiritTag(IModHelpers.get().getMinecraftHelpers().valueOutputToNbt(spirit.getData()::writeNBT, spirit.level().registryAccess()));
     }
 
     private void updateLidAngle() {
@@ -323,7 +322,7 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
     }
 
     private boolean findsTargetEntity() {
-        return WorldHelpers.efficientTick(getLevel(), TICK_MODULUS, getBlockPos())
+        return IModHelpers.get().getWorldHelpers().efficientTick(getLevel(), TICK_MODULUS, getBlockPos())
                 && findNextEntity();
     }
 
@@ -358,7 +357,7 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
 
     protected void updateLight() {
         BlockState blockState = getLevel().getBlockState(getBlockPos());
-        level.sendBlockUpdated(getBlockPos(), blockState, blockState, MinecraftHelpers.BLOCK_NOTIFY | MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+        level.sendBlockUpdated(getBlockPos(), blockState, blockState, IModHelpers.get().getMinecraftHelpers().getBlockNotify() | IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
     }
 
     public float getLidAngle() {
@@ -417,14 +416,14 @@ public class BlockEntityBoxOfEternalClosure extends CyclopsBlockEntity {
 
     private EntityVengeanceSpiritData loadSpiritDataLazy() {
         if (spiritData == null) {
-            spiritData = EntityVengeanceSpiritData.fromNBT(getSpiritTag());
+            spiritData = EntityVengeanceSpiritData.fromNBT(getSpiritTag(), level.registryAccess());
         }
         return spiritData;
     }
 
     @Override
-    public void read(CompoundTag tag, HolderLookup.Provider provider) {
-        super.read(tag, provider);
+    public void read(ValueInput input) {
+        super.read(input);
         initializeState();
         initializeLidAngle();
     }

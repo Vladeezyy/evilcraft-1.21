@@ -9,16 +9,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -39,19 +37,16 @@ public class BroomPartRegistry implements IBroomPartRegistry {
 
     private static final String NBT_TAG_NAME = "broom_parts_tag";
 
-    private final Map<ResourceLocation, IBroomPart> parts = Maps.newLinkedHashMap();
+    private final Map<Identifier, IBroomPart> parts = Maps.newLinkedHashMap();
     private final Multimap<IBroomPart, Supplier<ItemStack>> partItems = MultimapBuilder.SetMultimapBuilder.hashKeys().hashSetValues().build();
     private final Multimap<IBroomPart.BroomPartType, IBroomPart> partsByType = MultimapBuilder.SetMultimapBuilder.hashKeys().hashSetValues().build();
     private final Map<IBroomPart, Map<BroomModifier, Float>> baseModifiers = Maps.newHashMap();
-    @OnlyIn(Dist.CLIENT)
-    private Map<IBroomPart, ResourceLocation> partModels;
+    private Map<IBroomPart, Identifier> partModels;
 
     public BroomPartRegistry() {
         EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, this::beforeItemsRegistered);
         NeoForge.EVENT_BUS.addListener(this::onTooltipEvent);
-        if(MinecraftHelpers.isClientSide()) {
-            partModels = Maps.newHashMap();
-        }
+        partModels = Maps.newHashMap();
     }
 
     @Override
@@ -133,7 +128,7 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     }
 
     @Override
-    public IBroomPart getPart(ResourceLocation partId) {
+    public IBroomPart getPart(Identifier partId) {
         return parts.get(partId);
     }
 
@@ -143,20 +138,17 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void registerPartModel(IBroomPart part, ResourceLocation modelLocation) {
+    public void registerPartModel(IBroomPart part, Identifier modelLocation) {
         partModels.put(part, modelLocation);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public ResourceLocation getPartModel(IBroomPart part) {
+    public Identifier getPartModel(IBroomPart part) {
         return partModels.get(part);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public Collection<ResourceLocation> getPartModels() {
+    public Collection<Identifier> getPartModels() {
         return Collections.unmodifiableCollection(partModels.values());
     }
 
@@ -200,7 +192,7 @@ public class BroomPartRegistry implements IBroomPartRegistry {
             if (part != null) {
                 Map<BroomModifier, Float> modifiers = getBaseModifiersFromPart(part);
                 if (!modifiers.isEmpty()) {
-                    if (MinecraftHelpers.isShifted()) {
+                    if (IModHelpers.get().getMinecraftClientHelpers().isShifted()) {
                         event.getToolTip().add(Component.translatable("broom.modifiers." + Reference.MOD_ID + ".types")
                                 .withStyle(ChatFormatting.ITALIC));
                         for (Map.Entry<BroomModifier, Float> entry : modifiers.entrySet()) {
@@ -222,7 +214,7 @@ public class BroomPartRegistry implements IBroomPartRegistry {
             partItems.clear();
             partsByType.clear();
             baseModifiers.clear();
-            if (MinecraftHelpers.isClientSide()) {
+            if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
                 partModels.clear();
             }
         }

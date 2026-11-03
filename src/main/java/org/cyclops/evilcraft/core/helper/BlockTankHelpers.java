@@ -1,29 +1,26 @@
 package org.cyclops.evilcraft.core.helper;
 
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.TriState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.cyclops.cyclopscore.Capabilities;
-import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import org.cyclops.cyclopscore.capability.fluid.IFluidHandlerCapacity;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.cyclopscore.item.DamageIndicatedItemComponent;
 import org.cyclops.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.core.block.IBlockTank;
-import org.cyclops.evilcraft.core.fluid.FluidContainerItemWrapperWithSimulation;
 
-import javax.annotation.Nonnull;
+import java.util.Optional;
 
 /**
  * Helpers related to blocks with tanks.
@@ -44,12 +41,11 @@ public class BlockTankHelpers {
      * @param itemStack The itemStack that must be given information.
      * @return Information for that itemStack.
      */
-    @OnlyIn(Dist.CLIENT)
     public static MutableComponent getInfoTank(ItemStack itemStack) {
-        FluidStack fluidStack = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
+        FluidStack fluidStack = FluidUtil.getStack(itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM, ItemAccess.forStack(itemStack)), 0);
         int amount = fluidStack.getAmount();
-        int capacity = FluidUtil.getFluidHandler(itemStack)
-                .map(handler -> ((IFluidHandlerItemCapacity) handler).getCapacity())
+        int capacity = Optional.ofNullable(itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM, ItemAccess.forStack(itemStack)))
+                .map(handler -> handler.getCapacityAsInt(0, FluidResource.EMPTY))
                 .orElse(0);
         return DamageIndicatedItemComponent.getInfo(fluidStack, amount, capacity)
                 .withStyle(IInformationProvider.ITEM_PREFIX);
@@ -62,23 +58,23 @@ public class BlockTankHelpers {
      * @return The resulting itemstack.
      */
     public static ItemStack tileDataToItemStack(BlockEntity tile, ItemStack itemStack) {
-        IFluidHandler fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, tile.getBlockPos(), null, tile, null);
+        ResourceHandler<FluidResource> fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, tile.getBlockPos(), null, tile, null);
         if (fluidHandlerTile != null) {
-            IFluidHandlerItemCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY);
+            ItemAccess itemStackItemAccess = ItemAccess.forStack(itemStack);
+            IFluidHandlerCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY, itemStackItemAccess);
             if (fluidHandlerItemCapacity != null) {
-                if (fluidHandlerTile instanceof IFluidTank) {
-                    IFluidTank fluidTank = (IFluidTank) fluidHandlerTile;
-                    fluidHandlerItemCapacity.setCapacity(fluidTank.getCapacity());
-                    itemStack = fluidHandlerItemCapacity.getContainer();
+                if (fluidHandlerTile instanceof IFluidHandlerCapacity fluidHandlerCapacity) {
+                    try (var tx = Transaction.openRoot()) {
+                        fluidHandlerCapacity.setTankCapacity(0, fluidHandlerItemCapacity.getTankCapacity(0), tx);
+                        tx.commit();
+                    }
                 }
             }
-            IFluidHandlerItem fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
+            ResourceHandler<FluidResource> fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM, itemStackItemAccess);
             if (fluidHandlerItem != null) {
-                FluidActionResult res = FluidUtil.tryFillContainer(itemStack, fluidHandlerTile, Integer.MAX_VALUE, null, true);
-                if (res.isSuccess()) {
-                    itemStack = res.getResult();
-                }
+                IModHelpersNeoForge.get().getFluidHelpers().move(fluidHandlerTile, fluidHandlerItem, Integer.MAX_VALUE, null, false, false);
             }
+            return itemStackItemAccess.getResource().toStack(itemStackItemAccess.getAmount());
         }
         return itemStack;
     }
@@ -89,19 +85,21 @@ public class BlockTankHelpers {
      * @param tile The tile that has already been removed from the world.
      */
     public static void itemStackDataToTile(ItemStack itemStack, BlockEntity tile) {
-        IFluidHandler fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.BLOCK, tile.getBlockPos(), null, tile, null);
+        ResourceHandler<FluidResource> fluidHandlerTile = tile.getLevel().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.BLOCK, tile.getBlockPos(), null, tile, null);
         if (fluidHandlerTile != null) {
-            IFluidHandlerItemCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY);
+            IFluidHandlerCapacity fluidHandlerItemCapacity = itemStack.getCapability(Capabilities.Item.FLUID_HANDLER_CAPACITY, ItemAccess.forStack(itemStack));
             if (fluidHandlerItemCapacity != null) {
-                if (fluidHandlerTile instanceof FluidTank) {
-                    FluidTank fluidTank = (FluidTank) fluidHandlerTile;
-                    fluidTank.setCapacity(fluidHandlerItemCapacity.getCapacity());
+                if (fluidHandlerTile instanceof IFluidHandlerCapacity fluidHandlerCapacity) {
+                    try (var tx = Transaction.openRoot()) {
+                        fluidHandlerCapacity.setTankCapacity(0, fluidHandlerItemCapacity.getTankCapacity(0), tx);
+                        tx.commit();
+                    }
                 }
             }
 
-            IFluidHandlerItem fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM);
+            ResourceHandler<FluidResource> fluidHandlerItem = itemStack.getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM, ItemAccess.forStack(itemStack));
             if (fluidHandlerItem != null) {
-                FluidUtil.tryEmptyContainer(itemStack, fluidHandlerTile, Integer.MAX_VALUE, null, true);
+                IModHelpersNeoForge.get().getFluidHelpers().move(fluidHandlerItem, fluidHandlerTile, Integer.MAX_VALUE, null, false, false);
             }
         }
     }
@@ -110,74 +108,9 @@ public class BlockTankHelpers {
     public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
         // Force allow shift-right clicking with a fluid container passing through to this block
         if (!event.getItemStack().isEmpty()
-                && event.getItemStack().getCapability(net.neoforged.neoforge.capabilities.Capabilities.FluidHandler.ITEM) != null
+                && event.getItemStack().getCapability(net.neoforged.neoforge.capabilities.Capabilities.Fluid.ITEM, ItemAccess.forStack(event.getItemStack())) != null
                 && event.getLevel().getBlockState(event.getPos()).getBlock() instanceof IBlockTank) {
             event.setUseBlock(TriState.TRUE);
-        }
-    }
-
-    public static class SimulatableTankWrapper implements IFluidHandler {
-
-        private final IFluidHandler tank;
-
-        public SimulatableTankWrapper(IFluidHandler tank) {
-            this.tank = tank;
-        }
-
-        @Override
-        public int getTanks() {
-            return this.tank.getTanks();
-        }
-
-        @Nonnull
-        @Override
-        public FluidStack getFluidInTank(int tank) {
-            return this.tank.getFluidInTank(tank);
-        }
-
-        @Override
-        public int getTankCapacity(int tank) {
-            return this.tank.getTankCapacity(tank);
-        }
-
-        @Override
-        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-            return this.tank.isFluidValid(tank, stack);
-        }
-
-        @Override
-        public int fill(FluidStack resource, FluidAction action) {
-            return tank.fill(resource, action);
-        }
-
-        @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
-            FluidStack drained = tank.drain(resource, action);
-            return action.execute() ? drained : FluidContainerItemWrapperWithSimulation.asSimulatedFluidStack(new FluidStack(drained.getFluid(), drained.getAmount()));
-        }
-
-        @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            FluidStack drained = tank.drain(maxDrain, action);
-            return action.execute() ? drained : FluidContainerItemWrapperWithSimulation.asSimulatedFluidStack(new FluidStack(drained.getFluid(), drained.getAmount()));
-        }
-
-        public boolean isFull() {
-            for (int i = 0; i < tank.getTanks(); i++) {
-                if (tank.getFluidInTank(i).getAmount() < tank.getTankCapacity(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public boolean isEmpty() {
-            for (int i = 0; i < tank.getTanks(); i++) {
-                if (!tank.getFluidInTank(i).isEmpty()) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 

@@ -1,8 +1,9 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodinfuser;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;
@@ -32,7 +33,10 @@ public class InfuseItemTickAction extends BloodInfuserTickAction{
             if(recipe.isPresent()) {
                 if(addToProduceSlot(tile, recipe.get().getOutputItemFirst().copy())) {
                     tile.getInventory().removeItem(tile.getTileWorkingMetadata().getConsumeSlot(), 1);
-                    tile.getTank().drain(getRequiredFluidAmount(tile, recipe), IFluidHandler.FluidAction.EXECUTE);
+                    try (var tx = Transaction.openRoot()) {
+                        tile.getTank().extract(FluidResource.of(tile.getTank().getFluidType()), getRequiredFluidAmount(tile, recipe), tx);
+                        tx.commit();
+                    }
                     recipe.get().getXp().ifPresent(xp -> tile.addXp(xp));
                 }
             }
@@ -44,7 +48,7 @@ public class InfuseItemTickAction extends BloodInfuserTickAction{
             return Integer.MAX_VALUE;
         }
         MutableInt amount = new MutableInt(recipe.get().getInputFluid()
-                .map(FluidStack::getAmount)
+                .map(FluidStackTemplate::amount)
                 .orElse(0));
         Upgrades.sendEvent(tile, new UpgradeSensitiveEvent<>(amount, BlockEntityBloodInfuser.UPGRADEEVENT_BLOODUSAGE));
         return Math.max(1, amount.getValue());

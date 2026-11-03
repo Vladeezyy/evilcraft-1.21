@@ -1,9 +1,7 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -20,7 +18,7 @@ public class RecipeFluidContainerClear extends CustomRecipe {
     private final Ingredient inputIngredient;
 
     public RecipeFluidContainerClear(Ingredient inputIngredient) {
-        super(CraftingBookCategory.MISC);
+        super();
         this.inputIngredient = inputIngredient;
     }
 
@@ -30,11 +28,11 @@ public class RecipeFluidContainerClear extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid, world.registryAccess()).isEmpty();
+        return !assemble(grid).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
+    public ItemStack assemble(CraftingInput grid) {
         ItemStack result = ItemStack.EMPTY;
         for (int i = 0; i < grid.size(); i++) {
             ItemStack element = grid.getItem(i);
@@ -49,14 +47,8 @@ public class RecipeFluidContainerClear extends CustomRecipe {
         return result;
     }
 
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 1;
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
-        return inputIngredient.getItems()[0];
+    public ItemStack getResultItem() {
+        return new ItemStack(inputIngredient.items().findFirst().get()); // This is just a dummy item!
     }
 
     @Override
@@ -65,17 +57,12 @@ public class RecipeFluidContainerClear extends CustomRecipe {
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.of(Ingredient.EMPTY, inputIngredient);
-    }
-
-    @Override
     public boolean isSpecial() {
         return true;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return org.cyclops.evilcraft.RegistryEntries.RECIPESERIALIZER_FLUIDCONTAINER_CLEAR.get();
     }
 }

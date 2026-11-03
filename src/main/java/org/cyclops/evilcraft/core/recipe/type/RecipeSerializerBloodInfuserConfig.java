@@ -1,6 +1,7 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -8,13 +9,13 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class RecipeSerializerBloodInfuserConfig extends RecipeConfig<RecipeBloodInfuser> {
+public class RecipeSerializerBloodInfuserConfig extends RecipeConfigCommon<RecipeBloodInfuser, IModBase> {
 
     public RecipeSerializerBloodInfuserConfig() {
         super(
                 EvilCraft._instance,
                 "blood_infuser",
-                eConfig -> new RecipeSerializerBloodInfuser()
+                eConfig -> RecipeSerializerBloodInfuser.INSTANCE
         );
     }
 

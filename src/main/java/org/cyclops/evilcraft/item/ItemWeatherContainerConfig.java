@@ -1,47 +1,50 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import org.cyclops.cyclopscore.config.ConfigurableProperty;
-import org.cyclops.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.cyclopscore.helper.MinecraftHelpers;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Config for the {@link ItemWeatherContainer}.
  * @author rubensworks
  *
  */
-public class ItemWeatherContainerConfig extends ItemConfig {
+public class ItemWeatherContainerConfig extends ItemConfigCommon<IModBase> {
 
-    @ConfigurableProperty(category = "general", comment = "If shapeless crafting of the higher tiers of weather containers should be enabled.", requiresMcRestart = true)
+    @ConfigurablePropertyCommon(category = "general", comment = "If shapeless crafting of the higher tiers of weather containers should be enabled.", requiresMcRestart = true)
     public static boolean shapelessRecipes = true;
 
     public ItemWeatherContainerConfig() {
         super(
                 EvilCraft._instance,
             "weather_container",
-                eConfig -> new ItemWeatherContainer(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemWeatherContainer(properties)
         );
-        if (MinecraftHelpers.isClientSide()) {
-            EvilCraft._instance.getModEventBus().addListener(this::registerColors);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void registerColors(RegisterColorHandlersEvent.Item event) {
-        event.register(new ItemWeatherContainer.ItemColor(), getInstance());
+        EvilCraft._instance.getModEventBus().addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
+        return Collections.emptyList();
+    }
+
+    protected void fillCreativeTab(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTab() == EvilCraft._instance.getDefaultCreativeTab()) {
+            for (ItemStack itemStack : dynamicCreativeTabEntries()) {
+                event.accept(itemStack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            }
+        }
+    }
+
+    protected Collection<ItemStack> dynamicCreativeTabEntries() {
         NonNullList<ItemStack> list = NonNullList.create();
         ((ItemWeatherContainer) getInstance()).fillItemCategory(list);
         return list;

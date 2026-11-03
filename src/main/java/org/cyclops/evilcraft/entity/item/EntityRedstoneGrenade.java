@@ -12,8 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.item.ItemRedstoneGrenade;
 
@@ -22,11 +20,10 @@ import org.cyclops.evilcraft.item.ItemRedstoneGrenade;
  * @author immortaleeb
  *
  */
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
 public class EntityRedstoneGrenade extends ThrowableProjectile implements ItemSupplier {
 
     public EntityRedstoneGrenade(Level world, LivingEntity entity) {
-        super(RegistryEntries.ENTITY_REDSTONE_GRENADE.get(), entity, world);
+        super(RegistryEntries.ENTITY_REDSTONE_GRENADE.get(), entity.getX(), entity.getEyeY(), entity.getZ(), world);
     }
 
     public EntityRedstoneGrenade(EntityType<? extends EntityRedstoneGrenade> type, Level world) {
@@ -39,11 +36,11 @@ public class EntityRedstoneGrenade extends ThrowableProjectile implements ItemSu
             BlockPos blockPos = ((BlockHitResult) pos).getBlockPos();
 
             if (level().isEmptyBlock(blockPos.relative(((BlockHitResult) pos).getDirection()))) {
-                level().setBlockAndUpdate(blockPos.offset(((BlockHitResult) pos).getDirection().getNormal()), RegistryEntries.BLOCK_INVISIBLE_REDSTONE.get().defaultBlockState());
+                level().setBlockAndUpdate(blockPos.offset(((BlockHitResult) pos).getDirection().getUnitVec3i()), RegistryEntries.BLOCK_INVISIBLE_REDSTONE.get().defaultBlockState());
 
                 if (level().isClientSide()) {
-                    Minecraft.getInstance().levelRenderer.addParticle(
-                            DustParticleOptions.REDSTONE, false,
+                    Minecraft.getInstance().level.addParticle(
+                            DustParticleOptions.REDSTONE,
                             blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 1, 0, 0);
                 }
             }

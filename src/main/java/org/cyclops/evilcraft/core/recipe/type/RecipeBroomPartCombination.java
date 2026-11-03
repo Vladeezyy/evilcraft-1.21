@@ -4,17 +4,15 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.CommonHooks;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.api.broom.BroomModifiers;
@@ -34,18 +32,13 @@ import java.util.Set;
  */
 public class RecipeBroomPartCombination extends CustomRecipe {
 
-    public RecipeBroomPartCombination(CraftingBookCategory category) {
-        super(category);
+    public RecipeBroomPartCombination() {
+        super();
     }
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid, world.registryAccess()).isEmpty();
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
-        return getResultItem();
+        return !assemble(grid).isEmpty();
     }
 
     public ItemStack getResultItem() {
@@ -57,14 +50,15 @@ public class RecipeBroomPartCombination extends CustomRecipe {
         NonNullList<ItemStack> aitemstack = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
         for (int i = 0; i < aitemstack.size(); ++i) {
             ItemStack itemstack = inventory.getItem(i);
-            aitemstack.set(i, CommonHooks.getCraftingRemainingItem(itemstack));
+            net.minecraft.world.item.ItemStackTemplate remainder = itemstack.getCraftingRemainder();
+            aitemstack.set(i, remainder != null ? remainder.create() : ItemStack.EMPTY);
         }
 
         Pair<ItemStack, List<ItemStack>> result = getResult(inventory);
         if(result != null) {
             List<ItemStack> extraOutputs = result.getRight();
             for (ItemStack extraOutput : extraOutputs) {
-                InventoryHelpers.tryReAddToStack(CommonHooks.getCraftingPlayer(), ItemStack.EMPTY, extraOutput,
+                IModHelpers.get().getInventoryHelpers().tryReAddToStack(CommonHooks.getCraftingPlayer(), ItemStack.EMPTY, extraOutput,
                         CommonHooks.getCraftingPlayer().getUsedItemHand());
             }
         }
@@ -176,7 +170,7 @@ public class RecipeBroomPartCombination extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
+    public ItemStack assemble(CraftingInput grid) {
         Pair<ItemStack, List<ItemStack>> result = getResult(grid);
         if(result == null) {
             return ItemStack.EMPTY;
@@ -185,12 +179,7 @@ public class RecipeBroomPartCombination extends CustomRecipe {
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 1;
-    }
-
-    @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return RegistryEntries.RECIPESERIALIZER_BROOM_PART_COMBINATION.get();
     }
 

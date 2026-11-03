@@ -2,17 +2,16 @@ package org.cyclops.evilcraft.gametest;
 
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.cyclopscore.gametest.GameTest;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDarkBloodBrick;
@@ -22,11 +21,9 @@ import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
 
 import java.util.Set;
 
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsSpiritFurnace {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     @GameTest(template = TEMPLATE_EMPTY)
@@ -66,7 +63,7 @@ public class GameTestsSpiritFurnace {
         furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_BOX, createBox(helper, EntityType.ZOMBIE));
 
         helper.succeedWhen(() -> {
-            helper.assertFalse(furnace.isSizeValidForEntity(), "Furnace size should be invalid");
+            helper.assertFalse(furnace.isSizeValidForEntity(), Component.literal("Furnace size should be invalid"));
         });
     }
 
@@ -76,7 +73,7 @@ public class GameTestsSpiritFurnace {
         furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_BOX, createBox(helper, EntityType.ZOMBIE));
 
         helper.succeedWhen(() -> {
-            helper.assertTrue(furnace.isSizeValidForEntity(), "Furnace size should be valid");
+            helper.assertTrue(furnace.isSizeValidForEntity(), Component.literal("Furnace size should be valid"));
         });
     }
 
@@ -87,7 +84,10 @@ public class GameTestsSpiritFurnace {
         BlockEntitySpiritFurnace furnace = createFurnace(helper, furnacePos, 3);
 
         // Fill the blood tank directly so cooking can start immediately
-        furnace.getTank().fill(new FluidStack(RegistryEntries.FLUID_BLOOD.get(), furnace.getTank().getCapacity()), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            furnace.getTank().insert(0, FluidResource.of(RegistryEntries.FLUID_BLOOD.get()), furnace.getTank().getCapacity(), tx);
+            tx.commit();
+        }
         furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_BOX, createBox(helper, EntityType.CHICKEN));
 
         // Pre-fill all drop slots with cobblestone (not a chicken drop) using 63 items so
@@ -125,7 +125,18 @@ public class GameTestsSpiritFurnace {
         furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_BOX, createBox(helper, EntityType.CHICKEN));
 
         helper.succeedWhen(() -> {
-            helper.assertFalse(furnace.getInventory().getItem(BlockEntitySpiritFurnace.SLOTS_DROP[0]).isEmpty(), "Furnace should produce drops");
+            helper.assertFalse(furnace.getInventory().getItem(BlockEntitySpiritFurnace.SLOTS_DROP[0]).isEmpty(), Component.literal("Furnace should produce drops"));
+        });
+    }
+
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 250)
+    public void testSpiritFurnace4x4Player(GameTestHelper helper) {
+        BlockEntitySpiritFurnace furnace = createFurnace(helper, POS, 4);
+        furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_CONTAINER, new ItemStack(RegistryEntries.ITEM_CONDENSED_BLOOD, 64));
+        furnace.getInventory().setItem(BlockEntitySpiritFurnace.SLOT_BOX, createBoxPlayer(helper));
+
+        helper.succeedWhen(() -> {
+            helper.assertFalse(furnace.getInventory().getItem(BlockEntitySpiritFurnace.SLOTS_DROP[0]).isEmpty(), Component.literal("Furnace should produce drops"));
         });
     }
 
@@ -133,9 +144,19 @@ public class GameTestsSpiritFurnace {
         ItemStack stack = new ItemStack(RegistryEntries.ITEM_BOX_OF_ETERNAL_CLOSURE);
         EntityVengeanceSpirit spiritDummy = new EntityVengeanceSpirit(RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get(), helper.getLevel());
         spiritDummy.setInnerEntityType(entityType);
-        CompoundTag tag = new CompoundTag();
-        spiritDummy.getData().writeNBT(tag);
-        stack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, tag);
+        stack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, IModHelpers.get().getMinecraftHelpers().valueOutputToNbt(spiritDummy.getData()::writeNBT));
+        return stack;
+    }
+
+    public static ItemStack createBoxPlayer(GameTestHelper helper) {
+        ItemStack stack = new ItemStack(RegistryEntries.ITEM_BOX_OF_ETERNAL_CLOSURE);
+        EntityVengeanceSpirit spiritDummy = new EntityVengeanceSpirit(RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get(), helper.getLevel());
+        spiritDummy.setPlayerId("068d4de0-3a75-4c6a-9f01-8c37e16a394c");
+        spiritDummy.setPlayerName("kroeserr");
+        spiritDummy.setInnerEntityType(EntityType.ZOMBIE);
+        stack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA, IModHelpers.get().getMinecraftHelpers().valueOutputToNbt(spiritDummy.getData()::writeNBT));
+        stack.set(RegistryEntries.COMPONENT_BOX_PLAYER_ID, "068d4de0-3a75-4c6a-9f01-8c37e16a394c");
+        stack.set(RegistryEntries.COMPONENT_BOX_PLAYER_NAME, "kroeserr");
         return stack;
     }
 
@@ -158,7 +179,7 @@ public class GameTestsSpiritFurnace {
                 }
             }
         }
-        return exclude.contains(pos) ? null : helper.getBlockEntity(pos);
+        return exclude.contains(pos) ? null : helper.getBlockEntity(pos, BlockEntitySpiritFurnace.class);
     }
 
     protected void assertFurnaceValid(GameTestHelper helper, BlockPos pos, int dimension) {

@@ -2,8 +2,8 @@ package org.cyclops.evilcraft.client.render.entity;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.SilverfishRenderer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.monster.Silverfish;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.entity.monster.EntityNetherfishConfig;
 
@@ -15,16 +15,15 @@ import org.cyclops.evilcraft.entity.monster.EntityNetherfishConfig;
  */
 public class RenderNetherfish extends SilverfishRenderer {
 
-    private final ResourceLocation texture;
+    private final Identifier texture;
 
     public RenderNetherfish(EntityRendererProvider.Context renderContext, EntityNetherfishConfig config) {
         super(renderContext);
-        texture = ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_ENTITIES + config.getNamedId() + ".png");
+        texture = Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_ENTITIES + config.getNamedId() + ".png");
     }
 
     @Override
-    public ResourceLocation getTextureLocation(Silverfish entity) {
+    public Identifier getTextureLocation(LivingEntityRenderState renderState) {
         return texture;
     }
-
 }

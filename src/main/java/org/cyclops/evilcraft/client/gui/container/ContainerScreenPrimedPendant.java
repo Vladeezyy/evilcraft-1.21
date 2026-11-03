@@ -1,9 +1,8 @@
 package org.cyclops.evilcraft.client.gui.container;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.cyclopscore.client.gui.container.ContainerScreenExtended;
@@ -25,8 +24,8 @@ public class ContainerScreenPrimedPendant extends ContainerScreenExtended<Contai
     }
 
     @Override
-    public ResourceLocation constructGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "primed_pendant_gui.png");
+    public Identifier constructGuiTexture() {
+        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "primed_pendant_gui.png");
     }
 
     @Override
@@ -35,11 +34,10 @@ public class ContainerScreenPrimedPendant extends ContainerScreenExtended<Contai
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int x, int y) {
         // super.drawGuiContainerForegroundLayer(matrixStack, x, y);
         ItemStack itemStack = container.getItemStack(getMinecraft().player);
-        this.font.drawInBatch(itemStack.getHoverName(), 28, 6, 4210752, false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+        guiGraphics.text(this.font, itemStack.getHoverName(), 28, 6, 4210752, false);
     }
 
 }

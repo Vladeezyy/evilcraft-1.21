@@ -1,14 +1,17 @@
 package org.cyclops.evilcraft.entity.monster;
 
-import lombok.Getter;
-import lombok.Setter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.apache.logging.log4j.util.Strings;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 import javax.annotation.Nullable;
@@ -17,8 +20,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
 public class EntityVengeanceSpiritData {
     private static final int SWARM_TIERS = 5;
 
@@ -78,28 +79,27 @@ public class EntityVengeanceSpiritData {
         setSwarmTier(getRandomSwarmTier(random));
     }
 
-    public void readNBT(CompoundTag tag) {
-        setInnerEntityType(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(tag.getString(NBTKEY_INNER_ENTITY))));
-        setRemainingLife(tag.getInt(NBTKEY_REMAINING_LIFE));
-        setFrozenDuration(tag.getInt(NBTKEY_FROZEN_DURATION));
-        setSwarm(tag.getBoolean(NBTKEY_IS_SWARM));
-        setSwarmTier(tag.getInt(NBTKEY_SWARM_TIER));
-        setBuildupDuration(tag.getInt(NBTKEY_BUILDUP_DURATION));
-        setPlayerId(tag.getString(NBTKEY_PLAYER_ID));
-        setPlayerName(tag.getString(NBTKEY_PLAYER_NAME));
+    public void readNBT(ValueInput valueInput) {
+        valueInput.getString(NBTKEY_INNER_ENTITY).ifPresent(innerEntityType -> setInnerEntityType(BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(innerEntityType))));
+        setRemainingLife(valueInput.getInt(NBTKEY_REMAINING_LIFE).orElseThrow());
+        setFrozenDuration(valueInput.getInt(NBTKEY_FROZEN_DURATION).orElseThrow());
+        setSwarm(valueInput.getBooleanOr(NBTKEY_IS_SWARM, false));
+        setSwarmTier(valueInput.getInt(NBTKEY_SWARM_TIER).orElseThrow());
+        setBuildupDuration(valueInput.getInt(NBTKEY_BUILDUP_DURATION).orElseThrow());
+        setPlayerId(valueInput.getString(NBTKEY_PLAYER_ID).orElseThrow());
+        setPlayerName(valueInput.getString(NBTKEY_PLAYER_NAME).orElseThrow());
     }
 
-    public CompoundTag writeNBT(CompoundTag tag) {
+    public void writeNBT(ValueOutput valueOutput) {
         if (getInnerEntityType() != null)
-            tag.putString(NBTKEY_INNER_ENTITY, BuiltInRegistries.ENTITY_TYPE.getKey(getInnerEntityType()).toString());
-        tag.putInt(NBTKEY_REMAINING_LIFE, getRemainingLife());
-        tag.putInt(NBTKEY_FROZEN_DURATION, getFrozenDuration());
-        tag.putBoolean(NBTKEY_IS_SWARM, isSwarm());
-        tag.putInt(NBTKEY_SWARM_TIER, getSwarmTier());
-        tag.putInt(NBTKEY_BUILDUP_DURATION, getBuildupDuration());
-        tag.putString(NBTKEY_PLAYER_ID, getPlayerId());
-        tag.putString(NBTKEY_PLAYER_NAME, getPlayerName());
-        return tag;
+            valueOutput.putString(NBTKEY_INNER_ENTITY, BuiltInRegistries.ENTITY_TYPE.getKey(getInnerEntityType()).toString());
+        valueOutput.putInt(NBTKEY_REMAINING_LIFE, getRemainingLife());
+        valueOutput.putInt(NBTKEY_FROZEN_DURATION, getFrozenDuration());
+        valueOutput.putBoolean(NBTKEY_IS_SWARM, isSwarm());
+        valueOutput.putInt(NBTKEY_SWARM_TIER, getSwarmTier());
+        valueOutput.putInt(NBTKEY_BUILDUP_DURATION, getBuildupDuration());
+        valueOutput.putString(NBTKEY_PLAYER_ID, getPlayerId());
+        valueOutput.putString(NBTKEY_PLAYER_NAME, getPlayerName());
     }
 
     public UUID getPlayerUUID() {
@@ -124,18 +124,83 @@ public class EntityVengeanceSpiritData {
     @Nullable
     public static EntityType<?> getSpiritType(ItemStack itemStack) {
         CompoundTag tag = itemStack.get(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA);
-        if(tag != null && !tag.isEmpty()) {
-            String innerEntity = tag.getString(NBTKEY_INNER_SPIRIT);
-            if (!innerEntity.isEmpty()) {
-                return BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(innerEntity));
+        if (tag != null && !tag.isEmpty()) {
+            String innerEntity = tag.getString(NBTKEY_INNER_SPIRIT).orElse(null);
+            if (!Strings.isEmpty(innerEntity)) {
+                return BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(innerEntity));
             }
         }
         return null;
     }
 
-    public static EntityVengeanceSpiritData fromNBT(CompoundTag tag) {
+    public static EntityVengeanceSpiritData fromNBT(CompoundTag tag, HolderLookup.Provider lookupProvider) {
         EntityVengeanceSpiritData data = new EntityVengeanceSpiritData();
-        data.readNBT(tag);
+        IModHelpers.get().getMinecraftHelpers().valueInputFromNbtVoid(tag, lookupProvider, data::readNBT);
         return data;
+    }
+
+    @Nullable
+    public EntityType<?> getInnerEntityType() {
+        return this.innerEntityType;
+    }
+
+    public int getRemainingLife() {
+        return this.remainingLife;
+    }
+
+    public int getFrozenDuration() {
+        return this.frozenDuration;
+    }
+
+    public boolean isSwarm() {
+        return this.isSwarm;
+    }
+
+    public int getSwarmTier() {
+        return this.swarmTier;
+    }
+
+    public int getBuildupDuration() {
+        return this.buildupDuration;
+    }
+
+    public String getPlayerId() {
+        return this.playerId;
+    }
+
+    public String getPlayerName() {
+        return this.playerName;
+    }
+
+    public void setInnerEntityType(@Nullable EntityType<?> innerEntityType) {
+        this.innerEntityType = innerEntityType;
+    }
+
+    public void setRemainingLife(int remainingLife) {
+        this.remainingLife = remainingLife;
+    }
+
+    public void setFrozenDuration(int frozenDuration) {
+        this.frozenDuration = frozenDuration;
+    }
+
+    public void setSwarm(boolean isSwarm) {
+        this.isSwarm = isSwarm;
+    }
+
+    public void setSwarmTier(int swarmTier) {
+        this.swarmTier = swarmTier;
+    }
+
+    public void setBuildupDuration(int buildupDuration) {
+        this.buildupDuration = buildupDuration;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 }

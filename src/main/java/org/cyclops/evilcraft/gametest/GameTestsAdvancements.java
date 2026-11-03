@@ -4,43 +4,42 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import java.util.List;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.cyclopscore.gametest.GameTest;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBoxOfEternalClosure;
 import org.cyclops.evilcraft.entity.effect.EntityNecromancersHead;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
 
+import java.util.List;
+
 /**
  * Game tests for all EvilCraft advancements.
  * @author rubensworks
  */
-@GameTestHolder(Reference.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class GameTestsAdvancements {
 
-    public static final String TEMPLATE_EMPTY = "empty10";
+    public static final String TEMPLATE_EMPTY = Reference.MOD_ID + ":empty10";
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 0, 2);
 
     private static AdvancementHolder getAdvancement(GameTestHelper helper, String id) {
-        return helper.getLevel().getServer().getAdvancements().get(ResourceLocation.parse("evilcraft:" + id));
+        return helper.getLevel().getServer().getAdvancements().get(Identifier.parse("evilcraft:" + id));
     }
 
     private static void assertAdvancementDone(GameTestHelper helper, ServerPlayer player, AdvancementHolder advancement) {
@@ -51,7 +50,7 @@ public class GameTestsAdvancements {
     private static void assertAdvancementNotDone(GameTestHelper helper, ServerPlayer player, AdvancementHolder advancement) {
         AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
         if (progress.isDone()) {
-            throw new GameTestAssertException("Advancement " + advancement.id() + " should NOT be done");
+            throw new GameTestAssertException(Component.literal("Advancement " + advancement.id() + " should NOT be done"), (int) helper.getTick());
         }
     }
 
@@ -110,7 +109,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement cannibal should exist");
 
         // Consume flesh_humanoid, which triggers consume_item inside ItemWerewolfFlesh.finishUsingItem
-        ItemStack fleshHumanoid = new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse("evilcraft:flesh_humanoid")));
+        ItemStack fleshHumanoid = new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse("evilcraft:flesh_humanoid")));
         fleshHumanoid.finishUsingItem(helper.getLevel(), player);
 
         assertAdvancementDone(helper, player, advancement);
@@ -125,7 +124,7 @@ public class GameTestsAdvancements {
 
         // Set up box of eternal closure
         helper.setBlock(POS, RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.value());
-        BlockEntityBoxOfEternalClosure box = helper.getBlockEntity(POS);
+        BlockEntityBoxOfEternalClosure box = helper.getBlockEntity(POS, BlockEntityBoxOfEternalClosure.class);
 
         // Create a vengeance spirit with the player as an entangling player, then capture it
         EntityVengeanceSpirit spirit = new EntityVengeanceSpirit(RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get(), helper.getLevel());
@@ -215,7 +214,8 @@ public class GameTestsAdvancements {
         target.setPos(helper.absolutePos(POS.above().north()).getCenter());
 
         // Throw the necromancer's head at the target player
-        EntityNecromancersHead head = new EntityNecromancersHead(helper.getLevel(), player);
+        EntityNecromancersHead head = new EntityNecromancersHead(helper.getLevel(), player.getX(), player.getY(), player.getZ());
+        head.setOwner(player);
         head.setMobType(Zombie.class);
         // Aim north (yRot=180), level pitch; shootFromRotation params: pitch, yaw, roll, velocity, inaccuracy
         player.setYRot(180F);
@@ -324,7 +324,7 @@ public class GameTestsAdvancements {
 
         // Set up box of eternal closure
         helper.setBlock(POS, RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.value());
-        BlockEntityBoxOfEternalClosure box = helper.getBlockEntity(POS);
+        BlockEntityBoxOfEternalClosure box = helper.getBlockEntity(POS, BlockEntityBoxOfEternalClosure.class);
 
         // Capture a spirit that has NO entangling player, so the trigger is never fired
         EntityVengeanceSpirit spirit = new EntityVengeanceSpirit(RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get(), helper.getLevel());
@@ -442,8 +442,13 @@ public class GameTestsAdvancements {
     private static void useMaceOfDistortionFullCharge(GameTestHelper helper, ServerPlayer player) {
         // Fill the mace with blood, then release with itemInUseCount=0 (full charge = maximum area of effect)
         ItemStack maceStack = new ItemStack(RegistryEntries.ITEM_MACE_OF_DISTORTION.get());
-        FluidHelpers.getFluidHandlerItemCapacity(maceStack).ifPresent(
-                h -> h.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, h.getCapacity()), IFluidHandler.FluidAction.EXECUTE));
+        IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(maceStack)).ifPresent(
+                h -> {
+                    try (var ctx = Transaction.openRoot()) {
+                        h.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), h.getTankCapacity(0), ctx);
+                        ctx.commit();
+                    }
+                });
         RegistryEntries.ITEM_MACE_OF_DISTORTION.get().releaseUsing(maceStack, helper.getLevel(), player, 0);
     }
 

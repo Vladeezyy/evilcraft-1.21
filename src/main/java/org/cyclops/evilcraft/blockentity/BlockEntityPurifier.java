@@ -1,19 +1,15 @@
 package org.cyclops.evilcraft.blockentity;
 
-import lombok.Getter;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.EvilCraft;
@@ -51,7 +47,6 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
     @NBTPersist
     private Float randomRotation = 0F;
 
-    @Getter
     private int tick = 0;
 
     public static final int MAX_BUCKETS = 3;
@@ -81,7 +76,6 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
     private Integer finishedAnimation = 0;
 
     @NBTPersist
-    @Getter
     private Integer currentAction = -1;
 
     /* Copied from EnchantingTableTileEntity */
@@ -100,10 +94,18 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
      * Make a new instance.
      */
     public BlockEntityPurifier(BlockPos blockPos, BlockState blockState) {
-        super(RegistryEntries.BLOCK_ENTITY_PURIFIER.get(), blockPos, blockState, SLOTS, 1, FluidHelpers.BUCKET_VOLUME * MAX_BUCKETS, RegistryEntries.FLUID_BLOOD.get());
+        super(RegistryEntries.BLOCK_ENTITY_PURIFIER.get(), blockPos, blockState, SLOTS, 1, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * MAX_BUCKETS, RegistryEntries.FLUID_BLOOD.get());
 
         // Trigger render update client-side
         getInventory().addDirtyMarkListener(this::sendUpdate);
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public Integer getCurrentAction() {
+        return currentAction;
     }
 
     @Override
@@ -139,7 +141,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
      * @return The amount of buckets.
      */
     public int getBucketsFloored() {
-        return (int) Math.floor(getTank().getFluidAmount() / (double) FluidHelpers.BUCKET_VOLUME);
+        return (int) Math.floor(getTank().getFluidAmount() / (double) IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
     }
 
     /**
@@ -148,7 +150,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
      * @return The rest of the fluid.
      */
     public int getBucketsRest() {
-        return getTank().getFluidAmount() % FluidHelpers.BUCKET_VOLUME;
+        return getTank().getFluidAmount() % IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
     }
 
     /**
@@ -157,7 +159,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
      * @param rest The rest of the fluid.
      */
     public void setBuckets(int buckets, int rest) {
-        getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, FluidHelpers.BUCKET_VOLUME * buckets + rest));
+        getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * buckets + rest));
         sendUpdate();
     }
 
@@ -236,7 +238,7 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
      * @param itemStack The purify item.
      */
     public void setPurifyItem(ItemStack itemStack) {
-        this.randomRotation = level.random.nextFloat() * 360;
+        this.randomRotation = level.getRandom().nextFloat() * 360;
         getInventory().setItem(SLOT_PURIFY, itemStack);
     }
 
@@ -256,55 +258,52 @@ public class BlockEntityPurifier extends BlockEntityTankInventory {
         getInventory().setItem(SLOT_ADDITIONAL, itemStack);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void showEffect() {
         for (int i=0; i < 1; i++) {
-            double particleX = getBlockPos().getX() + 0.2 + level.random.nextDouble() * 0.6;
-            double particleY = getBlockPos().getY() + 0.2 + level.random.nextDouble() * 0.6;
-            double particleZ = getBlockPos().getZ() + 0.2 + level.random.nextDouble() * 0.6;
+            double particleX = getBlockPos().getX() + 0.2 + level.getRandom().nextDouble() * 0.6;
+            double particleY = getBlockPos().getY() + 0.2 + level.getRandom().nextDouble() * 0.6;
+            double particleZ = getBlockPos().getZ() + 0.2 + level.getRandom().nextDouble() * 0.6;
 
-            float particleMotionX = -0.01F + level.random.nextFloat() * 0.02F;
+            float particleMotionX = -0.01F + level.getRandom().nextFloat() * 0.02F;
             float particleMotionY = 0.01F;
-            float particleMotionZ = -0.01F + level.random.nextFloat() * 0.02F;
+            float particleMotionZ = -0.01F + level.getRandom().nextFloat() * 0.02F;
 
-            Minecraft.getInstance().levelRenderer.addParticle(
-                    RegistryEntries.PARTICLE_BLOOD_BUBBLE.get(), false,
+            level.addParticle(
+                    RegistryEntries.PARTICLE_BLOOD_BUBBLE.get(),
                     particleX, particleY, particleZ, particleMotionX, particleMotionY, particleMotionZ);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public void showEnchantingEffect() {
-        if(level.random.nextInt(10) == 0) {
+        if(level.getRandom().nextInt(10) == 0) {
             for (int i=0; i < 1; i++) {
-                double particleX = getBlockPos().getX() + 0.45 + level.random.nextDouble() * 0.1;
-                double particleY = getBlockPos().getY() + 1.45 + level.random.nextDouble() * 0.1;
-                double particleZ = getBlockPos().getZ() + 0.45 + level.random.nextDouble() * 0.1;
+                double particleX = getBlockPos().getX() + 0.45 + level.getRandom().nextDouble() * 0.1;
+                double particleY = getBlockPos().getY() + 1.45 + level.getRandom().nextDouble() * 0.1;
+                double particleZ = getBlockPos().getZ() + 0.45 + level.getRandom().nextDouble() * 0.1;
 
-                float particleMotionX = -0.4F + level.random.nextFloat() * 0.8F;
-                float particleMotionY = -level.random.nextFloat();
-                float particleMotionZ = -0.4F + level.random.nextFloat() * 0.8F;
+                float particleMotionX = -0.4F + level.getRandom().nextFloat() * 0.8F;
+                float particleMotionY = -level.getRandom().nextFloat();
+                float particleMotionZ = -0.4F + level.getRandom().nextFloat() * 0.8F;
 
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        ParticleTypes.ENCHANT, false,
+                level.addParticle(
+                        ParticleTypes.ENCHANT,
                         particleX, particleY, particleZ, particleMotionX, particleMotionY, particleMotionZ);
             }
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void showEnchantedEffect() {
         for (int i=0; i < 100; i++) {
-            double particleX = getBlockPos().getX() + 0.45 + level.random.nextDouble() * 0.1;
-            double particleY = getBlockPos().getY() + 1.45 + level.random.nextDouble() * 0.1;
-            double particleZ = getBlockPos().getZ() + 0.45 + level.random.nextDouble() * 0.1;
+            double particleX = getBlockPos().getX() + 0.45 + level.getRandom().nextDouble() * 0.1;
+            double particleY = getBlockPos().getY() + 1.45 + level.getRandom().nextDouble() * 0.1;
+            double particleZ = getBlockPos().getZ() + 0.45 + level.getRandom().nextDouble() * 0.1;
 
-            float particleMotionX = -0.4F + level.random.nextFloat() * 0.8F;
-            float particleMotionY = -0.4F + level.random.nextFloat() * 0.8F;
-            float particleMotionZ = -0.4F + level.random.nextFloat() * 0.8F;
+            float particleMotionX = -0.4F + level.getRandom().nextFloat() * 0.8F;
+            float particleMotionY = -0.4F + level.getRandom().nextFloat() * 0.8F;
+            float particleMotionZ = -0.4F + level.getRandom().nextFloat() * 0.8F;
 
-            Minecraft.getInstance().levelRenderer.addParticle(
-                    RegistryEntries.PARTICLE_MAGIC_FINISH.get(), false,
+            level.addParticle(
+                    RegistryEntries.PARTICLE_MAGIC_FINISH.get(),
                     particleX, particleY, particleZ, particleMotionX, particleMotionY, particleMotionZ);
         }
     }
