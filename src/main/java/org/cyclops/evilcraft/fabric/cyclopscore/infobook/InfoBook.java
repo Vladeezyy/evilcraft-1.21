@@ -5,7 +5,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.datastructure.EvictingStack;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import java.util.Collections;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 public class InfoBook implements IInfoBook {
 
-    private final ModBase mod;
+    private final ModBaseNeoForge mod;
     private final int pagesPerView;
     private final String baseUrl;
     private final EvictingStack<InfoSection.Location> history = new EvictingStack<InfoSection.Location>(128);
@@ -29,7 +29,7 @@ public class InfoBook implements IInfoBook {
 
     private final Map<String, InfoSection> sections = Maps.newHashMap();
 
-    public InfoBook(ModBase mod, int pagesPerView, String baseUrl) {
+    public InfoBook(ModBaseNeoForge mod, int pagesPerView, String baseUrl) {
         this.mod = Objects.requireNonNull(mod);
         this.pagesPerView = pagesPerView;
         this.baseUrl = baseUrl;
@@ -50,7 +50,7 @@ public class InfoBook implements IInfoBook {
         this.tagIndex = tagIndex;
     }
 
-    public ModBase getMod() {
+    public ModBaseNeoForge getMod() {
         return this.mod;
     }
 

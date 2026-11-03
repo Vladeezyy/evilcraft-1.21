@@ -9,20 +9,22 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.bus.api.EventPriority;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.EvilCraft;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -54,12 +56,13 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
         this.fluid = fluid;
         init();
 
-        RegisterCapabilitiesEvent.addListener(this::registerCapability);
+        // Register at lowest priority to allow other mods to override it.
+        CyclopsCoreNeoForge._instance.getModEventBus().addListener(EventPriority.LOWEST, this::registerCapability);
     }
 
     private void registerCapability(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.FluidHandler.ITEM, (itemStack, context) -> new FluidHandlerItemCapacity(itemStack, capacity, getFluid()), this);
-        event.registerItem(org.cyclops.evilcraft.fabric.cyclopscore.Capabilities.Item.FLUID_HANDLER_CAPACITY, (itemStack, context) -> new FluidHandlerItemCapacity(itemStack, capacity, getFluid()), this);
+        event.registerItem(Capabilities.Fluid.ITEM, (itemStack, context) -> new FluidHandlerItemCapacity(context, capacity, getFluid()), this);
+        event.registerItem(org.cyclops.evilcraft.fabric.cyclopscore.Capabilities.Item.FLUID_HANDLER_CAPACITY, (itemStack, context) -> new FluidHandlerItemCapacity(context, capacity, getFluid()), this);
     }
 
     private void init() {
@@ -78,16 +81,14 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag flag) {
 
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        component.addInformation(itemStack, context, list, flag);
-        super.appendHoverText(itemStack, context, list, flag);
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        component.addInformation(itemStack, context, tooltipDisplay, tooltipAdder, flag);
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
     }
 
     @Override
@@ -120,9 +121,15 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
      * @return If it could be drained.
      */
     public boolean canDrain(int amount, ItemStack itemStack) {
-        IFluidHandler fluidHandler = FluidUtil.getFluidHandler(itemStack).orElse(null);
+        ItemAccess itemAccess = ItemAccess.forStack(itemStack);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
         if (fluidHandler == null) return false;
-        FluidStack simulatedDrain = fluidHandler.drain(amount, IFluidHandler.FluidAction.SIMULATE);
-        return simulatedDrain != null && simulatedDrain.getAmount() == amount;
+        FluidResource resource = fluidHandler.getResource(0);
+        // Avoid IllegalArgumentException when the fluid handler has no fluid (empty resource is not allowed in NeoForge extract calls)
+        if (resource.isEmpty()) return false;
+        try (var tx = Transaction.openRoot()) {
+            int simulatedDrain = fluidHandler.extract(resource, amount, tx);
+            return simulatedDrain == amount;
+        }
     }
 }

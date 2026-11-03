@@ -4,7 +4,8 @@ import org.cyclops.evilcraft.fabric.fluids.SoundActions;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Rarity;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfig;
+import org.cyclops.evilcraft.fabric.fluids.SoundActions;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfigNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -13,18 +14,18 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  *
  */
-public class PoisonConfig extends FluidConfig {
+public class PoisonConfig extends FluidConfigNeoForge {
 
     public PoisonConfig() {
         super(
                 EvilCraft._instance,
                 "poison",
-                fluidConfig -> getDefaultFluidProperties(EvilCraft._instance,
-                        "block/poison",
+                fluidConfig -> getDefaultFluidProperties(fluidConfig,
                         builder -> builder
                                 .density(1000)
                                 .viscosity(1000)
                                 .temperature(290)
+                                .isWaterLike(true)
                                 .rarity(Rarity.UNCOMMON)
                                 .descriptionId("block.evilcraft.poison")
                                 .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)

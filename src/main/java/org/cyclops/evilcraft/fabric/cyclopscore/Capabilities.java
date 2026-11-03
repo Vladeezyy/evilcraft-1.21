@@ -3,9 +3,10 @@ package org.cyclops.evilcraft.fabric.cyclopscore;
 import org.cyclops.evilcraft.Reference;
 
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.fabric.capabilities.ItemCapability;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 
 /**
  * Used capabilities for this mod.
@@ -13,6 +14,6 @@ import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerIt
  */
 public class Capabilities {
     public static class Item {
-        public static final ItemCapability<IFluidHandlerItemCapacity, Void> FLUID_HANDLER_CAPACITY = ItemCapability.createVoid(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "fluid_handler_item_capacity"), IFluidHandlerItemCapacity.class);
+        public static ItemCapability<IFluidHandlerCapacity, ItemAccess> FLUID_HANDLER_CAPACITY = ItemCapability.create(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "fluid_handler_capacity"), IFluidHandlerCapacity.class, ItemAccess.class);
     }
 }

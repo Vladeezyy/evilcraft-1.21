@@ -2,13 +2,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
 
 /**
  * A reward instance.
@@ -39,26 +33,5 @@ public interface IReward {
      */
     public int getHeight();
 
-    /**
-     * @param infoBook The infobook instance.
-     * @return Factory for a button for this reward.
-     */
-    @Environment(EnvType.CLIENT)
-    public AdvancedButton createButton(IInfoBook infoBook);
-
-    /**
-     * Draw the reward.
-     * @param gui The gui.
-     * @param guiGraphics The gui graphics object.
-     * @param x Start X.
-     * @param y Start Y.
-     * @param width Max width.
-     * @param height Max height.
-     * @param page Current page.
-     * @param mx Mouse X.
-     * @param my Mouse Y.
-     * @param button The button of this reward.
-     */
-    @Environment(EnvType.CLIENT)
-    public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my, AdvancedButton button);
+    public IRewardClient constructRewardClient();
 }

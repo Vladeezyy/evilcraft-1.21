@@ -1,9 +1,10 @@
 package org.cyclops.evilcraft.blockentity.tickaction.sanguinaryenvironmentalaccumulator;
 
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.block.BlockSanguinaryEnvironmentalAccumulatorConfig;
 import org.cyclops.evilcraft.blockentity.BlockEntitySanguinaryEnvironmentalAccumulator;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;
@@ -39,7 +40,7 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
                             if(production.getCount() + willProduce.getCount() <= production.getMaxStackSize())
                                 precondition = true;
                         }
-                        return precondition && tile.canWork() && tile.getVirtualTank().getFluidAmount() >= getRequiredFluidAmount(tile, recipe);
+                        return precondition && tile.canWork() && tile.getVirtualTank().getAmountAsInt(0) >= getRequiredFluidAmount(tile, recipe);
                     })
                     .orElse(false);
         }
@@ -51,10 +52,13 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
         Optional<RecipeEnvironmentalAccumulator> optionalRecipe = getRecipe(tile);
         if(optionalRecipe.isPresent() && tick >= getRequiredTicks(tile, optionalRecipe.get())) {
             RecipeEnvironmentalAccumulator recipe = optionalRecipe.get();
-            ItemStack result = recipe.assemble(tile.getInventory().asRecipeInput(), tile.getLevel().registryAccess());
+            ItemStack result = recipe.assemble(tile.getInventory());
             if(addToProduceSlot(tile, result)) {
                 tile.getInventory().removeItem(tile.getTileWorkingMetadata().getConsumeSlot(), 1);
-                tile.getVirtualTank().drain(getRequiredFluidAmount(tile, recipe), IFluidHandler.FluidAction.EXECUTE);
+                try (var tx = Transaction.openRoot()) {
+                    tile.getVirtualTank().extract(FluidResource.of(tile.getVirtualTank().getFluid()), getRequiredFluidAmount(tile, recipe), tx);
+                    tx.commit();
+                }
             }
         }
     }
@@ -92,7 +96,7 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
     }
 
     protected ItemStack willProduceItem(BlockEntitySanguinaryEnvironmentalAccumulator tile, RecipeEnvironmentalAccumulator recipe) {
-        return recipe.assemble(tile.getInventory().asRecipeInput(), tile.getLevel().registryAccess());
+        return recipe.assemble(tile.getInventory());
     }
 
     /**
@@ -102,7 +106,7 @@ public class AccumulateItemTickAction implements ITickAction<BlockEntitySanguina
      * @return If the item could be added or joined in the production slot.
      */
     public boolean addToProduceSlot(BlockEntitySanguinaryEnvironmentalAccumulator tile, ItemStack itemStack) {
-        return InventoryHelpers.addToSlot(tile.getInventory(), tile.getTileWorkingMetadata().getProduceSlot(), itemStack);
+        return IModHelpers.get().getInventoryHelpers().addToSlot(tile.getInventory(), tile.getTileWorkingMetadata().getProduceSlot(), itemStack);
     }
 
 }

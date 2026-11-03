@@ -2,27 +2,24 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBookParser;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
 
 /**
  * Images that can be added to sections.
  * @author rubensworks
  */
-public class ImageAppendix extends SectionAppendix {
+public class ImageAppendix extends SectionAppendix<ImageAppendixClient> {
 
     private static final int OFFSET_Y = 0;
 
-    private ResourceLocation resource;
+    private Identifier resource;
     private int width;
     private int height;
 
-    public ImageAppendix(IInfoBook infoBook, ResourceLocation resource, int width, int height) {
+    public ImageAppendix(IInfoBook infoBook, Identifier resource, int width, int height) throws InfoBookParser.InvalidAppendixException {
         super(infoBook);
         this.resource = resource;
         this.width = width;
@@ -45,16 +42,8 @@ public class ImageAppendix extends SectionAppendix {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
-        guiGraphics.blit(resource, x, y, 0, 0, getWidth(), getHeight());
-        gui.drawOuterBorder(guiGraphics, x, y, getWidth(), getHeight(), 0.5F, 0.5F, 0.5F, 0.4f);
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
-
+    public ImageAppendixClient constructSectionAppendixClient() {
+        return new ImageAppendixClient(this);
     }
 
     @Override
@@ -65,5 +54,9 @@ public class ImageAppendix extends SectionAppendix {
     @Override
     public void bakeElement(InfoSection infoSection) {
 
+    }
+
+    public Identifier getResource() {
+        return resource;
     }
 }

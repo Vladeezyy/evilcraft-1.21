@@ -15,9 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntityGui;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.block.BlockWithEntityGui;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntitySanguinaryEnvironmentalAccumulator;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityWorking;
@@ -50,7 +49,7 @@ public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui 
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_SANGUINARY_ENVIRONMENTAL_ACCUMULATOR.get(), level.isClientSide ? new BlockEntitySanguinaryEnvironmentalAccumulator.TickerClient() : new BlockEntitySanguinaryEnvironmentalAccumulator.TickerServer<BlockEntitySanguinaryEnvironmentalAccumulator, MutableInt>());
+        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_SANGUINARY_ENVIRONMENTAL_ACCUMULATOR.get(), level.isClientSide() ? new BlockEntitySanguinaryEnvironmentalAccumulator.TickerClient() : new BlockEntitySanguinaryEnvironmentalAccumulator.TickerServer<BlockEntitySanguinaryEnvironmentalAccumulator, MutableInt>());
     }
 
     @Override
@@ -65,19 +64,10 @@ public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui 
 
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
-        return BlockEntityHelpers.get(world, pos, BlockEntitySanguinaryEnvironmentalAccumulator.class)
+        return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntitySanguinaryEnvironmentalAccumulator.class)
                 .filter(BlockEntityWorking::isVisuallyWorking)
                 .map(tile -> 4)
                 .orElseGet(() -> state.getLightEmission());
-    }
-
-    @Override
-    public void onRemove(BlockState oldState, Level world, BlockPos blockPos, BlockState newState, boolean isMoving) {
-        if (!world.isClientSide() && oldState.getBlock() != newState.getBlock()) {
-            BlockEntityHelpers.get(world, blockPos, BlockEntitySanguinaryEnvironmentalAccumulator.class)
-                    .ifPresent(tile -> InventoryHelpers.dropItems(world, tile.getInventory(), blockPos));
-        }
-        super.onRemove(oldState, world, blockPos, newState, isMoving);
     }
 
 }

@@ -1,7 +1,8 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodchest;
 
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.evilcraft.EvilCraft;
@@ -26,7 +27,10 @@ public class BulkRepairItemTickAction implements ITickAction<BlockEntityColossal
     }
 
     private void drainTank(BlockEntityColossalBloodChest tile, float usageMultiplier, int tick) {
-        tile.getTank().drain(getRequiredFluid(tile, usageMultiplier, tick), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            tile.getTank().extract(FluidResource.of(tile.getTank().getFluidType()), getRequiredFluid(tile, usageMultiplier, tick), tx);
+            tx.commit();
+        }
     }
 
     protected int getRequiredFluid(BlockEntityColossalBloodChest tile, float usageMultiplier, int tick) {
@@ -49,7 +53,7 @@ public class BulkRepairItemTickAction implements ITickAction<BlockEntityColossal
                         getRegistry(IBloodChestRepairActionRegistry.class);
                 int actionID = actions.canRepair(itemStack, tick);
                 if(actionID > -1) {
-                    float simulateMultiplier = actions.repair(itemStack, tile.getLevel().random, actionID, false, true, tile.getLevel().registryAccess()).getLeft();
+                    float simulateMultiplier = actions.repair(itemStack, tile.getLevel().getRandom(), actionID, false, true, tile.getLevel().registryAccess()).getLeft();
                     if(tile.getTank().getFluidAmount() >= getRequiredFluid(tile, simulateMultiplier, tick) * simulateMultiplier) {
                         // Make sure that increasing speed by upgrades does not increase efficiency any faster.
                         Boolean slotHistory = tile.getSlotTickHistory().get(slot);
@@ -57,7 +61,7 @@ public class BulkRepairItemTickAction implements ITickAction<BlockEntityColossal
                             tile.setEfficiency(Math.min(tile.getEfficiency() + 1, BlockEntityColossalBloodChest.MAX_EFFICIENCY));
                             tile.getSlotTickHistory().put(slot, true);
                         }
-                        Pair<Float, ItemStack> repairResult = actions.repair(itemStack, tile.getLevel().random, actionID, true, true, tile.getLevel().registryAccess());
+                        Pair<Float, ItemStack> repairResult = actions.repair(itemStack, tile.getLevel().getRandom(), actionID, true, true, tile.getLevel().registryAccess());
                         itemStack = repairResult.getRight();
                         drainTank(tile, repairResult.getLeft(), tick);
                     }

@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
 
 import org.cyclops.cyclopscore.init.IRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 /**
  * Registry for in-game manuals.
@@ -25,7 +25,7 @@ public interface IInfoBookRegistry extends IRegistry {
      * @param parentSection The section to register this new section to.
      * @param sectionPath The path to the xml file of the section to register.
      */
-    public void registerSection(ModBase<?> mod, IInfoBook infoBook, String parentSection, String sectionPath);
+    public void registerSection(ModBaseNeoForge<?> mod, IInfoBook infoBook, String parentSection, String sectionPath);
 
     /**
      * Get the root of the given book.
@@ -33,5 +33,7 @@ public interface IInfoBookRegistry extends IRegistry {
      * @return The root section.
      */
     public InfoSection getRoot(IInfoBook infoBook);
+
+    public void initializeAllBooks(boolean reload);
 
 }

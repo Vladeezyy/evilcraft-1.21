@@ -6,8 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyHandler;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.network.packet.FartPacket;
@@ -18,7 +16,6 @@ import org.cyclops.evilcraft.network.packet.FartPacket;
  * @author immortaleeb
  *
  */
-@Environment(EnvType.CLIENT)
 public class FartKeyHandler implements IKeyHandler {
 
     private boolean fartingEnabled = false;
@@ -32,11 +29,11 @@ public class FartKeyHandler implements IKeyHandler {
             fartingEnabled = !fartingEnabled;
 
             if (fartingEnabled)
-                player.displayClientMessage(Component.translatable("chat.evilcraft.command.farting_enabled")
-                        .withStyle(ChatFormatting.DARK_RED), true);
+                player.sendOverlayMessage(Component.translatable("chat.evilcraft.command.farting_enabled")
+                        .withStyle(ChatFormatting.DARK_RED));
             else
-                player.displayClientMessage(Component.translatable("chat.evilcraft.command.farting_disabled")
-                        .withStyle(ChatFormatting.DARK_RED), true);
+                player.sendOverlayMessage(Component.translatable("chat.evilcraft.command.farting_disabled")
+                        .withStyle(ChatFormatting.DARK_RED));
         }
 
         if (fartingEnabled && kb == settings.keyShift) {

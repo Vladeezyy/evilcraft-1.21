@@ -6,21 +6,15 @@
     "GDG"
   ],
   "key": {
-    "G": {
-      "tag": "c:glass_panes"
-    },
+    "G": "#c:glass_panes",
     "W": {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:weather_container"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:weather_container",
       "components": {
         "evilcraft:weather_container_type": "RAIN"
       }
     },
-    "D": {
-      "item": "evilcraft:dark_block"
-    }
+    "D": "evilcraft:dark_block"
   },
   "result": {
     "id": "evilcraft:eternal_water",

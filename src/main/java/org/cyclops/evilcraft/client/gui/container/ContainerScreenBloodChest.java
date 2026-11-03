@@ -1,9 +1,8 @@
 package org.cyclops.evilcraft.client.gui.container;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodChest;
@@ -38,8 +37,8 @@ public class ContainerScreenBloodChest extends ContainerScreenContainerTankInven
     }
 
     @Override
-    public ResourceLocation constructGuiTexture() {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "blood_chest_gui.png");
+    public Identifier constructGuiTexture() {
+        return Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_GUI + "blood_chest_gui.png");
     }
 
     @Override
@@ -48,10 +47,8 @@ public class ContainerScreenBloodChest extends ContainerScreenContainerTankInven
     }
 
     @Override
-    protected void drawForgegroundString(GuiGraphics guiGraphics) {
-        // MCP: drawString
-        font.drawInBatch(getName(), 28 + offsetX, 4 + offsetY, 4210752, false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+    protected void drawForgegroundString(GuiGraphicsExtractor guiGraphics) {
+        guiGraphics.text(font, getName(), 28 + offsetX, 4 + offsetY, 4210752, false);
     }
 
 }

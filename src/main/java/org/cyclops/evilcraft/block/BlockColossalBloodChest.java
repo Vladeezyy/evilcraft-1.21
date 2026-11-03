@@ -10,8 +10,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,9 +32,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.cyclopscore.block.multi.CubeDetector;
 import org.cyclops.cyclopscore.block.multi.DetectionResult;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityColossalBloodChest;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritFurnace;
@@ -67,7 +66,7 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_COLOSSAL_BLOOD_CHEST.get(), level.isClientSide ? new BlockEntityColossalBloodChest.TickerClient() : new BlockEntityColossalBloodChest.TickerServer());
+        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_COLOSSAL_BLOOD_CHEST.get(), level.isClientSide() ? new BlockEntityColossalBloodChest.TickerClient() : new BlockEntityColossalBloodChest.TickerServer());
     }
 
     @Override
@@ -82,29 +81,30 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
 
     @Override
     public RenderShape getRenderShape(BlockState blockState) {
-        return BlockHelpers.getSafeBlockStateProperty(blockState, ACTIVE, false) ? RenderShape.ENTITYBLOCK_ANIMATED : super.getRenderShape(blockState);
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(blockState, ACTIVE, false) ? RenderShape.MODEL : super.getRenderShape(blockState);
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState blockState, BlockGetter blockReader, BlockPos blockPos) {
-        return BlockHelpers.getSafeBlockStateProperty(blockState, ACTIVE, false);
+    public boolean propagatesSkylightDown(BlockState blockState) {
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(blockState, ACTIVE, false);
     }
 
-    public boolean shouldDisplayFluidOverlay(BlockState blockState, BlockAndTintGetter world, BlockPos pos, FluidState fluidState) {
+    @Override
+    public boolean shouldDisplayFluidOverlay(BlockState blockState, BlockAndLightGetter world, BlockPos pos, FluidState fluidState) {
         return true;
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack pStack, BlockState blockState, Level world, BlockPos blockPos, Player player, InteractionHand pHand, BlockHitResult pHitResult) {
-        if(BlockHelpers.getSafeBlockStateProperty(blockState, ACTIVE, false)) {
+    protected InteractionResult useItemOn(ItemStack pStack, BlockState blockState, Level world, BlockPos blockPos, Player player, InteractionHand pHand, BlockHitResult pHitResult) {
+        if(IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(blockState, ACTIVE, false)) {
             if (!BlockEntityColossalBloodChest.canWork(world, blockPos)) {
-                return ItemInteractionResult.FAIL;
+                return InteractionResult.FAIL;
             } else {
                 return super.useItemOn(pStack, blockState, world, blockPos, player, pHand, pHitResult);
             }
         } else {
             addPlayerChatError(world, blockPos, player, pHand);
-            return ItemInteractionResult.FAIL;
+            return InteractionResult.FAIL;
         }
     }
 
@@ -121,7 +121,7 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         if (stack.has(DataComponents.CUSTOM_NAME)) {
-            BlockEntityColossalBloodChest tile = BlockEntityHelpers.get(world, pos, BlockEntityColossalBloodChest.class).orElse(null);
+            BlockEntityColossalBloodChest tile = IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityColossalBloodChest.class).orElse(null);
             if (tile != null) {
                 tile.setSize(Vec3i.ZERO);
             }
@@ -144,17 +144,19 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
-        if(BlockHelpers.getSafeBlockStateProperty(state, ACTIVE, false)) triggerDetector(world, pos, false);
-        super.onExplosionHit(state, world, pos, explosion, dropConsumer);
+    public void onBlockExploded(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion) {
+        if(IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(state, ACTIVE, false)) triggerDetector(world, pos, false);
+        // IForgeBlock.super.onBlockExploded(state, world, pos, explosion);
+        world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+        wasExploded(world, pos, explosion);
     }
 
     @Override
     public void onDetect(LevelReader world, BlockPos location, Vec3i size, boolean valid, BlockPos originCorner) {
         Block block = world.getBlockState(location).getBlock();
         if(block == this) {
-            ((Level) world).setBlock(location, world.getBlockState(location).setValue(ACTIVE, valid), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
-            BlockEntityHelpers.get(world, location, BlockEntityColossalBloodChest.class)
+            ((Level) world).setBlock(location, world.getBlockState(location).setValue(ACTIVE, valid), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
+            IModHelpers.get().getBlockEntityHelpers().get(world, location, BlockEntityColossalBloodChest.class)
                     .ifPresent(tile -> {
                         tile.setSize(valid ? size : Vec3i.ZERO);
                         tile.setCenter(originCorner.offset(1, 1, 1));
@@ -169,12 +171,12 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
      * @param player The player.
      */
     public static void addPlayerChatError(Level world, BlockPos blockPos, Player player, InteractionHand hand) {
-        if(hand == InteractionHand.MAIN_HAND && !world.isClientSide && player.getItemInHand(hand).isEmpty()) {
+        if(hand == InteractionHand.MAIN_HAND && !world.isClientSide() && player.getItemInHand(hand).isEmpty()) {
             DetectionResult result = BlockEntityColossalBloodChest.getCubeDetector().detect(world, blockPos, null, false);
             if (result != null && result.getError() != null) {
                 addPlayerChatError(player, result.getError());
             } else {
-                player.sendSystemMessage(Component.translatable("multiblock.evilcraft.colossalbloodchest.error.unexpected"));
+                player.sendOverlayMessage(Component.translatable("multiblock.evilcraft.colossalbloodchest.error.unexpected"));
             }
         }
     }
@@ -186,14 +188,13 @@ public class BlockColossalBloodChest extends BlockWithEntityGuiTank implements C
                 .append(Component.literal("]: "))
                 .setStyle(Style.EMPTY.
                         applyFormat(ChatFormatting.GRAY).
-                        withHoverEvent(new HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
+                        withHoverEvent(new HoverEvent.ShowText(
                                 Component.translatable("multiblock.evilcraft.colossalbloodchest.error.prefix.info")
                         ))
                 );
         chat.append(prefix);
         chat.append(error);
-        player.sendSystemMessage(chat);
+        player.sendOverlayMessage(chat);
     }
 
 }

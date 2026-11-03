@@ -1,12 +1,14 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +18,7 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemBroomConfig extends ItemConfig {
+public class ItemBroomConfig extends ItemConfigCommon<ModBaseNeoForge<?>> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The position to render the broom gui overlay at. (0=NE, 1=SE, 2=SW,3=NW)", isCommandable = true)
     public static int guiOverlayPosition = 1;
@@ -42,15 +44,18 @@ public class ItemBroomConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
             "broom",
-                eConfig -> new ItemBroom(new Item.Properties()
-                        .stacksTo(1)
-                        )
+                (eConfig, properties) -> new ItemBroom(properties.stacksTo(1))
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public @Nullable ItemClientConfig<ModBaseNeoForge<?>> constructItemClientConfig() {
+        return new ItemBroomConfigClient(this);
+    }
+
+    @Override
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

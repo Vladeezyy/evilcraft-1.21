@@ -3,16 +3,12 @@ package org.cyclops.evilcraft.item;
 import com.google.common.collect.Lists;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
-import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -24,7 +20,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class ItemBiomeExtractConfig extends ItemConfig {
+public class ItemBiomeExtractConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "If creative versions for all variants should be added to the creative tab.", requiresMcRestart = true)
     public static boolean creativeTabVariants = true;
@@ -44,18 +40,9 @@ public class ItemBiomeExtractConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "biome_extract",
-                eConfig -> new ItemBiomeExtract(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemBiomeExtract(properties)
         );
-        if (MinecraftHelpers.isClientSide()) {
-            RegisterColorHandlersEvent.Item.addListener(this::onRegisterColors);
-        }
-        BuildCreativeModeTabContentsEvent.addListener(this::onCreativeModeTabBuildContents);
-    }
-
-    @Environment(EnvType.CLIENT)
-    public void onRegisterColors(RegisterColorHandlersEvent.Item event) {
-        event.register(new ItemBiomeExtract.ItemColor(), getInstance());
+        EvilCraft._instance.getModEventBus().addListener(this::onCreativeModeTabBuildContents);
     }
 
     public static boolean isCraftingBlacklisted(Holder<Biome> biome) {
@@ -67,7 +54,7 @@ public class ItemBiomeExtractConfig extends ItemConfig {
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register tab entries later, when the world is available
         return Collections.emptyList();
     }

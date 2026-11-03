@@ -3,8 +3,6 @@ package org.cyclops.evilcraft.fabric.cyclopscore.client.key;
 
 
 import net.minecraft.client.KeyMapping;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 /**
  * A handler responsible for handling key presses.
@@ -12,7 +10,6 @@ import net.fabricmc.api.Environment;
  * @author immortaleeb
  *
  */
-@Environment(EnvType.CLIENT)
 public interface IKeyHandler {
 
     /**

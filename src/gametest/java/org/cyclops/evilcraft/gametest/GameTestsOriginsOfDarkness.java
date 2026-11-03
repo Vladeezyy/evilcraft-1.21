@@ -2,17 +2,21 @@ package org.cyclops.evilcraft.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -47,14 +51,14 @@ public class GameTestsOriginsOfDarkness {
         helper.setBlock(POS.below().offset( 1, 0,  1), Blocks.STONE);
 
         // Spawn a pig inside the enclosure
-        net.minecraft.world.entity.animal.Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, POS);
+        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, POS);
 
         // Simulate feeding the pig a darkened apple by firing the player interact event.
         // With paling (amplifier 4 = 5 dmg/hit) and 10-tick invulnerability, the pig (10 HP) dies at ~tick 11.
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND,
-                new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse("evilcraft:darkened_apple"))));
-        UseEntityCallback.EVENT.invoker().interact(player, player.level(), InteractionHand.MAIN_HAND, pig, null);
+                new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse("evilcraft:darkened_apple"))));
+        NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, pig));
 
         // The spirit portal is placed at a shuffled random position within 1 block of the pig's
         // death position (pig.blockPosition() + (0,1,0) = POS.above().above()).
@@ -77,7 +81,7 @@ public class GameTestsOriginsOfDarkness {
                 }
             }
             if (!found) {
-                throw new GameTestAssertException("Spirit portal not found within 2 blocks of pig's death position.");
+                throw new GameTestAssertException(Component.literal("Spirit portal not found within 2 blocks of pig's death position."), (int) helper.getTick());
             }
         });
 

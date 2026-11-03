@@ -1,9 +1,7 @@
 package org.cyclops.evilcraft.api.broom;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.init.IRegistry;
 
 import javax.annotation.Nullable;
@@ -91,7 +89,7 @@ public interface IBroomPartRegistry extends IRegistry {
      * @param partId The unique part id.
      * @return The corresponding part or null.
      */
-    public IBroomPart getPart(ResourceLocation partId);
+    public IBroomPart getPart(Identifier partId);
 
     /**
      * @param type The type of parts to retrieve.
@@ -104,23 +102,20 @@ public interface IBroomPartRegistry extends IRegistry {
      * @param part The part
      * @param modelLocation The model resource location.
      */
-    @Environment(EnvType.CLIENT)
-    public void registerPartModel(IBroomPart part, ResourceLocation modelLocation);
+    public void registerPartModel(IBroomPart part, Identifier modelLocation);
 
     /**
      * Get the model resource location of the given part.
      * @param part The part.
      * @return The model resource location.
      */
-    @Environment(EnvType.CLIENT)
-    public ResourceLocation getPartModel(IBroomPart part);
+    public Identifier getPartModel(IBroomPart part);
 
     /**
      * Get all registered model resource locations for the parts.
      * @return All model resource locations.
      */
-    @Environment(EnvType.CLIENT)
-    public Collection<ResourceLocation> getPartModels();
+    public Collection<Identifier> getPartModels();
 
     /**
      * Get the broom parts in the given itemstack.

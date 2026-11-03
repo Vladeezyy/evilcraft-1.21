@@ -3,7 +3,8 @@ package org.cyclops.evilcraft.blockentity;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import com.google.common.collect.Sets;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockEntityConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockEntityConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -12,14 +13,14 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  *
  */
-public class BlockEntityEternalWaterConfig extends BlockEntityConfig<BlockEntityEternalWater> {
+public class BlockEntityEternalWaterConfig extends BlockEntityConfigCommon<BlockEntityEternalWater, IModBase> {
 
     public BlockEntityEternalWaterConfig() {
         super(
                 EvilCraft._instance,
                 "eternal_water",
                 (eConfig) -> new BlockEntityType<>(BlockEntityEternalWater::new,
-                        Sets.newHashSet(RegistryEntries.BLOCK_ETERNAL_WATER.get()), null)
+                        Sets.newHashSet(RegistryEntries.BLOCK_ETERNAL_WATER.get()))
         );
         RegisterCapabilitiesEvent.addListener(new BlockEntityEternalWater.CapabilityRegistrar(this::getInstance)::register);
     }

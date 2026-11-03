@@ -27,9 +27,8 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.algorithm.OrganicSpread;
@@ -83,7 +82,7 @@ public class EntityBiomeExtract extends EntityThrowable {
                     @Override
                     public void spreadTo(Level world, BlockPos location) {
                         setBiome((ServerLevel) world, location, biome);
-                        updatedChunks.add(new ChunkPos(location));
+                        updatedChunks.add(ChunkPos.containing(location));
                         int color = biome.value().getFoliageColor();
                         showChangedBiome((ServerLevel) world, new BlockPos(location.getX(), ((BlockHitResult) movingobjectposition).getBlockPos().getY(),
                                 location.getZ()), color);
@@ -162,16 +161,16 @@ public class EntityBiomeExtract extends EntityThrowable {
         if(chunk != null) {
             // Update biome in chunk
             // Based on ChunkAccess#getNoiseBiome
-            int minBuildHeight = QuartPos.fromBlock(chunk.getMinBuildHeight());
+            int minBuildHeight = QuartPos.fromBlock(chunk.getMinY());
             int maxHeight = minBuildHeight + QuartPos.fromBlock(chunk.getHeight()) - 1;
             int dummyY = Mth.clamp(i3, minBuildHeight, maxHeight);
             int sectionIndex = chunk.getSectionIndex(QuartPos.toBlock(dummyY));
             //chunk.sections[sectionIndex].getNoiseBiome(l2 & 3, dummyY & 3, j3 & 3);
             ((PalettedContainer<Holder<Biome>>) chunk.sections[sectionIndex].getBiomes()).set(l2 & 3, dummyY & 3, j3 & 3, biome);
 
-            chunk.setUnsaved(true);
+            chunk.markUnsaved();
         } else {
-            org.cyclops.evilcraft.EvilCraft.clog("Tried changing biome at non-existing chunk for position " + posIn, org.apache.logging.log4j.Level.WARN);
+            EvilCraft.clog("Tried changing biome at non-existing chunk for position " + posIn, org.apache.logging.log4j.Level.WARN);
         }
     }
 
@@ -182,11 +181,11 @@ public class EntityBiomeExtract extends EntityThrowable {
      * @param chunkPos The chunk position in which one or more biome positions were changed.
      */
     public static void updateChunkAfterBiomeChange(Level world, ChunkPos chunkPos) {
-        LevelChunk chunkSafe = world.getChunkSource().getChunk(chunkPos.x, chunkPos.z, false);
+        LevelChunk chunkSafe = world.getChunkSource().getChunk(chunkPos.x(), chunkPos.z(), false);
         ((ServerChunkCache) world.getChunkSource()).chunkMap.getPlayers(chunkPos, false).forEach((player) -> {
             player.connection.send(new ClientboundLevelChunkWithLightPacket(chunkSafe, ((ServerChunkCache) world.getChunkSource()).chunkMap.getLightEngine(), null, null));
             try {
-                EvilCraft._instance.getPacketHandler().sendToPlayer(new ResetChunkColorsPacket(chunkPos.x, chunkPos.z), player);
+                EvilCraft._instance.getPacketHandler().sendToPlayer(new ResetChunkColorsPacket(chunkPos.x(), chunkPos.z()), player);
             } catch (UnsupportedOperationException e) {
                 // Can occur for players without a channel for this packet, such as during game testing
                 e.printStackTrace();
@@ -195,8 +194,8 @@ public class EntityBiomeExtract extends EntityThrowable {
     }
 
     private void showChangedBiome(ServerLevel world, BlockPos pos, int color) {
-        Triple<Float, Float, Float> c = Helpers.intToRGB(color);
-        RandomSource rand = world.random;
+        Triple<Float, Float, Float> c = IModHelpers.get().getBaseHelpers().intToRGB(color);
+        RandomSource rand = world.getRandom();
         for (int j = 0; j < 2 + rand.nextInt(5); j++) {
             float x = pos.getX() + -0.5F + rand.nextFloat();
             float y = pos.getY() + -0.5F + rand.nextFloat();

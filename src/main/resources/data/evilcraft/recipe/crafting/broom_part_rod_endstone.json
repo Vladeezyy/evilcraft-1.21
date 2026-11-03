@@ -1,23 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "minecraft:end_stone",
     {
-      "item": "minecraft:end_stone"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:rod_bare"
         ]
       }
     },
-    {
-      "item": "minecraft:end_stone"
-    }
+    "minecraft:end_stone"
   ],
   "result": {
     "id": "evilcraft:broom_part",

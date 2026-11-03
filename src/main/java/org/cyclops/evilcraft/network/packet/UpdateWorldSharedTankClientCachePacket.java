@@ -2,12 +2,10 @@ package org.cyclops.evilcraft.network.packet;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.cyclopscore.network.CodecField;
 import org.cyclops.cyclopscore.network.PacketCodec;
@@ -22,7 +20,7 @@ import org.cyclops.evilcraft.core.fluid.WorldSharedTankCache;
  */
 public class UpdateWorldSharedTankClientCachePacket extends PacketCodec<UpdateWorldSharedTankClientCachePacket> {
 
-    public static final Type<UpdateWorldSharedTankClientCachePacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "update_world_shared_tank_client_cache"));
+    public static final Type<UpdateWorldSharedTankClientCachePacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "update_world_shared_tank_client_cache"));
     public static final StreamCodec<RegistryFriendlyByteBuf, UpdateWorldSharedTankClientCachePacket> CODEC = getCodec(UpdateWorldSharedTankClientCachePacket::new);
 
     @CodecField
@@ -49,7 +47,6 @@ public class UpdateWorldSharedTankClientCachePacket extends PacketCodec<UpdateWo
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void actionClient(Level world, Player player) {
         WorldSharedTankCache.getInstance().setTankContent(tankID, fluidStack);
     }

@@ -1,21 +1,23 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import com.google.common.collect.Lists;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.CommonHooks;
 import org.cyclops.evilcraft.RegistryEntries;
+
+import java.util.List;
 
 /**
  * Recipe for crafting a dead bush using shears.
@@ -24,8 +26,10 @@ import org.cyclops.evilcraft.RegistryEntries;
  */
 public class RecipeDeadBush extends CustomRecipe {
 
-    public RecipeDeadBush(CraftingBookCategory category) {
-        super(category);
+    private PlacementInfo placementInfo;
+
+    public RecipeDeadBush() {
+        super();
     }
 
     @Override
@@ -49,23 +53,29 @@ public class RecipeDeadBush extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider registryAccess) {
-        return getResultItem(registryAccess).copy();
+    public ItemStack assemble(CraftingInput inv) {
+        return new ItemStack(Items.DEAD_BUSH);
     }
 
-    @Override
     public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
         return new ItemStack(Items.DEAD_BUSH);
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.of(Ingredient.EMPTY, Ingredient.of(ItemTags.SAPLINGS), Ingredient.of(ConventionalItemTags.SHEAR_TOOLS));
+    public PlacementInfo placementInfo() {
+        if (this.placementInfo == null) {
+            this.placementInfo = PlacementInfo.create(Lists.newArrayList(Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(ItemTags.SAPLINGS)), Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(Tags.Items.TOOLS_SHEAR))));
+        }
+        return this.placementInfo;
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height == 2;
+    public List<RecipeDisplay> display() {
+        return List.of(new ShapelessCraftingRecipeDisplay(
+                List.of(new SlotDisplay.TagSlotDisplay(ItemTags.SAPLINGS), new SlotDisplay.TagSlotDisplay(Tags.Items.TOOLS_SHEAR)),
+                new SlotDisplay.ItemSlotDisplay(Items.DEAD_BUSH),
+                new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
+        ));
     }
 
     @Override
@@ -89,7 +99,8 @@ public class RecipeDeadBush extends CustomRecipe {
                     }
                 }
             } else {
-                itemStack = CommonHooks.getCraftingRemainingItem(itemStack);
+                net.minecraft.world.item.ItemStackTemplate remainder = itemStack.getCraftingRemainder();
+                itemStack = remainder != null ? remainder.create() : ItemStack.EMPTY;
             }
             stacks.add(itemStack);
         }
@@ -98,7 +109,7 @@ public class RecipeDeadBush extends CustomRecipe {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return RegistryEntries.RECIPESERIALIZER_DEAD_BUSH.get();
     }
 }

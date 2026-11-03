@@ -2,12 +2,15 @@ package org.cyclops.evilcraft.blockentity.tickaction;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.cyclops.evilcraft.fabric.fluids.FluidActionResult;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IFluidHelpersNeoForge;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTickingTankInventory;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;
@@ -22,34 +25,22 @@ public class EmptyFluidContainerInTankTickAction<T extends BlockEntityTickingTan
 
     @Override
     public void onTick(T tile, ItemStack itemStack, int slot, int tick) {
-        ItemStack containerStack = tile.getInventory().getItem(slot).copy();
-        IFluidHandler container = FluidUtil.getFluidHandler(containerStack).orElse(null);
-        if(container != null && FluidHelpers.hasFluid(container)) {
-            FluidActionResult result;
-            if (FluidUtil.getFluidHandler(containerStack)
-                    .map(h -> !h.drain(MB_PER_TICK, IFluidHandler.FluidAction.SIMULATE).isEmpty())
-                    .orElse(false)) {
-                result = FluidUtil.tryEmptyContainer(containerStack.split(1), tile.getTank(), MB_PER_TICK, null, true);
-            } else {
-                result = FluidUtil.tryEmptyContainer(containerStack.split(1), tile.getTank(), FluidHelpers.BUCKET_VOLUME, null, true);
+        ItemStack containerStackOriginal = tile.getInventory().getItem(slot).copy();
+        ItemAccess containerItemAccess = ItemAccess.forHandlerIndex(VanillaContainerWrapper.of(tile.getInventory()), slot).oneByOne();
+        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(containerItemAccess, null);
+        IFluidHelpersNeoForge fh = IModHelpers.get().getFluidHelpers();
+        if(container != null && fh.hasFluid(container)) {
+            FluidStack moved = fh.move(container, tile.getTank(), MB_PER_TICK, null, false, false);
+            if (moved.isEmpty()) {
+                moved = fh.move(container, tile.getTank(), IModHelpers.get().getFluidHelpers().getBucketVolume(), null, false, false);
             }
-            if (result.isSuccess()) {
-                ItemStack resultStack = result.getResult();
-                if (resultStack.getCount() == 0) {
-                    resultStack = containerStack;
-                    if (resultStack.getCount() == 0) {
-                        resultStack = ItemStack.EMPTY;
-                    }
-                } else {
-                    if (containerStack.getCount() > 0) {
-                        // In this case we have an "empty container", and a remaining container stack.
-                        // Let's pop out the empty container in this case
-                        ItemStackHelpers.spawnItemStack(tile.getLevel(), tile.getBlockPos(), resultStack.copy());
-                        resultStack = containerStack;
-                        // TODO: in the next major update, rewrite this so that we have a proper "empty container" slot.
-                    }
+            if (!moved.isEmpty()) {
+                if (!containerItemAccess.getResource().is(containerStackOriginal.getItem())) {
+                    // In this case we have an "empty container", and a remaining container stack.
+                    // Let's pop out the empty container in this case
+                    IModHelpers.get().getItemStackHelpers().spawnItemStack(tile.getLevel(), tile.getBlockPos(), containerItemAccess.getResource().toStack());
+                    tile.getInventory().setItem(slot, ItemStack.EMPTY);
                 }
-                tile.getInventory().setItem(slot, resultStack);
             }
         }
     }
@@ -66,11 +57,11 @@ public class EmptyFluidContainerInTankTickAction<T extends BlockEntityTickingTan
      * @return The required ticks.
      */
     public static int getRequiredTicks(BlockEntityTankInventory tile, ItemStack itemStack) {
-        IFluidHandler container = FluidUtil.getFluidHandler(itemStack).orElse(null);
+        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
         int amount = 0;
-        if(container != null && FluidHelpers.hasFluid(container))
-            amount = FluidHelpers.getAmount(FluidHelpers.getFluid(container));
-        int capacity = Math.min(FluidHelpers.getCapacity(container), tile.getTank().getFluidAmount());
+        if(container != null && IModHelpers.get().getFluidHelpers().hasFluid(container))
+            amount = IModHelpers.get().getFluidHelpers().getAmount(IModHelpers.get().getFluidHelpers().getFluid(container));
+        int capacity = (int) Math.min(IModHelpers.get().getFluidHelpers().getCapacity(container), tile.getTank().getFluidAmount());
         return (capacity - amount) / MB_PER_TICK;
     }
 
@@ -78,10 +69,10 @@ public class EmptyFluidContainerInTankTickAction<T extends BlockEntityTickingTan
     public boolean canTick(T tile, ItemStack itemStack, int slot, int tick) {
         boolean emptyContainer = false;
         ItemStack containerStack = tile.getInventory().getItem(slot);
-        IFluidHandler container = FluidUtil.getFluidHandler(containerStack).orElse(null);
-        if(container != null && FluidHelpers.hasFluid(container)) {
-            FluidStack fluidStack = FluidHelpers.getFluid(container);
-            if(FluidHelpers.getAmount(fluidStack) <= 0)
+        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(containerStack, ItemAccess.forHandlerIndex(VanillaContainerWrapper.of(tile.getInventory()), slot));
+        if(container != null && IModHelpers.get().getFluidHelpers().hasFluid(container)) {
+            FluidStack fluidStack = IModHelpers.get().getFluidHelpers().getFluid(container);
+            if(IModHelpers.get().getFluidHelpers().getAmount(fluidStack) <= 0)
                 emptyContainer = true;
         } else emptyContainer = true;
         return super.canTick(tile, itemStack, slot, tick) && !emptyContainer;

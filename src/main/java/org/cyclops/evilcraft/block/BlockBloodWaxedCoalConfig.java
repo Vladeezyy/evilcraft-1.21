@@ -8,7 +8,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -16,13 +19,13 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class BlockBloodWaxedCoalConfig extends BlockConfig {
+public class BlockBloodWaxedCoalConfig extends BlockConfigCommon<IModBase> {
 
     public BlockBloodWaxedCoalConfig() {
         super(
             EvilCraft._instance,
             "blood_waxed_coal_block",
-                eConfig -> new Block(Block.Properties.of()
+                (eConfig, properties) -> new Block(properties
                         .requiresCorrectToolForDrops()
                         .strength(3.0F, 5.0F)
                         .sound(SoundType.METAL)) {

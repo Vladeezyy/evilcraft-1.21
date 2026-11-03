@@ -34,3 +34,4 @@ changelog.txt
 /buildSrc/.gradle
 /buildSrc/build
 /run-gametest
+.cache

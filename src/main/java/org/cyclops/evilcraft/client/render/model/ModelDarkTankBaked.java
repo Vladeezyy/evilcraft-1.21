@@ -1,35 +1,42 @@
 package org.cyclops.evilcraft.client.render.model;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.client.IClientFluidTypeExtensions;
-import org.cyclops.evilcraft.fabric.client.model.ModelData;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingChildDynamicItemAndBlockModel;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.RenderHelpers;
+import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
-import org.cyclops.evilcraft.block.BlockDarkTankConfig;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,21 +48,21 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     private final int capacity;
     private final FluidStack fluidStack;
 
-    public ModelDarkTankBaked(BakedModel baseModel) {
+    public ModelDarkTankBaked(BlockStateModel baseModel) {
         super(baseModel);
         this.capacity = 0;
         this.fluidStack = null;
     }
 
-    public ModelDarkTankBaked(BakedModel baseModel, int capacity, FluidStack fluidStack,
-                              BlockState blockState, Direction facing, RandomSource rand, ModelData modelData, RenderType renderType) {
-        super(baseModel, blockState, facing, rand, modelData, renderType);
+    public ModelDarkTankBaked(BlockStateModel baseModel, int capacity, FluidStack fluidStack,
+                              BlockAndTintGetter level, BlockState blockState, Direction facing, RandomSource rand, ModelData modelData, ChunkSectionLayer renderType) {
+        super(baseModel, level, blockState, facing, rand, modelData, renderType);
         this.capacity = capacity;
         this.fluidStack = fluidStack;
     }
 
-    public ModelDarkTankBaked(BakedModel baseModel, int capacity, FluidStack fluidStack,
-                              ItemStack itemStack, Level world, LivingEntity entity) {
+    public ModelDarkTankBaked(BlockStateModel baseModel, int capacity, FluidStack fluidStack,
+                              ItemStack itemStack, ClientLevel world, LivingEntity entity) {
         super(baseModel, itemStack, world, entity);
         this.capacity = capacity;
         this.fluidStack = fluidStack;
@@ -65,18 +72,22 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     @Override
     public List<BakedQuad> getGeneralQuads() {
         List<BakedQuad> combinedList = Lists.newArrayList();
-        if(fluidStack != null && !fluidStack.isEmpty() && (BlockDarkTankConfig.staticBlockRendering || isItemStack())) {
-            boolean flowing = isItemStack() && RegistryEntries.BLOCK_DARK_TANK.get().isActivated(itemStack, Item.TooltipContext.of(world));
+        if(fluidStack != null && !fluidStack.isEmpty() && isItemStack()) {
+            boolean flowing = isItemStack() && RegistryEntries.BLOCK_DARK_TANK.get().isActivated(itemStack, Item.TooltipContext.EMPTY);
             combinedList.addAll(getFluidQuads(fluidStack, capacity, flowing));
         }
-        combinedList.addAll(baseModel.getQuads(blockState, getRenderingSide(), rand));
+        List<BlockStateModelPart> baseParts = new ArrayList<>();
+        baseModel.collectParts(level, BlockPos.ZERO, blockState, rand, baseParts);
+        for (BlockStateModelPart blockModelPart : baseParts) {
+            combinedList.addAll(blockModelPart.getQuads(null));
+        }
         return combinedList;
     }
 
     @Nonnull
     @Override
     public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
-        return BlockEntityHelpers.get(world, pos, BlockEntityDarkTank.class)
+        return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityDarkTank.class)
                 .map(tile -> {
                     ModelData.Builder builder = ModelData.builder();
                     builder.with(org.cyclops.evilcraft.block.BlockDarkTank.TANK_FLUID, tile.getTank().getFluid());
@@ -87,28 +98,34 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     }
 
     @Override
-    public BakedModel handleBlockState(BlockState state, Direction side, RandomSource rand, ModelData modelData, RenderType renderType) {
-        int capacity = ModelHelpers.getSafeProperty(modelData, org.cyclops.evilcraft.block.BlockDarkTank.TANK_CAPACITY, 0);
-        FluidStack fluidStack = ModelHelpers.getSafeProperty(modelData, org.cyclops.evilcraft.block.BlockDarkTank.TANK_FLUID, FluidStack.EMPTY);
-        return new ModelDarkTankBaked(baseModel, capacity, fluidStack, state, side, rand, modelData, renderType);
+    public List<ChunkSectionLayer> getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
+        return List.of(ChunkSectionLayer.TRANSLUCENT);
     }
 
     @Override
-    public BakedModel handleItemState(ItemStack itemStack, Level world, LivingEntity entity) {
-        IFluidHandlerItemCapacity fluidHandler = FluidHelpers.getFluidHandlerItemCapacity(itemStack).orElse(null);
+    public List<BakedQuad> handleBlockState(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side, RandomSource rand, ModelData extraData, ChunkSectionLayer renderType) {
+        int capacity = ModelHelpers.getSafeProperty(modelData, org.cyclops.evilcraft.block.BlockDarkTank.TANK_CAPACITY, 0);
+        FluidStack fluidStack = ModelHelpers.getSafeProperty(modelData, org.cyclops.evilcraft.block.BlockDarkTank.TANK_FLUID, FluidStack.EMPTY);
+        return new ModelDarkTankBaked(baseModel, capacity, fluidStack, level, state, side, rand, modelData, renderType).getGeneralQuads();
+    }
+
+    @Override
+    public List<BakedQuad> handleItemState(ItemStack itemStack, net.minecraft.world.level.Level world, ItemOwner entity) {
+        IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
         if(!itemStack.isEmpty() && fluidHandler != null) {
-            int capacity = fluidHandler.getCapacity();
-            FluidStack fluidStack = FluidHelpers.getFluid(fluidHandler);
-            return new ModelDarkTankBaked(baseModel, capacity, fluidStack, itemStack, world, entity);
+            int capacity = fluidHandler.getTankCapacity(0);
+            FluidStack fluidStack = IModHelpers.get().getFluidHelpers().getFluid(fluidHandler);
+            return new ModelDarkTankBaked(baseModel, capacity, fluidStack, itemStack, (ClientLevel) world, entity != null ? entity.asLivingEntity() : null).getGeneralQuads();
         }
-        return new ModelDarkTankBaked(baseModel, 0, null, itemStack, world, entity);
+        return new ModelDarkTankBaked(baseModel, 0, null, itemStack, (ClientLevel) world, entity.asLivingEntity()).getGeneralQuads();
     }
 
     public static TextureAtlasSprite getFluidIcon(FluidStack fluid, boolean flowing, Direction side) {
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluid.getFluid());
-        return RenderHelpers.TEXTURE_GETTER.apply(flowing && side != Direction.UP && side != Direction.DOWN
-                ? renderProperties.getFlowingTexture(fluid)
-                : renderProperties.getStillTexture(fluid));
+        FluidModel model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
+        if (!flowing || side == Direction.UP || side == Direction.DOWN) {
+            return model.stillMaterial().sprite();
+        }
+        return model.flowingMaterial().sprite();
     }
 
     protected List<BakedQuad> getFluidQuads(FluidStack fluidStack, int capacity, boolean flowing) {
@@ -116,7 +133,7 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
         List<BakedQuad> quads = Lists.newArrayList();
         for(Direction side : Direction.values()) {
             TextureAtlasSprite texture = getFluidIcon(fluidStack, flowing, side);
-            int color = RenderHelpers.getFluidBakedQuadColor(fluidStack);
+            int color = IModHelpers.get().getRenderHelpers().getFluidBakedQuadColor(fluidStack);
             if(side == Direction.UP) {
                 addBakedQuadRotated(quads, 0.13F, 0.87F, 0.13F, 0.87F, height, texture, side, ROTATION_FIX[side.ordinal()], true, color, ROTATION_UV);
             } else if(side == Direction.DOWN) {
@@ -158,12 +175,10 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
                                 new float[][]{{1, 0}, {1, height}, {0, height}, {0, 0}});
                         break;
                     case WEST:
-                        // TODO: shadow not right yet
                         addBakedQuadRotated(quads, x1, x2, z1, z2, 0.87F, texture, side, 0, true, color,
                                 new float[][]{{1, height}, {0, height}, {0, 0}, {1, 0}});
                         break;
                     case EAST:
-                        // TODO: shadow not right yet
                         addBakedQuadRotated(quads, x1, x2, z1, z2, width, texture, side, 0, true, color,
                                 new float[][]{{0, 0}, {1, 0}, {1, height}, {0, height}});
                         break;
@@ -174,8 +189,13 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon() {
-        return baseModel.getParticleIcon();
+    public Material.Baked particleMaterial() {
+        return baseModel.particleMaterial();
+    }
+
+    @Override
+    public int materialFlags() {
+        return 0;
     }
 
     @Override
@@ -184,7 +204,22 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
     }
 
     @Override
-    public ItemTransforms getTransforms() {
+    public UnbakedModel wrapped() {
+        return null;
+    }
+
+    @Override
+    public @Nullable ResolvedModel parent() {
+        return null;
+    }
+
+    @Override
+    public ItemTransforms getTopTransforms() {
         return ModelHelpers.DEFAULT_CAMERA_TRANSFORMS;
+    }
+
+    @Override
+    public String debugName() {
+        return Reference.MOD_ID + ":dark_tank";
     }
 }

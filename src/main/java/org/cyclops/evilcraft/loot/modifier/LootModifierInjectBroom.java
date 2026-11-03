@@ -12,10 +12,11 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.cyclops.evilcraft.fabric.loot.IGlobalLootModifier;
 import org.cyclops.evilcraft.fabric.loot.LootModifier;
-import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 import org.cyclops.evilcraft.api.broom.BroomModifiers;
@@ -39,8 +40,8 @@ public class LootModifierInjectBroom extends LootModifier {
 
     private final List<String> lootTables;
 
-    public LootModifierInjectBroom(LootItemCondition[] conditionsIn, List<String> lootTables) {
-        super(conditionsIn);
+    public LootModifierInjectBroom(LootItemCondition[] conditionsIn, int priority, List<String> lootTables) {
+        super(conditionsIn, priority);
         this.lootTables = lootTables;
     }
 
@@ -50,13 +51,16 @@ public class LootModifierInjectBroom extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        if (getLootTables().contains(org.cyclops.evilcraft.fabric.loot.GlobalLootModifiers.getQueriedLootTableId(context).toString())) {
-            ItemStack stack = new ItemStack(RegistryEntries.ITEM_BROOM);
+        if (getLootTables().contains(context.getQueriedLootTableId().toString())) {
+            ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(RegistryEntries.ITEM_BROOM));
 
             // Fill with blood
-            IFluidHandlerItemCapacity fluidHanderFull = FluidHelpers.getFluidHandlerItemCapacity(stack).orElse((IFluidHandlerItemCapacity) null);
-            fluidHanderFull.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, fluidHanderFull.getCapacity() / 2 + context.getRandom().nextInt(fluidHanderFull.getCapacity() / 2)), IFluidHandler.FluidAction.EXECUTE);
-            stack = fluidHanderFull.getContainer();
+            IFluidHandlerCapacity fluidHanderFull = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
+            try (var tx = Transaction.openRoot()) {
+                fluidHanderFull.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), fluidHanderFull.getTankCapacity(0) / 2 + context.getRandom().nextInt(fluidHanderFull.getTankCapacity(0) / 2), tx);
+                tx.commit();
+            }
+            ItemStack stack = itemAccess.getResource().toStack(itemAccess.getAmount());
 
             // Add random parts
             ArrayList<IBroomPart> parts = Lists.newArrayList(BroomParts.REGISTRY.getParts());

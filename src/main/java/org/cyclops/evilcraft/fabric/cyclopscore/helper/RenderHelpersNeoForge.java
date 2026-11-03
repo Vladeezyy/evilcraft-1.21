@@ -3,17 +3,15 @@ package org.cyclops.evilcraft.fabric.cyclopscore.helper;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.material.Fluid;
-import org.cyclops.evilcraft.fabric.client.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import net.minecraft.client.renderer.block.FluidModel;
 import org.apache.commons.lang3.tuple.Triple;
-import org.lwjgl.opengl.GL11;
 
 /**
  * @author rubensworks
@@ -32,58 +30,51 @@ public class RenderHelpersNeoForge {
         this.modHelpers = modHelpers;
     }
 
+    private FluidModel getFluidModel(Fluid fluid) {
+        return Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
+    }
+
+    @Override
     public TextureAtlasSprite getFluidIcon(Fluid fluid, Direction side) {
         return getFluidIcon(new FluidStack(fluid, 1000), side);
     }
 
     public TextureAtlasSprite getFluidIcon(FluidStack fluid, Direction side) {
-        if(side == null) side = Direction.UP;
-
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluid.getFluid());
-        TextureAtlasSprite icon = modHelpers.getRenderHelpers().getBlockTextureGetter().apply(renderProperties.getFlowingTexture(fluid));
-        if(icon == null || (side == Direction.UP || side == Direction.DOWN)) {
-            icon = modHelpers.getRenderHelpers().getBlockTextureGetter().apply(renderProperties.getStillTexture(fluid));
+        if (side == null) side = Direction.UP;
+        FluidModel model = getFluidModel(fluid.getFluid());
+        if (side == Direction.UP || side == Direction.DOWN) {
+            return model.stillMaterial().sprite();
         }
-
-        return icon;
+        return model.flowingMaterial().sprite();
     }
 
-    public void renderFluidContext(FluidStack fluid, PoseStack matrixStack, Runnable render) {
-        if(fluid != null && fluid.getAmount() > 0) {
+    @Override
+    public void renderFluidContext(FluidStack fluid, PoseStack matrixStack, IFluidContextRender render) {
+        if (fluid != null && fluid.getAmount() > 0) {
             matrixStack.pushPose();
-
-            // Make sure both sides are rendered
-            RenderSystem.enableBlend();
-            RenderSystem.disableCull();
-
-            // Correct color & lighting
-            RenderSystem.enableBlend();
-            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-            // Set blockState textures
-            Minecraft.getInstance().getTextureManager().bindForSetup(TextureAtlas.LOCATION_BLOCKS);
-
-            render.run();
-
-            RenderSystem.disableBlend();
+            render.render();
             matrixStack.popPose();
         }
     }
 
     public Triple<Float, Float, Float> getFluidVertexBufferColor(FluidStack fluidStack) {
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        int color = renderProperties.getTintColor(fluidStack);
+        int color = getFluidTintColor(fluidStack);
         return this.modHelpers.getBaseHelpers().intToRGB(color);
     }
 
     public int getFluidBakedQuadColor(FluidStack fluidStack) {
-        IClientFluidTypeExtensions renderProperties = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        Triple<Float, Float, Float> colorParts = this.modHelpers.getBaseHelpers().intToRGB(renderProperties.getTintColor(fluidStack));
+        Triple<Float, Float, Float> colorParts = this.modHelpers.getBaseHelpers().intToRGB(getFluidTintColor(fluidStack));
         return this.modHelpers.getBaseHelpers().RGBAToInt(
                 (int) (colorParts.getRight() * 255),
                 (int) (colorParts.getMiddle() * 255),
                 (int) (colorParts.getLeft() * 255),
                 255
         );
+    }
+
+    private int getFluidTintColor(FluidStack fluidStack) {
+        FluidModel model = getFluidModel(fluidStack.getFluid());
+        FluidTintSource tintSource = model.fluidTintSource();
+        return tintSource != null ? tintSource.colorAsStack(fluidStack) : -1;
     }
 }

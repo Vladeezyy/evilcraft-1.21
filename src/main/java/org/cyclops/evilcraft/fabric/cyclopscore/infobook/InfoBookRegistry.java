@@ -7,9 +7,15 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 
 
 import com.google.common.collect.Maps;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.apache.logging.log4j.Level;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.RecipeHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.AdvancementRewards;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import java.util.Map;
 import java.util.Objects;
@@ -23,9 +29,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class InfoBookRegistry implements IInfoBookRegistry {
 
     static {
-        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> onClientTagsLoadedStatic());
-        RecipesUpdatedEvent.LISTENERS.register(InfoBookRegistry::onClientRecipesLoadedStatic);
-        ServerLifecycleEvents.SERVER_STARTED.register(InfoBookRegistry::onServerStartedStatic);
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, InfoBookRegistry::onClientTagsLoadedStatic);
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, InfoBookRegistry::onServerStartedStatic);
     }
 
     private final Map<IInfoBook, String> bookPaths = Maps.newIdentityHashMap();
@@ -33,9 +38,8 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     private final Queue<SectionInjection> sectionInjections = new LinkedBlockingQueue<>(); // Thread-safe queue
 
     public InfoBookRegistry() {
-        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> onClientTagsLoaded());
-        RecipesUpdatedEvent.LISTENERS.register(this::onClientRecipesLoaded);
-        ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
+        NeoForge.EVENT_BUS.addListener(this::onPlayerLoggedIn);
+        NeoForge.EVENT_BUS.addListener(this::onServerStarted);
     }
 
     @Override
@@ -44,7 +48,7 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     }
 
     @Override
-    public void registerSection(ModBase<?> mod, IInfoBook infoBook, String parentSection, String sectionPath) {
+    public void registerSection(ModBaseNeoForge<?> mod, IInfoBook infoBook, String parentSection, String sectionPath) {
         synchronized (sectionInjections) {
             sectionInjections.add(new SectionInjection(Objects.requireNonNull(mod), infoBook, parentSection, sectionPath));
         }
@@ -58,62 +62,34 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     // Reset achievement rewards to avoid remembering stuff across different servers and client worlds.
     // We have this in static methods to make sure that this is called only once per server start,
     // to avoid it being called for every infobook registry.
-    private static volatile boolean infobookStageTagsStatic = false;
-    private static volatile boolean infobookStageRecipesStatic = false;
-    public static void onClientTagsLoadedStatic() {
-        infobookStageTagsStatic = true;
-        if (infobookStageTagsStatic && infobookStageRecipesStatic) {
-            infobookStageTagsStatic = false;
-            infobookStageRecipesStatic = false;
-            AdvancementRewards.reset();
-        }
+    public static void onClientTagsLoadedStatic(TagsUpdatedEvent event) {
+        AdvancementRewards.reset();
     }
-    public static void onClientRecipesLoadedStatic(RecipesUpdatedEvent event) {
-        infobookStageRecipesStatic = true;
-        if (infobookStageTagsStatic && infobookStageRecipesStatic) {
-            infobookStageTagsStatic = false;
-            infobookStageRecipesStatic = false;
-            AdvancementRewards.reset();
-        }
-    }
-    public static void onServerStartedStatic(MinecraftServer server) {
-        if (server.isDedicatedServer()) {
-            infobookStageTagsStatic = false;
-            infobookStageRecipesStatic = false;
+    public static void onServerStartedStatic(ServerStartedEvent event) {
+        if (event.getServer().isDedicatedServer()) {
             // Only call this on dedicated servers, as the RecipesUpdatedEvent won't be emitted there
             AdvancementRewards.reset();
         }
     }
 
-    // Reload infobooks if BOTH tags and recipes are initialized (can occur out-of-order in SMP)
-    private volatile boolean infobookStageTags = false;
-    private volatile boolean infobookStageRecipes = false;
-    public void onClientTagsLoaded() {
-        infobookStageTags = true;
-        if (infobookStageTags && infobookStageRecipes) {
-            afterRecipesAndTagsLoaded();
-        }
+    public void onPlayerLoggedIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        RecipeHelpers.reset();
+        initializeAllBooks(false);
     }
-    public void onClientRecipesLoaded(RecipesUpdatedEvent event) {
-        infobookStageRecipes = true;
-        if (infobookStageTags && infobookStageRecipes) {
-            afterRecipesAndTagsLoaded();
-        }
-    }
-    public void onServerStarted(MinecraftServer server) {
-        if (server.isDedicatedServer()) {
-            // Only call this on dedicated servers, as the RecipesUpdatedEvent won't be emitted there
-            afterRecipesAndTagsLoaded();
+
+    public void onServerStarted(ServerStartedEvent event) {
+        if (event.getServer().isDedicatedServer()) {
+            initializeAllBooks(false);
         }
     }
 
-    public void afterRecipesAndTagsLoaded() {
-        this.infobookStageTags = false;
-        this.infobookStageRecipes = false;
-
+    @Override
+    public void initializeAllBooks(boolean reload) {
         // Load after recipes are loaded client-side
         for (Map.Entry<IInfoBook, String> entry : bookPaths.entrySet()) {
-            entry.getKey().getMod().log(Level.INFO, "Loading infobook " + entry.getValue());
+            if (!reload) {
+                entry.getKey().getMod().log(Level.INFO, "Loading infobook " + entry.getValue());
+            }
             bookRoots.put(entry.getKey(), InfoBookParser.initializeInfoBook(entry.getKey().getMod(), entry.getKey(), entry.getValue(), null));
             // Reset the infobook history
             entry.getKey().setCurrentSection(null);
@@ -130,19 +106,19 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     }
 
     private static final class SectionInjection {
-        private final ModBase<?> mod;
+        private final ModBaseNeoForge<?> mod;
         private final IInfoBook infoBook;
         private final String parentSection;
         private final String sectionPath;
 
-        private SectionInjection(ModBase<?> mod, IInfoBook infoBook, String parentSection, String sectionPath) {
+        private SectionInjection(ModBaseNeoForge<?> mod, IInfoBook infoBook, String parentSection, String sectionPath) {
             this.mod = mod;
             this.infoBook = Objects.requireNonNull(infoBook);
             this.parentSection = parentSection;
             this.sectionPath = sectionPath;
         }
 
-        public ModBase<?> getMod() {
+        public ModBaseNeoForge<?> getMod() {
             return mod;
         }
 

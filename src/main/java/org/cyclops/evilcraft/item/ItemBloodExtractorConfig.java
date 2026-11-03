@@ -2,11 +2,11 @@ package org.cyclops.evilcraft.item;
 
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemBloodExtractorConfig extends ItemConfig {
+public class ItemBloodExtractorConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The minimum multiplier for amount of mB to receive per mob HP.", isCommandable = true)
     public static double minimumMobMultiplier = 5;
@@ -32,14 +32,13 @@ public class ItemBloodExtractorConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "blood_extractor",
-                eConfig -> new ItemBloodExtractor(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemBloodExtractor(properties)
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

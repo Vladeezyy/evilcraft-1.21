@@ -4,36 +4,24 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.SectionAppendix;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Section of the info book.
  * Can have child sections.
+ *
  * @author rubensworks
  */
 public class InfoSection {
@@ -43,13 +31,12 @@ public class InfoSection {
     private static final int APPENDIX_OFFSET_LINE = 1;
     private static final int LINK_INDENT = 8;
 
-    @Getter private final IInfoBook infoBook;
-    @Getter
+    private final IInfoBook infoBook;
     @Nullable
-    private final ModBase<?> mod;
+    private final ModBaseNeoForge<?> mod;
     private InfoSection parent;
     private int childIndex;
-    @Getter private String translationKey;
+    private String translationKey;
     private List<InfoSection> sections = Lists.newLinkedList();
     private List<List<HyperLink>> links = Lists.newLinkedList();
     private List<SectionAppendix> appendixes;
@@ -60,7 +47,7 @@ public class InfoSection {
     private Map<Integer, List<AdvancedButton>> advancedButtons = Maps.newHashMap();
 
     public InfoSection(IInfoBook infoBook, InfoSection parent, int childIndex, String translationKey,
-                       List<String> paragraphs, List<SectionAppendix> appendixes, ArrayList<String> tagList, ModBase<?> mod) {
+                       List<String> paragraphs, List<SectionAppendix> appendixes, ArrayList<String> tagList, ModBaseNeoForge<?> mod) {
         this.infoBook = infoBook;
         this.mod = mod;
         this.parent = parent;
@@ -71,10 +58,8 @@ public class InfoSection {
         this.tagList = tagList;
     }
 
-    @Deprecated // TODO: RM in next major MC version
-    public InfoSection(IInfoBook infoBook, InfoSection parent, int childIndex, String translationKey,
-                       List<String> paragraphs, List<SectionAppendix> appendixes, ArrayList<String> tagList) {
-        this(infoBook, parent, childIndex, translationKey, paragraphs, appendixes, tagList, null);
+    public List<SectionAppendix> getAppendixes() {
+        return appendixes;
     }
 
     public String getRelativeWebPath() {
@@ -95,22 +80,23 @@ public class InfoSection {
 
     /**
      * Add all links from the given map to this section, starting from page 0.
-     * @param maxLines The maximum amount of lines per page.
+     *
+     * @param maxLines   The maximum amount of lines per page.
      * @param lineHeight The line height.
-     * @param yOffset The y gui offset.
-     * @param softLinks The map of links.
+     * @param yOffset    The y gui offset.
+     * @param softLinks  The map of links.
      */
     protected void addLinks(int maxLines, int lineHeight, int yOffset, Map<String, Pair<InfoSection, Integer>> softLinks) {
         int linesOnPage = 0;
-        if(isTitlePage(0)) {
+        if (isTitlePage(0)) {
             linesOnPage += TITLE_LINES;
         }
         List<HyperLink> pageLinks = Lists.newArrayListWithCapacity(maxLines);
         StringBuilder lines = new StringBuilder();
-        for(Map.Entry<String, Pair<InfoSection, Integer>> entry : softLinks.entrySet()) {
+        for (Map.Entry<String, Pair<InfoSection, Integer>> entry : softLinks.entrySet()) {
             lines.append(" \n");
             linesOnPage++;
-            if(linesOnPage >= maxLines) {
+            if (linesOnPage >= maxLines) {
                 linesOnPage = 0;
                 links.add(pageLinks);
                 pageLinks = Lists.newArrayListWithCapacity(maxLines);
@@ -126,9 +112,9 @@ public class InfoSection {
     }
 
     protected static void constructAllLinks(InfoSection root, Map<String, Pair<InfoSection, Integer>> softLinks, int indent, int maxDepth) {
-        for(InfoSection section : root.sections) {
+        for (InfoSection section : root.sections) {
             softLinks.put(section.getTranslationKey(), Pair.of(section, indent));
-            if(maxDepth - 1 > 0) {
+            if (maxDepth - 1 > 0) {
                 constructAllLinks(section, softLinks, indent + LINK_INDENT, maxDepth - 1);
             }
         }
@@ -137,14 +123,15 @@ public class InfoSection {
     /**
      * Will make a localized version of this section with a variable amount of paragraphs.
      * Must be called once before the section will be drawn.
+     *
      * @param fontRenderer The font renderer.
-     * @param width Section width
-     * @param maxLines The maximum amount of lines per page.
-     * @param lineHeight The line height.
-     * @param yOffset The y gui offset.
+     * @param width        Section width
+     * @param maxLines     The maximum amount of lines per page.
+     * @param lineHeight   The line height.
+     * @param yOffset      The y gui offset.
      */
     public void bakeSection(Font fontRenderer, int width, int maxLines, int lineHeight, int yOffset) {
-        if(paragraphs.size() == 0 && shouldAddIndex()) {
+        if (paragraphs.size() == 0 && shouldAddIndex()) {
             // linkedmap to make sure the contents are sorted by insertion order.
             Map<String, Pair<InfoSection, Integer>> softLinks = Maps.newLinkedHashMap();
             constructAllLinks(this, softLinks, 0, 2);
@@ -153,9 +140,9 @@ public class InfoSection {
 
         // Localize paragraphs and fit them into materialized paragraphs.
         String contents = "";
-        for(Iterator<String> it = paragraphs.iterator(); it.hasNext();) {
+        for (Iterator<String> it = paragraphs.iterator(); it.hasNext(); ) {
             String paragraph = it.next();
-            contents += formatString(L10NHelpers.localize(paragraph)) + (it.hasNext() ? "\n\n" : "");
+            contents += formatString(IModHelpers.get().getL10NHelpers().localize(paragraph)) + (it.hasNext() ? "\n\n" : "");
         }
 
         // Wrap the text into pages.
@@ -163,13 +150,14 @@ public class InfoSection {
         localizedPages = Lists.newLinkedList();
         int linesOnPage = 0;
         List<FormattedCharSequence> currentPage = Lists.newArrayList();
-        if(isTitlePage(0)) {
-            for(int i = 1; i < TITLE_LINES; i++) currentPage.add(FormattedCharSequence.forward("", Style.EMPTY)); // Make a blank space for the section title.
+        if (isTitlePage(0)) {
+            for (int i = 1; i < TITLE_LINES; i++)
+                currentPage.add(FormattedCharSequence.forward("", Style.EMPTY)); // Make a blank space for the section title.
             linesOnPage += TITLE_LINES;
         }
         pages = 1;
-        for(FormattedCharSequence line : allLines) {
-            if(linesOnPage >= maxLines) {
+        for (FormattedCharSequence line : allLines) {
+            if (linesOnPage >= maxLines) {
                 linesOnPage = 0;
                 pages++;
                 localizedPages.add(currentPage);
@@ -187,9 +175,9 @@ public class InfoSection {
         List<SectionAppendix> appendixCurrentPage = Lists.newLinkedList();
         int appendixPageStart = pages - 1;
         int appendixLineStart = linesOnPage;
-        for(SectionAppendix appendix : appendixes) {
+        for (SectionAppendix appendix : appendixes) {
             int lines = getAppendixLineHeight(appendix, fontRenderer);
-            if(linesOnPage + lines > maxLines) {
+            if (linesOnPage + lines > maxLines) {
                 appendixesPerPage.put(pages - 1, appendixCurrentPage);
                 pages++;
                 linesOnPage = 0;
@@ -204,18 +192,18 @@ public class InfoSection {
         appendixesPerPage.put(pages - 1, appendixCurrentPage);
 
         // Loop over each page to determine optimal vertical float positioning of appendixes.
-        for(Map.Entry<Integer, List<SectionAppendix>> entry : appendixesPerPage.entrySet()) {
+        for (Map.Entry<Integer, List<SectionAppendix>> entry : appendixesPerPage.entrySet()) {
             int freeLines = maxLines;
             int lineStart = 0;
 
             // Special case if appendixes occurs on a page that still has text content, so this needs an offset.
-            if(entry.getKey() == appendixPageStart) {
+            if (entry.getKey() == appendixPageStart) {
                 lineStart = appendixLineStart;
                 freeLines -= appendixLineStart;
             }
 
             // Count total lines that are free.
-            for(SectionAppendix appendix : entry.getValue()) {
+            for (SectionAppendix appendix : entry.getValue()) {
                 freeLines -= getAppendixLineHeight(appendix, fontRenderer);
             }
 
@@ -223,7 +211,7 @@ public class InfoSection {
             int linesOffset = freeLines / (entry.getValue().size() + 1);
             int linesOffsetMod = freeLines % (entry.getValue().size() + 1);
             lineStart += linesOffset;
-            for(SectionAppendix appendix : entry.getValue()) {
+            for (SectionAppendix appendix : entry.getValue()) {
                 appendix.setLineStart(lineStart);
                 lineStart += linesOffset + getAppendixLineHeight(appendix, fontRenderer) + (linesOffsetMod > 0 ? linesOffsetMod-- : 0);
             }
@@ -231,7 +219,7 @@ public class InfoSection {
 
         // Bake appendix contents
         advancedButtons.clear();
-        for(SectionAppendix appendix : appendixes) {
+        for (SectionAppendix appendix : appendixes) {
             appendix.preBakeElement(this);
             appendix.bakeElement(this);
         }
@@ -315,6 +303,7 @@ public class InfoSection {
      * Will allow the convenient "&amp;" format codes to be used instead of "§": http://minecraft.gamepedia.com/Formatting_codes
      * Will also refresh all formats at the end of the string.
      * This will replace "&amp;N"'s with a newlines.
+     *
      * @param string The string to format.
      * @return The formatted string.
      */
@@ -323,12 +312,12 @@ public class InfoSection {
     }
 
     protected List<FormattedCharSequence> getLocalizedPageLines(int page) {
-        if(page >= localizedPages.size() || page < 0) return null;
+        if (page >= localizedPages.size() || page < 0) return null;
         return localizedPages.get(page);
     }
 
     public String getLocalizedTitle() {
-        return formatString(L10NHelpers.localize(translationKey));
+        return formatString(IModHelpers.get().getL10NHelpers().localize(translationKey));
     }
 
     public int getSubSections() {
@@ -352,101 +341,29 @@ public class InfoSection {
     }
 
     public List<HyperLink> getLinks(int page) {
-        if(links.size() <= page || page < 0) return Collections.emptyList();
+        if (links.size() <= page || page < 0) return Collections.emptyList();
         return links.get(page);
     }
 
-    /**
-     * Draw the screen for a given page.
-     * @param gui The gui.
-     * @param guiGraphics The gui graphics object
-     * @param mouseX X.
-     * @param mouseY Y.
-     * @param yOffset The y offset.
-     * @param width The width of the page.
-     * @param height The height of the page.
-     * @param page The page to render.
-     * @param mx Mouse X.
-     * @param my Mouse Y.
-     * @param footnoteOffsetX Footnote offset x
-     * @param footnoteOffsetY Footnote offset y
-     */
-    @Environment(EnvType.CLIENT)
-    public void drawScreen(ScreenInfoBook gui, GuiGraphics guiGraphics, int mouseX, int mouseY, int yOffset, int width, int height, int page, int mx, int my, int footnoteOffsetX, int footnoteOffsetY) {
-        if(page < getPages()) {
-            Font fontRenderer = gui.getFont();
-
-            // Draw text content
-            List<FormattedCharSequence> lines = getLocalizedPageLines(page);
-            int l = 0;
-            if (lines != null) {
-                for (FormattedCharSequence line : lines) {
-                    fontRenderer.drawInBatch(line, mouseX, mouseY + yOffset + l * 9, 0, false,
-                            guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
-                    l++;
-                }
-            }
-
-            // Draw title if on first page
-            if (isTitlePage(page)) {
-                gui.drawScaledCenteredString(guiGraphics, getLocalizedTitle(), mouseX, mouseY + yOffset + 10, width, 1.5f, width, gui.getTitleColor());
-                gui.drawHorizontalRule(guiGraphics, mouseX + width / 2, mouseY + yOffset);
-                gui.drawHorizontalRule(guiGraphics, mouseX + width / 2, mouseY + yOffset + 21);
-            }
-
-            // Draw current page/section indication
-            gui.drawScaledCenteredString(guiGraphics, getLocalizedTitle() + " - " + (page + 1) +  "/" + getPages(), mouseX + (((page % 2 == 0) ? 1 : -1) * footnoteOffsetX), mouseY + height + footnoteOffsetY, width, 0.6f, (int) (width * 0.75f), Helpers.RGBToInt(190, 190, 190));
-
-            // Draw appendixes
-            for (SectionAppendix appendix : appendixes) {
-                if (appendix.getPage() == page) {
-                    appendix.drawScreen(gui, guiGraphics, mouseX, mouseY + yOffset + getAppendixOffsetLine(fontRenderer, appendix),
-                            width, height, page, mx, my, true);
-                }
-            }
-        }
-    }
-
-    /**
-     * Draw the overlays for the given page, for tooltips and such.
-     * @param gui The gui.
-     * @param guiGraphics The gui graphics object.
-     * @param mouseX X.
-     * @param mouseY Y.
-     * @param width The width of the page.
-     * @param height The height of the page.
-     * @param page The page to render.
-     * @param mx Mouse X.
-     * @param my Mouse Y.
-     */
-    @Environment(EnvType.CLIENT)
-    public void postDrawScreen(ScreenInfoBook gui, GuiGraphics guiGraphics, int mouseX, int mouseY, int width, int height, int page, int mx, int my) {
-        if(page < getPages()) {
-            Font fontRenderer = gui.getFont();
-            // Post draw appendixes
-            for (SectionAppendix appendix : appendixes) {
-                if (appendix.getPage() == page) {
-                    appendix.drawScreen(gui, guiGraphics, mouseX, mouseY + getAppendixOffsetLine(fontRenderer, appendix),
-                            width, height, page, mx, my, false);
-                }
-            }
-        }
+    public InfoSectionClient constructInfoSectionClient() {
+        return new InfoSectionClient(this);
     }
 
     /**
      * Get the next InfoSection relative to this one plus page in this tree hierarchy using pre-order traversal.
-     * @param page The current page.
+     *
+     * @param page        The current page.
      * @param stepSection Take a complete section as traversal step.
      * @return The next location or the current location if this was the last location.
      */
     public InfoSection.Location getNext(int page, boolean stepSection) {
-        if(page < getPages() - 1 && !stepSection) {
+        if (page < getPages() - 1 && !stepSection) {
             return new InfoSection.Location(page + 1, this);
-        } else if(getSubSections() > 0) {
+        } else if (getSubSections() > 0) {
             return new InfoSection.Location(0, getSubSection(0));
         } else {
             InfoSection current = this;
-            while(!current.isRoot()) {
+            while (!current.isRoot()) {
                 if (current.getChildIndex() < current.getParent().getSubSections() - 1) {
                     return new Location(0, current.getParent().getSubSection(current.getChildIndex() + 1));
                 }
@@ -458,18 +375,19 @@ public class InfoSection {
 
     /**
      * Get the previous InfoSection relative to this one plus page in this tree hierarchy using pre-order traversal.
-     * @param page The current page.
+     *
+     * @param page        The current page.
      * @param stepSection Take a complete section as traversal step.
      * @return The previous location or the current location if this was the last location.
      */
     public InfoSection.Location getPrevious(int page, boolean stepSection) {
-        if(page > 0) {
+        if (page > 0) {
             return new InfoSection.Location(stepSection ? 0 : page - getInfoBook().getPagesPerView(), this);
-        } else if(!isRoot() && getChildIndex() == 0) {
+        } else if (!isRoot() && getChildIndex() == 0) {
             return new InfoSection.Location(0, getParent());
-        } else if(!isRoot() && getChildIndex() > 0) {
+        } else if (!isRoot() && getChildIndex() > 0) {
             InfoSection current = getParent().getSubSection(getChildIndex() - 1);
-            while(current.getSubSections() > 0) {
+            while (current.getSubSections() > 0) {
                 current = current.getSubSection(current.getSubSections() - 1);
             }
             return new InfoSection.Location(0, current);
@@ -486,31 +404,49 @@ public class InfoSection {
     }
 
     public List<AdvancedButton> getAdvancedButtons(int page) {
-        if(!advancedButtons.containsKey(page)) {
+        if (!advancedButtons.containsKey(page)) {
             return Collections.emptyList();
         }
         return advancedButtons.get(page);
     }
 
     public void addAdvancedButton(int page, AdvancedButton advancedButton) {
-        if(!advancedButtons.containsKey(page)) {
+        if (!advancedButtons.containsKey(page)) {
             advancedButtons.put(page, Lists.<AdvancedButton>newLinkedList());
         }
         advancedButtons.get(page).add(advancedButton);
     }
 
     public <T extends AdvancedButton> void addAdvancedButtons(int page, Collection<T> advancedButtons) {
-        for(AdvancedButton advancedButton : advancedButtons) addAdvancedButton(page, advancedButton);
+        for (AdvancedButton advancedButton : advancedButtons) addAdvancedButton(page, advancedButton);
     }
 
-    @Data @AllArgsConstructor public static class Location {
+    public IInfoBook getInfoBook() {
+        return this.infoBook;
+    }
+
+    @Nullable
+    public ModBaseNeoForge<?> getMod() {
+        return this.mod;
+    }
+
+    public String getTranslationKey() {
+        return this.translationKey;
+    }
+
+    public static class Location {
 
         private int page;
         private InfoSection infoSection;
 
+        public Location(int page, InfoSection infoSection) {
+            this.page = page;
+            this.infoSection = infoSection;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if(o instanceof Location) {
+            if (o instanceof Location) {
                 return ((Location) o).page == this.page && ((Location) o).infoSection == this.infoSection;
             }
             return false;
@@ -521,6 +457,25 @@ public class InfoSection {
             return infoSection.hashCode() >> 4 & page;
         }
 
+        public int getPage() {
+            return this.page;
+        }
+
+        public InfoSection getInfoSection() {
+            return this.infoSection;
+        }
+
+        public void setPage(int page) {
+            this.page = page;
+        }
+
+        public void setInfoSection(InfoSection infoSection) {
+            this.infoSection = infoSection;
+        }
+
+        public String toString() {
+            return "InfoSection.Location(page=" + this.getPage() + ", infoSection=" + this.getInfoSection() + ")";
+        }
     }
 
 }

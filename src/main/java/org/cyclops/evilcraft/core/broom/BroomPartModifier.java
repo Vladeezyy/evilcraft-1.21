@@ -1,9 +1,7 @@
 package org.cyclops.evilcraft.core.broom;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.api.broom.BroomModifier;
 
 import javax.annotation.Nullable;
@@ -20,10 +18,10 @@ public class BroomPartModifier extends BroomPartBase {
         this.modifier = modifier;
     }
 
-    @Environment(EnvType.CLIENT)
-    protected void registerModelResourceLocation() {
+    @Override
+    protected void registerModelIdentifier() {
         BroomParts.REGISTRY.registerPartModel(this,
-                ResourceLocation.fromNamespaceAndPath(getId().getNamespace(), "broom_part/ring"));
+                Identifier.fromNamespaceAndPath(getId().getNamespace(), "broom_part/ring"));
     }
 
     @Nullable

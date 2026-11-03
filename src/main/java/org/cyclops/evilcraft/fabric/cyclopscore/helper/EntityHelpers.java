@@ -6,7 +6,7 @@ import org.cyclops.evilcraft.fabric.PersistentData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -66,11 +66,12 @@ public class EntityHelpers {
      * @param x X coordinate.
      * @param y Y coordinate.
      * @param z Z coordinate.
+     * @param spawnReason The spawn reason
      * @return the entity that was spawned.
      */
-    public static Optional<Entity> spawnEntity(Level world, @Nullable ResourceLocation entityName, double x, double y, double z) {
+    public static Optional<Entity> spawnEntity(Level world, @Nullable Identifier entityName, double x, double y, double z, EntitySpawnReason spawnReason) {
         return EntityType.byString(entityName.toString()).map((type) -> {
-            Entity entity = type.create(world);
+            Entity entity = type.create(world, spawnReason);
             entity.setPos(x, y, z);
             world.addFreshEntity(entity);
             return entity;
@@ -84,8 +85,8 @@ public class EntityHelpers {
      * @param spawnReason The spawn reason.
      * @return If the entity was spawned.
      */
-    public static boolean spawnEntity(ServerLevelAccessor world, Mob entityLiving, MobSpawnType spawnReason) {
-        entityLiving.finalizeSpawn(world, world.getCurrentDifficultyAt(entityLiving.blockPosition()), spawnReason, null);
+    public static boolean spawnEntity(ServerLevelAccessor world, Mob entityLiving, EntitySpawnReason spawnReason) {
+        EventHooks.finalizeMobSpawn(entityLiving, world, world.getCurrentDifficultyAt(entityLiving.blockPosition()), spawnReason, null);
         world.addFreshEntity(entityLiving);
         return true;
     }
@@ -125,7 +126,13 @@ public class EntityHelpers {
      * @return The player's persisted NBT tag.
      */
     public static CompoundTag getPersistedPlayerNbt(Player player) {
-        return PersistentData.getPersisted(player);
+        CompoundTag tag = player.getPersistentData();
+        CompoundTag persistedTag = tag.getCompound(Player.PERSISTED_NBT_TAG).orElse(null);
+        if (persistedTag == null) {
+            persistedTag = new CompoundTag();
+            tag.put(Player.PERSISTED_NBT_TAG, persistedTag);
+        }
+        return persistedTag;
     }
 
 }

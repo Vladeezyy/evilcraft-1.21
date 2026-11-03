@@ -1,8 +1,9 @@
 package org.cyclops.evilcraft;
 
-import org.cyclops.cyclopscore.config.ModConfigLocation;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.DummyConfig;
+import org.cyclops.cyclopscore.config.ModConfigLocation;
+import org.cyclops.cyclopscore.config.extendedconfig.DummyConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 
 
 /**
@@ -10,7 +11,7 @@ import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.DummyConfi
  * @author rubensworks
  *
  */
-public class GeneralConfig extends DummyConfig {
+public class GeneralConfig extends DummyConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "general", comment = "Evil stuff...", isCommandable = true, configLocation = ModConfigLocation.SERVER)
     public static boolean dieWithoutAnyReason = false;
@@ -52,5 +53,4 @@ public class GeneralConfig extends DummyConfig {
     public GeneralConfig() {
         super(EvilCraft._instance, "general");
     }
-
 }

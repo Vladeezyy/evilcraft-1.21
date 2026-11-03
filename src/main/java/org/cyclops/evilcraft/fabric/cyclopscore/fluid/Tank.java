@@ -2,13 +2,13 @@ package org.cyclops.evilcraft.fabric.cyclopscore.fluid;
 
 
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerMutable;
 
 /**
  * A simple fluid tank.
@@ -16,14 +16,34 @@ import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerMu
  * @author rubensworks
  *
  */
-public class Tank extends FluidTank implements IFluidHandlerCapacity, IFluidHandlerMutable {
+public class Tank extends FluidStacksResourceHandler implements IFluidHandlerCapacity {
 
     /**
      * Make a new fluid tank.
      * @param capacity The capacity (mB) for the tank.
      */
     public Tank(int capacity) {
-        super(capacity);
+        super(1, capacity);
+    }
+
+    public FluidStack getFluid() {
+        return size() == 0 ? FluidStack.EMPTY : this.stacks.get(0);
+    }
+
+    public int getFluidAmount() {
+        return getFluid().getAmount();
+    }
+
+    public void setFluid(FluidStack fluid) {
+        this.stacks.set(0, fluid);
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
     }
 
     /**
@@ -55,57 +75,48 @@ public class Tank extends FluidTank implements IFluidHandlerCapacity, IFluidHand
     }
 
     @Override
-    public CompoundTag writeToNBT(HolderLookup.Provider lookupProvider, CompoundTag nbt) {
+    public void serialize(ValueOutput output) {
         if(replaceInnerFluid()) {
-            super.writeToNBT(lookupProvider, nbt);
+            super.serialize(output);
         }
-        writeTankToNBT(nbt);
-        return nbt;
+        serializeTank(output);
     }
 
-    public CompoundTag writeToNBT(HolderLookup.Provider lookupProvider, CompoundTag nbt, String tag) {
-        CompoundTag subTag = new CompoundTag();
-        writeToNBT(lookupProvider, subTag);
-        nbt.put(tag, subTag);
-        return nbt;
+    public void serialize(ValueOutput output, String tag) {
+        serialize(output.child(tag));
     }
 
     @Override
-    public FluidTank readFromNBT(HolderLookup.Provider lookupProvider, CompoundTag nbt) {
+    public void deserialize(ValueInput input) {
         if(replaceInnerFluid()) {
-            if (nbt.contains("Empty")) {
+            if (input.child("Empty").isPresent()) {
                 setFluid(null);
             }
-            super.readFromNBT(lookupProvider, nbt);
+            super.deserialize(input);
         }
-        readTankFromNBT(nbt);
-        return this;
+        deserializeTank(input);
     }
 
-    public FluidTank readFromNBT(HolderLookup.Provider lookupProvider, CompoundTag data, String tag) {
-        CompoundTag subTag = data.getCompound(tag);
-        return readFromNBT(lookupProvider, subTag);
+    public void deserialize(ValueInput input, String tag) {
+        deserialize(input.child(tag).orElseThrow());
     }
 
     /**
      * Write the tank contents to NBT.
-     * @param nbt The NBT tag to write to.
+     * @param output The value tag to write to.
      */
-    public void writeTankToNBT(CompoundTag nbt) {
-        nbt.putInt("capacity", getCapacity());
+    public void serializeTank(ValueOutput output) {
+        output.putInt("capacity", getCapacity());
     }
 
     /**
      * Read the tank contents from NBT.
-     * @param nbt The NBT tag to write from.
+     * @param input The value to write from.
      */
-    public void readTankFromNBT(CompoundTag nbt) {
-        if(nbt.contains("capacity")) { // Backwards compatibility.
-            setCapacity(nbt.getInt("capacity"));
-        }
+    public void deserializeTank(ValueInput input) {
+        setCapacity(input.getInt("capacity").orElseThrow());
     }
 
-    @Override
     public void setFluidInTank(int tank, FluidStack fluidStack) {
         if (tank == 0) {
             setFluid(fluidStack);
@@ -113,7 +124,7 @@ public class Tank extends FluidTank implements IFluidHandlerCapacity, IFluidHand
     }
 
     @Override
-    public void setTankCapacity(int tank, int capacity) {
+    public void setTankCapacity(int tank, int capacity, TransactionContext transaction) {
         if (tank == 0) {
             setCapacity(capacity);
         }

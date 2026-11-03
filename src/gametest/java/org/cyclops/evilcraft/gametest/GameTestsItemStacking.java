@@ -1,16 +1,18 @@
 package org.cyclops.evilcraft.gametest;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
-import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
@@ -27,13 +29,13 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         hopper.setItem(0, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR, 3));
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -44,18 +46,20 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         hopper.setItem(0, itemStack.copy());
         hopper.setItem(1, itemStack.copy());
         hopper.setItem(2, itemStack.copy());
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -66,21 +70,23 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack1 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
         ItemStack itemStack2 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
         ItemStack itemStack3 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack2).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
-        fluidHandler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack2, ItemAccess.forStack(itemStack2));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+            fluidHandler.extract(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         hopper.setItem(0, itemStack1);
         hopper.setItem(1, itemStack2);
         hopper.setItem(2, itemStack3);
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -91,19 +97,21 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         ItemHelpers.toggleActivation(itemStack);
         hopper.setItem(0, itemStack.copy());
         hopper.setItem(1, itemStack.copy());
         hopper.setItem(2, itemStack.copy());
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -114,7 +122,7 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack1 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
         ItemStack itemStack2 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
         ItemStack itemStack3 = new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR);
@@ -123,11 +131,11 @@ public class GameTestsItemStacking {
         hopper.setItem(0, itemStack1);
         hopper.setItem(1, itemStack2);
         hopper.setItem(2, itemStack3);
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -138,13 +146,13 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         hopper.setItem(0, new ItemStack(RegistryEntries.ITEM_DARK_TANK, 3));
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -155,18 +163,20 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         hopper.setItem(0, itemStack.copy());
         hopper.setItem(1, itemStack.copy());
         hopper.setItem(2, itemStack.copy());
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -177,21 +187,23 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack1 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
         ItemStack itemStack2 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
         ItemStack itemStack3 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack2).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
-        fluidHandler.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack2, ItemAccess.forStack(itemStack2));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+            fluidHandler.extract(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         hopper.setItem(0, itemStack1);
         hopper.setItem(1, itemStack2);
         hopper.setItem(2, itemStack3);
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -202,19 +214,21 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
-        IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(itemStack).orElse(null);
-        fluidHandler.fill(new FluidStack(RegistryEntries.FLUID_BLOOD, 1000), IFluidHandler.FluidAction.EXECUTE);
+        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
+        try (var tx = Transaction.openRoot()) {
+            fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), 1000, tx);
+        }
         ItemHelpers.toggleActivation(itemStack);
         hopper.setItem(0, itemStack.copy());
         hopper.setItem(1, itemStack.copy());
         hopper.setItem(2, itemStack.copy());
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 
@@ -225,7 +239,7 @@ public class GameTestsItemStacking {
         helper.setBlock(POS, Blocks.CHEST);
 
         // Add items to hopper
-        HopperBlockEntity hopper = helper.getBlockEntity(POS.above());
+        HopperBlockEntity hopper = helper.getBlockEntity(POS.above(), HopperBlockEntity.class);
         ItemStack itemStack1 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
         ItemStack itemStack2 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
         ItemStack itemStack3 = new ItemStack(RegistryEntries.ITEM_DARK_TANK);
@@ -234,11 +248,11 @@ public class GameTestsItemStacking {
         hopper.setItem(0, itemStack1);
         hopper.setItem(1, itemStack2);
         hopper.setItem(2, itemStack3);
-        ChestBlockEntity chest = helper.getBlockEntity(POS);
+        ChestBlockEntity chest = helper.getBlockEntity(POS, ChestBlockEntity.class);
 
         helper.succeedWhen(() -> {
             // Check result remains in the same stack
-            helper.assertTrue(chest.getItem(0).getCount() == 3, "Stacking failed");
+            helper.assertTrue(chest.getItem(0).getCount() == 3, Component.literal("Stacking failed"));
         });
     }
 

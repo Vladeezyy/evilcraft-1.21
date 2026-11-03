@@ -1,23 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "#c:slime_balls",
     {
-      "tag": "c:slime_balls"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"
         ]
       }
     },
-    {
-      "tag": "c:slime_balls"
-    }
+    "#c:slime_balls"
   ],
   "result": {
     "id": "evilcraft:broom_part",

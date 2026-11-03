@@ -1,14 +1,15 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.inventory;
 
 import org.cyclops.cyclopscore.inventory.ItemLocation;
+import org.cyclops.cyclopscore.inventory.SimpleInventory;
 
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
  * A simple inventory for a currently held item by a player that can be stored in NBT.
@@ -52,13 +53,13 @@ public class NBTSimpleInventoryItemHeld extends SimpleInventory {
     }
 
     @Override
-    public void readFromNBT(HolderLookup.Provider provider, CompoundTag data, String tagName) {
-        InventoryHelpers.readFromNBT(provider, this, data, tagName);
+    public void readFromNBT(ValueInput data, String tagName) {
+        IModHelpers.get().getInventoryHelpers().readFromNBT(this, data, tagName);
     }
 
     @Override
-    public void writeToNBT(HolderLookup.Provider provider, CompoundTag data, String tagName) {
-        InventoryHelpers.writeToNBT(provider, this, data, tagName);
+    public void writeToNBT(ValueOutput data, String tagName) {
+        IModHelpers.get().getInventoryHelpers().writeToNBT(this, data, tagName);
     }
 
 }

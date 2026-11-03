@@ -1,153 +1,143 @@
 package org.cyclops.evilcraft.client.render.model;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ResolvableModel;
+import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.client.model.ModelData;
-import org.cyclops.evilcraft.fabric.client.model.IGeometryBakingContext;
-import org.cyclops.evilcraft.fabric.client.model.UnbakedGeometryHelper;
+import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import net.neoforged.neoforge.model.data.ModelData;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DynamicItemAndBlockModel;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDisplayStand;
 import org.cyclops.evilcraft.blockentity.BlockEntityDisplayStand;
-import org.cyclops.evilcraft.core.client.model.GeometryBakingContextRetextured;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * The dynamic item model for the display stand.
- * Inspired by TCon's dynamic tool table retexturing.
+ * This works in a very hacky manner, as it stores all information for baking at game-time using ModelLoaderDisplayStand.
  * @author rubensworks
  */
 public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
 
-    private static final Map<Direction, BlockModelRotation> ROTATIONS = ImmutableMap.<Direction, BlockModelRotation>builder()
-            .put(Direction.NORTH, BlockModelRotation.X270_Y0)
-            .put(Direction.SOUTH, BlockModelRotation.X90_Y0)
-            .put(Direction.WEST, BlockModelRotation.X90_Y90)
-            .put(Direction.EAST, BlockModelRotation.X270_Y90)
-            .put(Direction.UP, BlockModelRotation.X180_Y0)
-            .put(Direction.DOWN, BlockModelRotation.X0_Y0)
-            .build();
-
-    private final SingleCache<ResourceLocation, BakedModel> modelCache = new SingleCache<>(new SingleCache.ICacheUpdater<ResourceLocation, BakedModel>() {
+    private final SingleCache<Material, BlockStateModelPart> modelCache = new SingleCache<>(new SingleCache.ICacheUpdater<>() {
         @Override
-        public BakedModel getNewValue(ResourceLocation textureName) {
-            return bakeModel(blockModel, new GeometryBakingContextRetextured(context, textureName), blockModel.getElements(), transform,
-                    ItemOverrides.EMPTY, spriteGetter, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "dummy"));
+        public BlockStateModelPart getNewValue(Material key) {
+            return bakeModel(key);
         }
 
         @Override
-        public boolean isKeyEqual(ResourceLocation resourceLocation, ResourceLocation k1) {
-            return resourceLocation.equals(k1);
+        public boolean isKeyEqual(Material k1, Material k2) {
+            return k1.equals(k2);
         }
     });
 
-    private final BlockModel blockModel;
-    private final BakedModel untexturedBakedModel;
-    private final TextureAtlasSprite texture;
-    private final IGeometryBakingContext context;
-    private final ModelState transform;
-    private final Function<Material, TextureAtlasSprite> spriteGetter;
+    private final ModelBaker baker;
+    private final ResolvedModel resolvedModel;
+    private final ModelState modelState;
+    private final TextureSlots textureSlots;
+    private final Material.Baked particleMaterialBaked;
+    private final BlockStateModelPart untexturedModel;
 
-    public ModelDisplayStandBaked(BlockModel blockModel, BakedModel untexturedBakedModel, IGeometryBakingContext context, ModelState transform, Function<Material, TextureAtlasSprite> spriteGetter) {
+    public ModelDisplayStandBaked(ModelBaker baker, ResolvedModel resolvedModel, ModelState modelState, TextureSlots textureSlots, Material.Baked particleMaterialBaked) {
         super(true, false);
-        this.blockModel = blockModel;
-        this.untexturedBakedModel = untexturedBakedModel;
-        this.context = context;
-        this.transform = transform;
-        this.texture = null;
-        this.spriteGetter = spriteGetter;
-    }
-
-    public ModelDisplayStandBaked(BlockModel blockModel, BakedModel untexturedBakedModel, TextureAtlasSprite texture, boolean item, IGeometryBakingContext context, ModelState transform, Function<Material, TextureAtlasSprite> spriteGetter) {
-        super(false, item);
-        this.blockModel = blockModel;
-        this.untexturedBakedModel = untexturedBakedModel;
-        this.texture = texture;
-        this.context = context;
-        this.transform = transform;
-        this.spriteGetter = spriteGetter;
+        this.baker = baker;
+        this.resolvedModel = resolvedModel;
+        this.modelState = modelState;
+        this.textureSlots = textureSlots;
+        this.particleMaterialBaked = particleMaterialBaked;
+        // Bake the model with its own default textures, for when no display stand type is set
+        this.untexturedModel = new SimpleModelWrapper(
+                resolvedModel.bakeTopGeometry(textureSlots, baker, modelState),
+                resolvedModel.getTopAmbientOcclusion(),
+                resolvedModel.resolveParticleMaterial(textureSlots, baker));
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon() {
-        return this.texture;
+    public Material.Baked particleMaterial() {
+        return particleMaterialBaked;
     }
 
-    protected BakedModel handleDisplayStandType(ItemStack displayStandType, boolean item) {
+    @Override
+    public int materialFlags() {
+        return 0;
+    }
+
+    protected BlockStateModelPart handleDisplayStandType(ItemStack displayStandType) {
         if (displayStandType != null && !displayStandType.isEmpty()) {
             // Get reference texture
-            BlockState blockState = BlockHelpers.getBlockStateFromItemStack(displayStandType);
-            ResourceLocation textureName = Minecraft.getInstance().getModelManager().getBlockModelShaper()
-                    .getBlockModel(blockState).getParticleIcon().contents().name();
-            return modelCache.get(textureName);
-        }
-        return untexturedBakedModel;
-    }
-
-    // Inspired by TCon's TableModel, SimpleBlockModel and RetexturedModel
-    public static BakedModel bakeModel(BlockModel blockModel, IGeometryBakingContext context, List<BlockElement> blockParts, ModelState transform,
-                                        ItemOverrides overrides, Function<Material, TextureAtlasSprite> spriteGetter,
-                                        ResourceLocation modelName) {
-        TextureAtlasSprite particle = spriteGetter.apply(context.getMaterial("particle"));
-        SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(blockModel.hasAmbientOcclusion(), blockModel.getGuiLight().lightLikeBlock(), true, ModelHelpers.DEFAULT_CAMERA_TRANSFORMS, overrides).particle(particle);
-        for(BlockElement blockPart : blockParts) {
-            for(Direction direction : blockPart.faces.keySet()) {
-                BlockElementFace blockPartFace = blockPart.faces.get(direction);
-
-                // Remove mandatory hash at start of texture name
-                String texture = blockPartFace.texture();
-                if (texture.charAt(0) == '#') {
-                    texture = texture.substring(1);
-                }
-                TextureAtlasSprite sprite = spriteGetter.apply(context.getMaterial(texture));
-
-                if (blockPartFace.cullForDirection() == null) {
-                    builder.addUnculledFace(UnbakedGeometryHelper.bakeElementFace(blockPart, blockPartFace, sprite, direction, transform));
-                } else {
-                    builder.addCulledFace(Direction.rotate(transform.getRotation().getMatrix(), blockPartFace.cullForDirection()),
-                            UnbakedGeometryHelper.bakeElementFace(blockPart, blockPartFace, sprite, direction, transform));
-                }
+            BlockState blockState = IModHelpers.get().getBlockHelpers().getBlockStateFromItemStack(displayStandType);
+            BlockStateModel blockModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(blockState);
+            Material.Baked blockParticleMaterial = blockModel.particleMaterial();
+            if (blockParticleMaterial != null) {
+                return modelCache.get(new Material(blockParticleMaterial.sprite().contents().name()));
             }
         }
-        return builder.build();
+        // Fall back to the default (untextured) model, e.g. for display stands without a type,
+        // such as the ones shown in recipe viewers like JEI.
+        return untexturedModel;
+    }
+
+    public BlockStateModelPart bakeModel(Material material) {
+        // Override all textures in the model to the given texture
+        // Get the original texture slot names from the wrapped model
+        TextureSlots.Data originalData = resolvedModel.wrapped().textureSlots();
+        TextureSlots.Data.Builder overrideBuilder = new TextureSlots.Data.Builder();
+        for (String slotName : originalData.values().keySet()) {
+            overrideBuilder.addTexture(slotName, material);
+        }
+        TextureSlots textureSlotsOverride = new TextureSlots.Resolver()
+                .addFirst(overrideBuilder.build())
+                .addLast(originalData)
+                .resolve(resolvedModel);
+
+        // Based on SimpleModelWrapper.
+        // The geometry and particle material are baked directly instead of through
+        // ResolvedModel#bakeTopGeometry and ResolvedModel#resolveParticleMaterial,
+        // because those cache their result without taking the texture slots into account,
+        // which would make this texture override be silently ignored.
+        boolean useAmbientOcclusion = resolvedModel.getTopAmbientOcclusion();
+        Material.Baked particleMatBaked = baker.materials().resolveSlot(textureSlotsOverride, "particle", resolvedModel);
+        QuadCollection quadcollection = resolvedModel.getTopGeometry()
+                .bake(textureSlotsOverride, baker, modelState, resolvedModel, resolvedModel.getTopAdditionalProperties());
+
+        return new SimpleModelWrapper(quadcollection, useAmbientOcclusion, particleMatBaked);
     }
 
     @Nonnull
     @Override
     public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
-        return BlockEntityHelpers.get(world, pos, BlockEntityDisplayStand.class)
+        return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityDisplayStand.class)
                 .map(tile -> {
                     ModelData.Builder builder = ModelData.builder();
                     builder.with(BlockDisplayStand.DIRECTION, tile.getDirection());
@@ -158,35 +148,97 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
     }
 
     @Override
-    public BakedModel handleBlockState(BlockState state, Direction side, RandomSource rand, ModelData modelData, RenderType renderType) {
-        return handleDisplayStandType(ModelHelpers.getSafeProperty(modelData, BlockDisplayStand.TYPE, ItemStack.EMPTY), false);
+    public List<ChunkSectionLayer> getRenderTypes(BlockState state, RandomSource rand, ModelData data) {
+        return List.of(ChunkSectionLayer.values());
     }
 
     @Override
-    public BakedModel handleItemState(ItemStack itemStack, Level world, LivingEntity entity) {
-        return handleDisplayStandType(RegistryEntries.BLOCK_DISPLAY_STAND.get().getDisplayStandType(itemStack), true);
+    public List<BakedQuad> handleBlockState(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side, RandomSource rand, ModelData extraData, ChunkSectionLayer renderType) {
+        List<BakedQuad> quads = Lists.newLinkedList();
+        quads.addAll(handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY)).getQuads(null));
+        return quads;
+    }
+
+    @Override
+    public List<BakedQuad> handleItemState(@Nullable ItemStack stack, @Nullable Level level, @Nullable ItemOwner entity) {
+        List<BakedQuad> quads = Lists.newLinkedList();
+        quads.addAll(handleDisplayStandType(RegistryEntries.BLOCK_DISPLAY_STAND.get().getDisplayStandType(stack)).getQuads(null));
+        return quads;
     }
 
     @Override
     public List<BakedQuad> getGeneralQuads() {
-        return this.untexturedBakedModel.getQuads(null, null, null)
-                .stream()
-                .map(quad -> new BakedQuad(quad.getVertices(), quad.getTintIndex(), quad.getDirection(), this.texture, quad.isShade()))
-                .collect(Collectors.toList());
+        throw new UnsupportedOperationException("getGeneralQuads is not supported in a factory");
     }
 
     @Override
     public boolean usesBlockLight() {
-        return true ; // If false, RenderHelper.setupGuiFlatDiffuseLighting() is called
+        return true; // If false, RenderHelper.setupGuiFlatDiffuseLighting() is called
     }
 
     @Override
-    public ItemTransforms getTransforms() {
+    public UnbakedModel wrapped() {
+        return null;
+    }
+
+    @Override
+    public @Nullable ResolvedModel parent() {
+        return null;
+    }
+
+    @Override
+    public ItemTransforms getTopTransforms() {
         return ModelHelpers.DEFAULT_CAMERA_TRANSFORMS;
     }
 
-    public TextureAtlasSprite getParticleIcon(@Nonnull ModelData data) {
-        return handleDisplayStandType(ModelHelpers.getSafeProperty(data, BlockDisplayStand.TYPE, ItemStack.EMPTY), false)
-                .getParticleIcon();
+    public ModelData getModelData(BlockAndTintGetter level, BlockPos pos) {
+        return level.getBlockEntity(pos, RegistryEntries.BLOCK_ENTITY_DISPLAY_STAND.get())
+                .map(tile -> {
+                    ModelData.Builder builder = ModelData.builder();
+                    builder.with(BlockDisplayStand.DIRECTION, tile.getDirection());
+                    builder.with(BlockDisplayStand.TYPE, tile.getDisplayStandType());
+                    return builder.build();
+                })
+                .orElse(ModelData.EMPTY);
+    }
+
+    @Override
+    public Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+        return handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY))
+                .particleMaterial();
+    }
+
+    @Override
+    public String debugName() {
+        return Reference.MOD_ID + ":display_stand";
+    }
+
+    public record Unbaked(Identifier base, Variant.SimpleModelState modelState) implements CustomUnbakedBlockStateModel {
+
+        public static final MapCodec<ModelDisplayStandBaked.Unbaked> CODEC = RecordCodecBuilder.mapCodec(
+                builder -> builder.group(
+                                Identifier.CODEC.fieldOf("base").forGetter(ModelDisplayStandBaked.Unbaked::base),
+                                Variant.SimpleModelState.MAP_CODEC.forGetter(ModelDisplayStandBaked.Unbaked::modelState)
+                        )
+                        .apply(builder, ModelDisplayStandBaked.Unbaked::new));
+        public static final Identifier ID = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "display_stand");
+
+        @Override
+        public void resolveDependencies(ResolvableModel.Resolver resolver) {
+            resolver.markDependency(this.base);
+        }
+
+        @Override
+        public BlockStateModel bake(ModelBaker baker) {
+            ResolvedModel resolvedModel = baker.getModel(base);
+            TextureSlots textureslots = resolvedModel.getTopTextureSlots();
+            Material.Baked particleMatBaked = resolvedModel.resolveParticleMaterial(textureslots, baker);
+            return new ModelDisplayStandBaked(baker, resolvedModel, modelState.asModelState(), textureslots, particleMatBaked);
+        }
+
+        @Override
+        public MapCodec<? extends CustomUnbakedBlockStateModel> codec() {
+            return CODEC;
+        }
     }
 }

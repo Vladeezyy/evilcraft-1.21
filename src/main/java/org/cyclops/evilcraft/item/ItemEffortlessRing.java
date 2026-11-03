@@ -1,20 +1,24 @@
 package org.cyclops.evilcraft.item;
 
-import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
-import org.cyclops.evilcraft.fabric.event.LivingEvent;
-import org.cyclops.evilcraft.fabric.event.LivingFallEvent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
+
+import javax.annotation.Nullable;
 
 /**
  * A ring that allows the player to walk faster with a double step height.
@@ -26,7 +30,7 @@ public class ItemEffortlessRing extends Item {
     private static final int TICK_MODULUS = 1;
 
     private static final float SPEED_BONUS = 0.05F;
-    private static final AttributeModifier STEP_SIZE_MODIFIER = new AttributeModifier(ResourceLocation.parse(Reference.MOD_ID + ":step_height_modifier"), 1, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier STEP_SIZE_MODIFIER = new AttributeModifier(Identifier.parse(Reference.MOD_ID + ":step_height_modifier"), 1, AttributeModifier.Operation.ADD_VALUE);
     private static final float JUMP_DISTANCE_FACTOR = 0.05F;
     private static final float JUMP_HEIGHT_FACTOR = 0.3F;
     private static final float FALLDISTANCE_REDUCTION = 2F;
@@ -65,7 +69,7 @@ public class ItemEffortlessRing extends Item {
     public void onPlayerJump(LivingEvent.LivingJumpEvent event) {
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if(ItemStackHelpers.hasPlayerItem(player, this)) {
+            if(IModHelpers.get().getItemStackHelpers().hasPlayerItem(player, this)) {
                 player.setDeltaMovement(player.getDeltaMovement().add(0, JUMP_HEIGHT_FACTOR, 0));;
             }
         }
@@ -77,7 +81,7 @@ public class ItemEffortlessRing extends Item {
             Player player = (Player) event.getEntity();
             AttributeInstance attribute = player.getAttribute(Attributes.STEP_HEIGHT);
             if (attribute != null && attribute.hasModifier(STEP_SIZE_MODIFIER.id())) {
-                if (!ItemStackHelpers.hasPlayerItem(player, this)) {
+                if (!IModHelpers.get().getItemStackHelpers().hasPlayerItem(player, this)) {
                     attribute.removeModifier(STEP_SIZE_MODIFIER.id());
                 }
             }
@@ -87,18 +91,18 @@ public class ItemEffortlessRing extends Item {
     public void onPlayerFall(LivingFallEvent event) {
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            if(ItemStackHelpers.hasPlayerItem(player, this)) {
+            if(IModHelpers.get().getItemStackHelpers().hasPlayerItem(player, this)) {
                 event.setDistance(event.getDistance() - FALLDISTANCE_REDUCTION);
             }
         }
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if(entityIn instanceof Player) {
-            adjustParameters(stack, (Player) entityIn);
+    public void inventoryTick(ItemStack itemStack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if(entity instanceof Player player) {
+            adjustParameters(itemStack, player);
         }
-        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
+        super.inventoryTick(itemStack, level, entity, slot);
     }
 
 }

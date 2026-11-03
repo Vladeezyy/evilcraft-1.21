@@ -5,12 +5,11 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,25 +18,25 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.client.particle.ParticleBlurTargettedEntityData;
 import org.cyclops.evilcraft.client.particle.ParticleDistortData;
 import org.cyclops.evilcraft.client.particle.ParticleExplosionExtendedData;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * An abstract powerable mace.
@@ -65,11 +64,13 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     }
 
     @Override
-    public boolean hurtEnemy(ItemStack itemStack, LivingEntity attacked, LivingEntity attacker) {
+    public void hurtEnemy(ItemStack itemStack, LivingEntity attacked, LivingEntity attacker) {
         if(attacker instanceof Player && isUsable(itemStack, (Player) attacker)) {
-            FluidUtil.getFluidHandler(itemStack).orElseGet(null).drain(hitUsage, IFluidHandler.FluidAction.EXECUTE);
+            try (var tx = Transaction.openRoot()) {
+                Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack)).extract(FluidResource.of(getFluid()), hitUsage, tx);
+                tx.commit();
+            }
         }
-        return true;
     }
 
     @Override
@@ -78,8 +79,8 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
@@ -88,22 +89,22 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if(ItemPowerableHelpers.onPowerableItemItemRightClick(itemStack, world, player, this.powerLevels, true)) {
-            return MinecraftHelpers.successAction(itemStack);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
         } else {
             if(isUsable(itemStack, player)) {
                 player.startUsingItem(hand);
-                return MinecraftHelpers.successAction(itemStack);
+                return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
             } else {
                 if(world.isClientSide()) {
                     animateOutOfEnergy(world, player);
-                    return new InteractionResultHolder<ItemStack>(InteractionResult.FAIL, itemStack);
+                    return InteractionResult.FAIL;
                 }
             }
         }
-        return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStack);
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -115,7 +116,6 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
         super.onUseTick(level, player, itemStack, duration);
     }
 
-    @Environment(EnvType.CLIENT)
     protected void showUsingItemTick(Level world, ItemStack itemStack, LivingEntity entity, int duration) {
         int itemUsedCount = getUseDuration(itemStack, entity) - duration;
         double area = getArea(itemUsedCount);
@@ -123,7 +123,7 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
         int particleChance = 5 * (this.powerLevels - getPower(itemStack));
         for(double point = -points; point <= points; point++) {
             for(double pointHeight = -points; pointHeight <= points; pointHeight+=0.5F) {
-                if(world.random.nextInt(particleChance) == 0) {
+                if(world.getRandom().nextInt(particleChance) == 0) {
                     double u = Math.PI * (point / points);
                     double v = -2 * Math.PI * (pointHeight / points);
 
@@ -136,33 +136,33 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
                             - (Minecraft.getInstance().player == entity ? 0.5D : 1.5D);
                     double zCoord = entity.getZ();
 
-                    double particleX = xCoord + xOffset - world.random.nextFloat() * area / 4 - 0.5F;
-                    double particleY = yCoord + yOffset - world.random.nextFloat() * area / 4 - 0.5F;
-                    double particleZ = zCoord + zOffset - world.random.nextFloat() * area / 4 - 0.5F;
+                    double particleX = xCoord + xOffset - world.getRandom().nextFloat() * area / 4 - 0.5F;
+                    double particleY = yCoord + yOffset - world.getRandom().nextFloat() * area / 4 - 0.5F;
+                    double particleZ = zCoord + zOffset - world.getRandom().nextFloat() * area / 4 - 0.5F;
 
                     float particleMotionX = (float) (xOffset * 10);
                     float particleMotionY = (float) (yOffset * 10);
                     float particleMotionZ = (float) (zOffset * 10);
 
-                    Minecraft.getInstance().levelRenderer.addParticle(
-                            new ParticleDistortData((float) area * 3), false,
+                    world.addParticle(
+                            new ParticleDistortData((float) area * 3),
                             particleX, particleY, particleZ,
                             particleMotionX, particleMotionY, particleMotionZ);
 
-                    if(world.random.nextInt(10) == 0) {
+                    if(world.getRandom().nextInt(10) == 0) {
                         int spread = 10;
-                        float scale2 = 0.3F - world.random.nextFloat() * 0.2F;
-                        float r = 1.0F * world.random.nextFloat();
-                        float g = 0.2F + 0.01F * world.random.nextFloat();
-                        float b = 0.1F + 0.5F * world.random.nextFloat();
+                        float scale2 = 0.3F - world.getRandom().nextFloat() * 0.2F;
+                        float r = 1.0F * world.getRandom().nextFloat();
+                        float g = 0.2F + 0.01F * world.getRandom().nextFloat();
+                        float b = 0.1F + 0.5F * world.getRandom().nextFloat();
                         float ageMultiplier2 = 20;
 
-                        double motionX = spread - world.random.nextDouble() * 2 * spread;
-                        double motionY = spread - world.random.nextDouble() * 2 * spread;
-                        double motionZ = spread - world.random.nextDouble() * 2 * spread;
+                        double motionX = spread - world.getRandom().nextDouble() * 2 * spread;
+                        double motionY = spread - world.getRandom().nextDouble() * 2 * spread;
+                        double motionZ = spread - world.getRandom().nextDouble() * 2 * spread;
 
-                        Minecraft.getInstance().levelRenderer.addParticle(
-                                new ParticleBlurTargettedEntityData(r, g, b, scale2, ageMultiplier2, entity.getId()), false,
+                        world.addParticle(
+                                new ParticleBlurTargettedEntityData(r, g, b, scale2, ageMultiplier2, entity.getId()),
                                 particleX, particleY, particleZ,
                                 motionX, motionY, motionZ);
                     }
@@ -171,24 +171,23 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
         }
     }
 
-    @Environment(EnvType.CLIENT)
     protected void showUsedItemTick(Level world, LivingEntity player, int power) {
         int particles = (power + 1) * (power + 1) * (power + 1) * 10;
         for(int i = 0; i < particles; i++) {
-            double x = player.getX() - 0.5F + world.random.nextDouble();
-            double y = player.getY() + player.getEyeHeight() - 1F + world.random.nextDouble();
-            double z = player.getZ() - 0.5F + world.random.nextDouble();
+            double x = player.getX() - 0.5F + world.getRandom().nextDouble();
+            double y = player.getY() + player.getEyeHeight() - 1F + world.getRandom().nextDouble();
+            double z = player.getZ() - 0.5F + world.getRandom().nextDouble();
 
-            double particleMotionX = (-1 + world.random.nextDouble() * 2) * (power + 1) / 2;
-            double particleMotionY = (-1 + world.random.nextDouble() * 2) * (power + 1) / 2;
-            double particleMotionZ = (-1 + world.random.nextDouble() * 2) * (power + 1) / 2;
+            double particleMotionX = (-1 + world.getRandom().nextDouble() * 2) * (power + 1) / 2;
+            double particleMotionY = (-1 + world.getRandom().nextDouble() * 2) * (power + 1) / 2;
+            double particleMotionZ = (-1 + world.getRandom().nextDouble() * 2) * (power + 1) / 2;
 
-            float r = 1.0F * world.random.nextFloat();
-            float g = 0.2F + 0.01F * world.random.nextFloat();
-            float b = 0.1F + 0.5F * world.random.nextFloat();
+            float r = 1.0F * world.getRandom().nextFloat();
+            float g = 0.2F + 0.01F * world.getRandom().nextFloat();
+            float b = 0.1F + 0.5F * world.getRandom().nextFloat();
 
-            Minecraft.getInstance().levelRenderer.addParticle(
-                    new ParticleExplosionExtendedData(r, g, b, 0.3F), false,
+            world.addParticle(
+                    new ParticleExplosionExtendedData(r, g, b, 0.3F),
                     x, y, z, particleMotionX, particleMotionY, particleMotionZ);
         }
     }
@@ -203,21 +202,21 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     }
 
     @Override
-    public void releaseUsing(ItemStack itemStack, Level world, LivingEntity entity, int itemInUseCount) {
+    public boolean releaseUsing(ItemStack itemStack, Level world, LivingEntity entity, int itemInUseCount) {
         if(entity instanceof Player) {
-            IFluidHandlerItemCapacity fluidHandler = FluidHelpers.getFluidHandlerItemCapacity(itemStack).orElse(null);
+            IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
             Player player = (Player) entity;
             // Actual usage length
             int itemUsedCount = getUseDuration(itemStack, entity) - itemInUseCount;
 
             // Calculate how much blood to drain
-            int toDrain = itemUsedCount * fluidHandler.getCapacity() * (getPower(itemStack) + 1)
+            int toDrain = itemUsedCount * fluidHandler.getTankCapacity(0) * (getPower(itemStack) + 1)
                     / (getUseDuration(itemStack, entity) * this.powerLevels);
             FluidStack consumed = consume(toDrain, itemStack, player);
             int consumedAmount = consumed == null ? 0 : consumed.getAmount();
 
             // Recalculate the itemUsedCount depending on how much blood is available
-            itemUsedCount = consumedAmount * getUseDuration(itemStack, entity) / fluidHandler.getCapacity();
+            itemUsedCount = consumedAmount * getUseDuration(itemStack, entity) / fluidHandler.getTankCapacity(0);
 
             // Only do something if there is some blood left
             if (consumedAmount > 0) {
@@ -230,7 +229,9 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
             } else if (world.isClientSide()) {
                 animateOutOfEnergy(world, entity);
             }
+            return true;
         }
+        return false;
     }
 
     /**
@@ -242,24 +243,18 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
      */
     protected abstract void use(Level world, LivingEntity entity, int itemUsedCount, int power);
 
-    @Environment(EnvType.CLIENT)
     protected void animateOutOfEnergy(Level world, LivingEntity entity) {
         double xCoord = entity.getX();
         double yCoord = entity.getY();
         double zCoord = entity.getZ();
 
-        float particleMotionX = world.random.nextFloat() * 0.2F - 0.1F;
+        float particleMotionX = world.getRandom().nextFloat() * 0.2F - 0.1F;
         float particleMotionY = 0.2F;
-        float particleMotionZ = world.random.nextFloat() * 0.2F - 0.1F;
+        float particleMotionZ = world.getRandom().nextFloat() * 0.2F - 0.1F;
         world.addParticle(ParticleTypes.SMOKE, xCoord, yCoord, zCoord, particleMotionX, particleMotionY, particleMotionZ);
 
         world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.NOTE_BLOCK_BASEDRUM.value(),
-                SoundSource.NEUTRAL, 0.5F, 0.4F / (world.random.nextFloat() * 0.4F + 0.8F));
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return 15;
+                SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 
     @Override
@@ -267,15 +262,15 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
         return new ItemAttributeModifiers(Lists.newArrayList(
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_DAMAGE,
-                        new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_damage"), this.meleeDamage, AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_damage"), this.meleeDamage, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND
                 ),
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_SPEED,
-                        new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_attack_speed"), getAttackSpeed(), AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_attack_speed"), getAttackSpeed(), AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND
                 )
-        ), true);
+        ));
     }
 
     /**
@@ -284,12 +279,11 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
      */
     protected abstract float getAttackSpeed();
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        ItemPowerableHelpers.addPreInformation(itemStack, list);
-        super.appendHoverText(itemStack, context, list, flag);
-        ItemPowerableHelpers.addPostInformation(itemStack, list);
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        ItemPowerableHelpers.addPreInformation(itemStack, tooltipAdder, flag);
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
+        ItemPowerableHelpers.addPostInformation(itemStack, tooltipAdder);
     }
 
     /**

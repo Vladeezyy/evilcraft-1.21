@@ -2,8 +2,6 @@ package org.cyclops.evilcraft.block;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.evilcraft.EvilCraft;
@@ -56,12 +54,12 @@ public class BlockSpiritFurnaceConfig extends UpgradableBlockContainerConfig {
         super(
                 EvilCraft._instance,
             "spirit_furnace",
-                eConfig -> new BlockSpiritFurnace(Block.Properties.of()
+                (eConfig, properties) -> new BlockSpiritFurnace(properties
                         .requiresCorrectToolForDrops()
                         .strength(5.0F)
-                        .sound(SoundType.STONE)),
-                (eConfig, block) -> new ItemBlockFluidContainer(block, (new Item.Properties())
-                        )
+                        .sound(SoundType.STONE)
+                        .isValidSpawn((_, _, _, _) -> false)),
+                (eConfig, block) -> new ItemBlockFluidContainer(block, eConfig.createDefaultItemProperties())
         );
     }
 

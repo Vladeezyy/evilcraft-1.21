@@ -2,13 +2,12 @@ package org.cyclops.evilcraft.block;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.StandingAndWallBlockItem;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.TorchBlock;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -17,7 +16,7 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  *
  */
-public class BlockGemStoneTorchConfig extends BlockConfig {
+public class BlockGemStoneTorchConfig extends BlockConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "block", comment = "The radius that will be kept spirit-proof.", isCommandable = true)
     public static int area = 15;
@@ -26,15 +25,12 @@ public class BlockGemStoneTorchConfig extends BlockConfig {
         super(
                 EvilCraft._instance,
             "gem_stone_torch",
-                eConfig -> new TorchBlock(ParticleTypes.FLAME, Block.Properties.of()
-                        .noCollission()
+                (eConfig, properties) -> new TorchBlock(ParticleTypes.FLAME, properties
+                        .noCollision()
                         .strength(0)
                         .lightLevel((state) -> 14)
                         .sound(SoundType.WOOD)),
-                (eConfig, block) -> {
-                    Item.Properties itemProperties = new Item.Properties();
-                    return new StandingAndWallBlockItem(block, RegistryEntries.BLOCK_GEM_STONE_TORCH_WALL.get(), itemProperties, Direction.DOWN);
-                }
+                (eConfig, block) -> new StandingAndWallBlockItem(block, RegistryEntries.BLOCK_GEM_STONE_TORCH_WALL.get(), Direction.DOWN, eConfig.createDefaultItemProperties())
         );
     }
 

@@ -16,7 +16,7 @@ def classes(root):
     for d, _, fs in os.walk(root):
         for f in fs:
             if f.endswith('.java'):
-                fq = os.path.relpath(os.path.join(d, f), root)[:-5].replace('/', '.')
+                fq = os.path.relpath(os.path.join(d, f), root)[:-5].replace(os.sep, '/').replace('/', '.')
                 if fq.startswith(OLD + '.'):
                     out.add(fq[len(OLD) + 1:])
     return out

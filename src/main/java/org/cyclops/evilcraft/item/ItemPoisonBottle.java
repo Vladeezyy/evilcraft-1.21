@@ -9,10 +9,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.HitResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -39,20 +38,12 @@ public class ItemPoisonBottle extends Item {
                         event.getEntity().mayUseItemAt(blockPos, event.getFace(), event.getEntity().getItemInHand(hand)) &&
                         event.getLevel().getBlockState(blockPos).getFluidState().is(Fluids.WATER)) {
                     if(event.getLevel().getFluidState(blockPos).getType() == RegistryEntries.FLUID_POISON.get()) {
-                        InventoryHelpers.tryReAddToStack(event.getEntity(), event.getEntity().getItemInHand(hand), new ItemStack(this), hand);
+                        IModHelpers.get().getInventoryHelpers().tryReAddToStack(event.getEntity(), event.getEntity().getItemInHand(hand), new ItemStack(this), hand);
                         event.getLevel().removeBlock(blockPos, false);
                         event.setCanceled(true);
                     }
                 }
             }
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
-        @Override
-        public int getColor(ItemStack itemStack, int renderPass) {
-            return renderPass == 0 ? Helpers.RGBAToInt(77, 117, 15, 255) : -1;
         }
     }
 

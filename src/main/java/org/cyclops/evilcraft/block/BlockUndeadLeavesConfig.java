@@ -1,10 +1,10 @@
 package org.cyclops.evilcraft.block;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.SoundType;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -12,7 +12,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class BlockUndeadLeavesConfig extends BlockConfig {
+public class BlockUndeadLeavesConfig extends BlockConfigCommon<EvilCraft> {
 
     @ConfigurablePropertyCommon(category = "block", comment = "How much Blood (mB) can be produced at most as a Blood Stain on each random tick.")
     public static int maxBloodStainAmount = 25;
@@ -21,7 +21,7 @@ public class BlockUndeadLeavesConfig extends BlockConfig {
         super(
                 EvilCraft._instance,
             "undead_leaves",
-                eConfig -> new BlockUndeadLeaves(Block.Properties.of()
+                (eConfig, properties) -> new BlockUndeadLeaves(properties
                         .replaceable()
                         .strength(0.5F)
                         .sound(SoundType.GRAVEL)
@@ -31,9 +31,14 @@ public class BlockUndeadLeavesConfig extends BlockConfig {
     }
 
     @Override
-    public void onForgeRegistered() {
-        super.onForgeRegistered();
+    public void onRegistryRegistered() {
+        super.onRegistryRegistered();
         ComposterBlock.COMPOSTABLES.put(getItemInstance(), 0.3F);
+    }
+
+    @Override
+    public BlockClientConfig<EvilCraft> constructBlockClientConfig() {
+        return new BlockUndeadLeavesConfigClient(this);
     }
 
 }

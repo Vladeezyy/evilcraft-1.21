@@ -1,23 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "#c:ingots/manyullyn",
     {
-      "tag": "c:ingots/manyullyn"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"
         ]
       }
     },
-    {
-      "tag": "c:ingots/manyullyn"
-    }
+    "#c:ingots/manyullyn"
   ],
   "result": {
     "id": "evilcraft:broom_part",

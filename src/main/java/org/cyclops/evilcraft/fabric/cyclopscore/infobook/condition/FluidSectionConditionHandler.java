@@ -3,8 +3,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition;
 
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import net.minecraft.resources.Identifier;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 /**
  * Condition handler for checking if a fluid has been registered.
@@ -14,8 +14,8 @@ import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 public class FluidSectionConditionHandler implements ISectionConditionHandler {
 
     @Override
-    public boolean isSatisfied(ModBase<?> mod, String param) {
-        return BuiltInRegistries.FLUID.containsKey(ResourceLocation.parse(param));
+    public boolean isSatisfied(ModBaseNeoForge<?> mod, String param) {
+        return BuiltInRegistries.FLUID.containsKey(Identifier.parse(param));
     }
 
 }

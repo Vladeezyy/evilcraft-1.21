@@ -3,29 +3,25 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
 /**
  * A button for the advancements, so they can be hovered.
  */
-@Environment(EnvType.CLIENT)
 public class AdvancementButton extends AdvancedButton {
 
-    private final ResourceLocation advancementId;
+    private final Identifier advancementId;
 
-    public AdvancementButton(ResourceLocation advancementId) {
+    public AdvancementButton(Identifier advancementId) {
         this.advancementId = advancementId;
     }
 
@@ -35,9 +31,8 @@ public class AdvancementButton extends AdvancedButton {
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, Font font, int mx, int my) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mx, int my) {
         super.renderTooltip(guiGraphics, font, mx, my);
-        guiGraphics.pose().pushPose();
         if(mx >= getX() && my >= getY() && mx <= getX() + AdvancementRewardsAppendix.SLOT_SIZE && my <= getY() + AdvancementRewardsAppendix.SLOT_SIZE) {
             List<FormattedCharSequence> lines = Lists.newArrayList();
             AdvancementHolder advancement = AdvancementHelpers.getAdvancement(EnvType.CLIENT, advancementId);
@@ -47,11 +42,7 @@ public class AdvancementButton extends AdvancedButton {
                     lines.add(display.getDescription().getVisualOrderText());
                 });
             }
-            guiGraphics.renderTooltip(font, lines, mx, my);
+            guiGraphics.setTooltipForNextFrame(font, lines, mx, my);
         }
-        guiGraphics.pose().popPose();
-
-        GlStateManager._enableBlend();
-        GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 }

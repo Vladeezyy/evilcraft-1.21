@@ -2,22 +2,18 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
 
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
  * An advanced button type.
  * @author rubensworks
  */
-@Environment(EnvType.CLIENT)
 public class AdvancedButton extends Button {
 
     private InfoSection target;
@@ -38,7 +34,7 @@ public class AdvancedButton extends Button {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers input) {
         if (this.onPress != null) {
             this.onPress.onPress(this);
         }
@@ -64,12 +60,9 @@ public class AdvancedButton extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if(isVisible() && isHover(mouseX, mouseY)) {
-            // MCP: drawString
-            Minecraft.getInstance().font.drawInBatch(((MutableComponent) getMessage()).withStyle(ChatFormatting.UNDERLINE), getX(), getY(),
-                    Helpers.RGBToInt(100, 100, 150), false,
-                    guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+            guiGraphics.text(Minecraft.getInstance().font, getMessage(), getX(), getY(), IModHelpers.get().getBaseHelpers().RGBAToInt(100, 100, 150, 255), false);
         }
     }
 
@@ -80,7 +73,7 @@ public class AdvancedButton extends Button {
      * @param mx Mouse x.
      * @param my Mouse Y.
      */
-    public void renderTooltip(GuiGraphics guiGraphics, Font font, int mx, int my) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mx, int my) {
 
     }
 

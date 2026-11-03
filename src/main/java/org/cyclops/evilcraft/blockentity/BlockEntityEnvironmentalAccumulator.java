@@ -2,12 +2,9 @@ package org.cyclops.evilcraft.blockentity;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,22 +18,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.CraftingHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.LocationHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.degradation.IDegradable;
 import org.cyclops.evilcraft.block.BlockEnvironmentalAccumulator;
@@ -45,6 +41,7 @@ import org.cyclops.evilcraft.client.particle.ParticleBlurTargettedData;
 import org.cyclops.evilcraft.client.particle.ParticleBubbleExtendedData;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityBeacon;
 import org.cyclops.evilcraft.core.degradation.DegradationExecutor;
+import org.cyclops.evilcraft.core.recipe.display.RecipeDisplayEnvironmentalAccumulator;
 import org.cyclops.evilcraft.core.recipe.type.RecipeEnvironmentalAccumulator;
 import org.cyclops.evilcraft.core.weather.WeatherType;
 import org.joml.Vector4f;
@@ -104,7 +101,10 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     // The recipe we're currently working on
     @Nullable
     private RecipeHolder<RecipeEnvironmentalAccumulator> recipe;
+    @Nullable
     private String recipeId;
+    @Nullable
+    private RecipeDisplay recipeDisplay;
 
     /**
      * Make a new instance.
@@ -118,7 +118,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         inventory = new Inventory(this);
         inventory.addDirtyMarkListener(this);
 
-        if (MinecraftHelpers.isClientSide()) {
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
             setBeamColor(getOuterColorByState(state));
         }
     }
@@ -130,7 +130,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
         @Override
         public void populate() {
-            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK, (blockEntity, direction) -> VanillaContainerWrapper.of(blockEntity.getInventory()));
         }
     }
 
@@ -140,6 +140,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
     protected void recreateBossInfo() {
         this.bossInfo = (ServerBossEvent)(new ServerBossEvent(
+                java.util.UUID.randomUUID(),
                 Component.translatable("chat.evilcraft.boss_display.charge"),
                 BossEvent.BossBarColor.PURPLE,
                 BossEvent.BossBarOverlay.PROGRESS))
@@ -151,10 +152,9 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
             return Triple.of(0F, 0F, 0F);
         }
         Biome biome = getLevel().getBiome(getBlockPos()).value();
-        return Helpers.intToRGB(biome.getGrassColor(getBlockPos().getX(), getBlockPos().getZ()));
+        return IModHelpers.get().getBaseHelpers().intToRGB(biome.getGrassColor(getBlockPos().getX(), getBlockPos().getZ()));
     }
 
-    @Environment(EnvType.CLIENT)
     private Vector4f getOuterColorByState(int state) {
         Triple<Float, Float, Float> baseColor = getBaseBeamColor();
         float coolFactor = (getMaxCooldownTick() - tick) / (float) getMaxCooldownTick();
@@ -178,7 +178,6 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
      * Get the Y coordinate of the current moving item.
      * @return The Y coordinate of the inner item.
      */
-    @Environment(EnvType.CLIENT)
     public float getMovingItemY() {
         if (state == BlockEnvironmentalAccumulator.STATE_PROCESSING_ITEM)
             return ITEM_MIN_SPAWN_HEIGHT + (getItemMoveDuration() - tick) * getItemMoveSpeed();
@@ -193,6 +192,10 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
      */
     public RecipeHolder<RecipeEnvironmentalAccumulator> getRecipe() {
         return recipe;
+    }
+
+    public RecipeDisplayEnvironmentalAccumulator getRecipeDisplay() {
+        return (RecipeDisplayEnvironmentalAccumulator) this.recipeDisplay;
     }
 
     private int getItemMoveDuration() {
@@ -215,9 +218,8 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         getBossInfo().removeAllPlayers();
     }
 
-    @Environment(EnvType.CLIENT)
     protected void showWaterBeams() {
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         BlockPos target = getBlockPos();
         for (int j = 0; j < waterOffsets.length; j++) {
             BlockPos offset = waterOffsets[j];
@@ -226,8 +228,8 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
             double y = location.getY() + 0.5;
             double z = location.getZ() + 0.5;
 
-            float rotationYaw = (float) LocationHelpers.getYaw(location, target);
-            float rotationPitch = (float) LocationHelpers.getPitch(location, target);
+            float rotationYaw = (float) IModHelpers.get().getLocationHelpers().getYaw(location, target);
+            float rotationPitch = (float) IModHelpers.get().getLocationHelpers().getPitch(location, target);
 
             for (int i = 0; i < random.nextInt(2); i++) {
                 double particleX = x - 0.2 + random.nextDouble() * 0.4;
@@ -240,21 +242,19 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 double particleMotionY = Mth.cos(rotationPitch / 180.0F * (float) Math.PI) * speed * 5;
                 double particleMotionZ = Mth.sin(rotationPitch / 180.0F * (float) Math.PI) * Mth.sin(rotationYaw / 180.0F * (float)Math.PI) * speed;
 
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        new ParticleBubbleExtendedData(0.02F), false,
+                level.addParticle(
+                        new ParticleBubbleExtendedData(0.02F),
                         particleX, particleY, particleZ, particleMotionX, particleMotionY, particleMotionZ);
             }
         }
     }
 
-    @Environment(EnvType.CLIENT)
     protected void showAccumulatingParticles() {
         showAccumulatingParticles(level, getBlockPos().getX() + 0.5F, getBlockPos().getY() + 0.5F, getBlockPos().getZ() + 0.5F, SPREAD);
     }
 
-    @Environment(EnvType.CLIENT)
     public static void showAccumulatingParticles(Level world, float centerX, float centerY, float centerZ, float spread) {
-        RandomSource rand = world.random;
+        RandomSource rand = world.getRandom();
         for (int j = 0; j < rand.nextInt(20); j++) {
             float scale = 0.6F - rand.nextFloat() * 0.4F;
             float red = rand.nextFloat() * 0.1F + 0.2F;
@@ -266,8 +266,8 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
             float motionY = spread - rand.nextFloat() * 2 * spread;
             float motionZ = spread - rand.nextFloat() * 2 * spread;
 
-            Minecraft.getInstance().levelRenderer.addParticle(
-                    new ParticleBlurTargettedData(red, green, blue, scale, ageMultiplier, centerX, centerY, centerZ), false,
+            world.addParticle(
+                    new ParticleBlurTargettedData(red, green, blue, scale, ageMultiplier, centerX, centerY, centerZ),
                     centerX, centerY, centerZ, motionX, motionY, motionZ);
         }
     }
@@ -285,7 +285,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 );
 
         // Loop over all recipes until we find an item dropped in the accumulator that matches a recipe
-        for (RecipeHolder<RecipeEnvironmentalAccumulator> recipe : CraftingHelpers.findRecipes(level, getRegistry())) {
+        for (RecipeHolder<RecipeEnvironmentalAccumulator> recipe : IModHelpers.get().getCraftingHelpers().findRecipes((ServerLevel) level, getRegistry())) {
             Ingredient recipeIngredient = recipe.value().getInputIngredient();
             WeatherType weatherType = recipe.value().getInputWeather();
 
@@ -301,6 +301,11 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
                     // Save the recipe
                     this.recipe = recipe;
+                    this.recipeDisplay = IModHelpers.get().getCraftingHelpers().getRecipeDisplays(
+                            this.recipe.value().getType(),
+                            this.recipe.id()
+                    ).getFirst().display();
+                    this.sendUpdate();
 
                     if (!level.isClientSide()) {
                         decreaseStackSize(entityItem, 1);
@@ -333,7 +338,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 entity.setItem(this.getInventory().getItem(0));
             } else {
                 // Recipe found, throw back the result
-                entity.setItem(recipe.value().assemble(getInventory().asRecipeInput(), level.registryAccess()));
+                entity.setItem(recipe.value().assemble(getInventory()));
 
                 // Change the weather to the resulting weather
                 WeatherType weatherSource = recipe.value().getInputWeather();
@@ -401,6 +406,11 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     @Override
+    public void onDataPacket(Connection net, ValueInput valueInput) {
+        super.onDataPacket(net, valueInput);
+        onUpdateReceived();
+    }
+
     public void onUpdateReceived() {
         // If we receive an update from the server and our new state is the
         // finished processing item state, show the corresponding effect
@@ -428,19 +438,20 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     @Override
-    public void read(CompoundTag compound, HolderLookup.Provider holderLookupProvider) {
-        super.read(compound, holderLookupProvider);
+    public void read(ValueInput input) {
+        super.read(input);
 
-        inventory.readFromNBT(holderLookupProvider, compound, "inventory");
+        inventory.readFromNBT(input, "inventory");
 
-        degradation = compound.getInt("degradation");
-        tick = compound.getInt("tick");
-        state = compound.getInt("state");
+        degradation = input.getInt("degradation").orElseThrow();
+        tick = input.getInt("tick").orElseThrow();
+        state = input.getInt("state").orElseThrow();
 
         // Delay loading of recipe when world is set during ticking
-        this.recipeId = compound.getString("recipe");
+        this.recipeId = input.getString("recipe").orElse(null);
+        this.recipeDisplay = input.read("recipeDisplay", RecipeDisplay.CODEC).orElse(null);
 
-        degradationExecutor.read(compound);
+        degradationExecutor.read(input.child("degradation_executor").orElseThrow());
 
         if (getLevel() != null && getLevel().isClientSide()) {
             setBeamColor(getOuterColorByState(state));
@@ -448,19 +459,21 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        super.saveAdditional(tag, holderLookupProvider);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
 
-        inventory.writeToNBT(holderLookupProvider, tag, "inventory");
+        inventory.writeToNBT(output, "inventory");
 
-        tag.putInt("degradation", degradation);
-        tag.putInt("tick", tick);
-        tag.putInt("state", state);
+        output.putInt("degradation", degradation);
+        output.putInt("tick", tick);
+        output.putInt("state", state);
 
-        if (recipe != null)
-            tag.putString("recipe", recipe.id().toString());
+        if (recipe != null) {
+            output.putString("recipe", recipe.id().toString());
+            output.store("recipeDisplay", RecipeDisplay.CODEC, recipeDisplay);
+        }
 
-        degradationExecutor.write(tag);
+        degradationExecutor.write(output.child("degradation_executor"));
     }
 
     public float getMaxHealth() {
@@ -530,17 +543,11 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
         protected void update(Level level, BlockPos pos, BlockState blockState, BlockEntityEnvironmentalAccumulator blockEntity) {
             super.update(level, pos, blockState, blockEntity);
 
-            // Delayed loading of recipe when world is set
-            if (blockEntity.recipeId != null && level != null) {
-                blockEntity.recipe = (RecipeHolder<RecipeEnvironmentalAccumulator>) level.getRecipeManager().byKey(ResourceLocation.parse(blockEntity.recipeId)).orElse(null);
-                blockEntity.recipeId = null;
-            }
-
             // Keep ticking if necessary
             if (blockEntity.tick > 0)
                 blockEntity.tick--;
 
-            if (blockEntity.state == BlockEnvironmentalAccumulator.STATE_IDLE) {
+            if (blockEntity.state == BlockEnvironmentalAccumulator.STATE_IDLE && !level.isClientSide()) {
                 blockEntity.updateEnvironmentalAccumulatorIdle();
             } // Are we processing an item?
             else if (blockEntity.state == BlockEnvironmentalAccumulator.STATE_PROCESSING_ITEM) {
@@ -588,7 +595,9 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
             if (!level.isClientSide()) {
                 // Update boss bars for nearby players
-                blockEntity.getBossInfo().setProgress(blockEntity.getHealth() / blockEntity.getMaxHealth());
+                if (blockEntity.getMaxHealth() > 0) {
+                    blockEntity.getBossInfo().setProgress(blockEntity.getHealth() / blockEntity.getMaxHealth());
+                }
                 Set<Integer> playerIds = Sets.newHashSet();
                 if (blockEntity.getHealth() != blockEntity.getMaxHealth()) {
                     for (Player player : level.getEntitiesOfClass(Player.class, new AABB(pos).inflate(32D))) {

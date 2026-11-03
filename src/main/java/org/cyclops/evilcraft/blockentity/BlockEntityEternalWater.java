@@ -7,16 +7,18 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
+import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockEternalWaterConfig;
 
-import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 /**
@@ -51,50 +53,44 @@ public class BlockEntityEternalWater extends CyclopsBlockEntity {
 
         @Override
         public void populate() {
-            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> new InfiniteWaterFluidCapability());
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK, (blockEntity, direction) -> new InfiniteWaterFluidCapability());
         }
     }
 
-    public static class InfiniteWaterFluidCapability implements IFluidHandler {
+    public static class InfiniteWaterFluidCapability implements ResourceHandler<FluidResource> {
         @Override
-        public int getTanks() {
+        public int size() {
             return 1;
         }
 
-        @Nonnull
         @Override
-        public FluidStack getFluidInTank(int tank) {
-            return WATER;
+        public FluidResource getResource(int tank) {
+            return FluidResource.of(WATER);
         }
 
         @Override
-        public int getTankCapacity(int tank) {
-            return Integer.MAX_VALUE;
+        public long getAmountAsLong(int tank) {
+            return Long.MAX_VALUE;
         }
 
         @Override
-        public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
+        public long getCapacityAsLong(int tank, FluidResource resource) {
+            return Long.MAX_VALUE;
+        }
+
+        @Override
+        public boolean isValid(int tank, FluidResource resource) {
             return false;
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int insert(int tank, FluidResource resource, int amount, TransactionContext transaction) {
             return 0;
         }
 
-        @Nonnull
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (resource.isEmpty() || resource.getFluid() != WATER.getFluid()) {
-                return FluidStack.EMPTY;
-            }
-            return new FluidStack(WATER.getFluid(), resource.getAmount());
-        }
-
-        @Nonnull
-        @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
-            return new FluidStack(WATER.getFluid(), maxDrain);
+        public int extract(int tank, FluidResource resource, int amount, TransactionContext transaction) {
+            return amount;
         }
     }
 
@@ -105,9 +101,14 @@ public class BlockEntityEternalWater extends CyclopsBlockEntity {
 
             if (blockEntity.isEnabled()) {
                 for(Direction direction : Direction.values()) {
-                    BlockEntityHelpers.getCapability(level, pos.relative(direction),
-                                    direction.getOpposite(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK)
-                            .ifPresent(handler -> handler.fill(WATER, IFluidHandler.FluidAction.EXECUTE));
+                    IModHelpers.get().getCapabilityHelpers().getCapability(level, pos.relative(direction),
+                                    direction.getOpposite(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
+                            .ifPresent(handler -> {
+                                try (var tx = Transaction.openRoot()) {
+                                    handler.insert(FluidResource.of(WATER), WATER.getAmount(), tx);
+                                    tx.commit();
+                                }
+                            });
                 }
             }
         }

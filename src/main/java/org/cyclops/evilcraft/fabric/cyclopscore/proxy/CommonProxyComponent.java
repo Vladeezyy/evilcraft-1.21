@@ -2,8 +2,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.proxy;
 
 import org.cyclops.cyclopscore.proxy.CommonProxyComponentCommon;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.client.key.RegisterKeyMappingsEvent;
-import org.cyclops.evilcraft.fabric.cyclopscore.network.PacketHandler;
+import org.cyclops.cyclopscore.network.IPacketHandler;
 
 /**
  * Base proxy for server and client side.
@@ -17,7 +16,7 @@ public abstract class CommonProxyComponent extends CommonProxyComponentCommon im
     }
 
     @Override
-    public void registerPacketHandlers(PacketHandler packetHandler) {
+    public void registerPackets(IPacketHandler packetHandler) {
 
     }
 

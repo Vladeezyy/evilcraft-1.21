@@ -6,10 +6,10 @@ import com.google.common.collect.Maps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
  */
 public class BroomModifierRegistry implements IBroomModifierRegistry {
 
-    private final Map<ResourceLocation, BroomModifier> broomModifiers = Maps.newLinkedHashMap();
+    private final Map<Identifier, BroomModifier> broomModifiers = Maps.newLinkedHashMap();
     private final Map<BroomModifier, IBroomPart> broomModifierParts = Maps.newHashMap();
     private final List<Pair<Supplier<ItemStack>, Map<BroomModifier, Float>>> broomItems = Lists.newArrayList();
 
@@ -52,7 +52,7 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
 
     @Nullable
     @Override
-    public BroomModifier getModifier(ResourceLocation id) {
+    public BroomModifier getModifier(Identifier id) {
         return broomModifiers.get(id);
     }
 
@@ -162,7 +162,7 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
         if (ItemBroomConfig.broomModifierTooltips) {
             Map<BroomModifier, Float> modifiers = getModifiersFromItem(event.getItemStack());
             if (modifiers != null) {
-                if (MinecraftHelpers.isShifted()) {
+                if (IModHelpers.get().getMinecraftClientHelpers().isShifted()) {
                     event.getToolTip().add(Component.translatable("broom.modifiers." + Reference.MOD_ID + ".types")
                             .withStyle(ChatFormatting.ITALIC));
                     for (Map.Entry<BroomModifier, Float> entry : modifiers.entrySet()) {

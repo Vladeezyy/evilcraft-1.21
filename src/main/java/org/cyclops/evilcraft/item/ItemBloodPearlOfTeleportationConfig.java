@@ -1,12 +1,12 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -17,7 +17,7 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemBloodPearlOfTeleportationConfig extends ItemConfig {
+public class ItemBloodPearlOfTeleportationConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The amount of second slowness should be applied after each teleport.", isCommandable = true)
     public static int slownessDuration = 0;
@@ -26,14 +26,14 @@ public class ItemBloodPearlOfTeleportationConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
             "blood_pearl_of_teleportation",
-                eConfig -> new ItemBloodPearlOfTeleportation(new Item.Properties()
+                (eConfig, properties) -> new ItemBloodPearlOfTeleportation(properties
                         .rarity(Rarity.UNCOMMON))
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

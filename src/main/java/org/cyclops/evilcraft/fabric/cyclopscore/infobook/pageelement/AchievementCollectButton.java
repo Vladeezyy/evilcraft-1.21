@@ -3,33 +3,29 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.AdvancementHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
 /**
  * A button that can be clicked for reward collection.
  */
-@Environment(EnvType.CLIENT)
 public class AchievementCollectButton extends AdvancedButton {
 
     private final AdvancementRewards advancementRewards;
@@ -45,19 +41,18 @@ public class AchievementCollectButton extends AdvancedButton {
     }
 
     @Override
-    public void renderTooltip(GuiGraphics guiGraphics, Font font, int mx, int my) {
+    public void renderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mx, int my) {
         super.renderTooltip(guiGraphics, font, mx, my);
-        guiGraphics.pose().pushPose();
         if(mx >= getX() && my >= getY() && mx <= getX() + width && my <= getY() + height) {
             List<FormattedCharSequence> lines = Lists.newArrayList();
             if (advancementRewards.isObtained(Minecraft.getInstance().player)) {
                 lines.add(FormattedCharSequence.forward(
-                        L10NHelpers.localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collected"),
+                        IModHelpers.get().getL10NHelpers().localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collected"),
                         Style.EMPTY.withItalic(true)
                 ));
             } else {
                 lines.add(FormattedCharSequence.forward(
-                        L10NHelpers.localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collect"),
+                        IModHelpers.get().getL10NHelpers().localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collect"),
                         Style.EMPTY.withBold(true)
                 ));
                 boolean canObtain = true;
@@ -68,17 +63,13 @@ public class AchievementCollectButton extends AdvancedButton {
                 }
                 if (!canObtain) {
                     lines.add(FormattedCharSequence.forward(
-                            L10NHelpers.localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collectFailure"),
+                            IModHelpers.get().getL10NHelpers().localize("gui." + getInfoBook().getMod().getModId() + ".rewards.collectFailure"),
                             Style.EMPTY.withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))
                     ));
                 }
             }
-            guiGraphics.renderTooltip(font, lines, mx, my);
+            guiGraphics.setTooltipForNextFrame(font, lines, mx, my);
         }
-        guiGraphics.pose().popPose();
-
-        GlStateManager._enableBlend();
-        GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     @Override
@@ -87,11 +78,11 @@ public class AchievementCollectButton extends AdvancedButton {
     }
 
     @Override
-    public void onPress() {
-        super.onPress();
+    public void onPress(InputWithModifiers input) {
+        super.onPress(input);
         Player player = Minecraft.getInstance().player;
         boolean canObtain = true;
-        for (ResourceLocation advancement : advancementRewards.getAdvancements()) {
+        for (Identifier advancement : advancementRewards.getAdvancements()) {
             if (!AdvancementHelpers.hasAdvancementUnlocked(Minecraft.getInstance().player, advancement)) {
                 canObtain = false;
             }

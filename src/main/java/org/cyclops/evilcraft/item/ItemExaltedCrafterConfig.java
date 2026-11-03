@@ -1,10 +1,13 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.NBTSimpleInventoryItemStack;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -12,7 +15,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class ItemExaltedCrafterConfig extends ItemConfig {
+public class ItemExaltedCrafterConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "If shift clicking on an item should first try to go into the crafting grid.", isCommandable = true)
     public static boolean shiftCraftingGrid = false;
@@ -21,10 +24,15 @@ public class ItemExaltedCrafterConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "exalted_crafter" + (wooden ? "_wooden" : "") + (empowered ? "_empowered" : ""),
-                eConfig -> new ItemExaltedCrafter(new Item.Properties()
+                (eConfig, properties) -> new ItemExaltedCrafter(properties
                         .component(DataComponents.RARITY, empowered ? Rarity.UNCOMMON : Rarity.COMMON)
                         .stacksTo(1), wooden, empowered)
         );
+        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
+    }
+
+    protected void registerCapability(RegisterCapabilitiesEvent event) {
+        event.registerItem(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.ITEM, (stack, context) -> VanillaContainerWrapper.of(new NBTSimpleInventoryItemStack(context, 27, 64, "inv")), getInstance());
     }
 
 }

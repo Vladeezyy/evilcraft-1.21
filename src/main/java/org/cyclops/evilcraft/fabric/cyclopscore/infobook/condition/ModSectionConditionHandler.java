@@ -3,7 +3,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition;
 import net.fabricmc.loader.api.FabricLoader;
 
 
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import net.neoforged.fml.ModList;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 /**
  * Condition handler for checking if mods are available.
@@ -13,8 +14,8 @@ import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 public class ModSectionConditionHandler implements ISectionConditionHandler {
 
     @Override
-    public boolean isSatisfied(ModBase<?> mod, String param) {
-        return FabricLoader.getInstance().isModLoaded(param);
+    public boolean isSatisfied(ModBaseNeoForge<?> mod, String param) {
+        return ModList.get().isLoaded(param);
     }
 
 }

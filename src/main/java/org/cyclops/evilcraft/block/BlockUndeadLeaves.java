@@ -10,14 +10,10 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.TintedParticleLeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.HitResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.cyclopscore.block.component.ParticleDropBlockComponent;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodStain;
 
@@ -27,14 +23,14 @@ import org.cyclops.evilcraft.blockentity.BlockEntityBloodStain;
  * @author rubensworks
  *
  */
-public class BlockUndeadLeaves extends LeavesBlock {
+public class BlockUndeadLeaves extends TintedParticleLeavesBlock {
 
     private ParticleDropBlockComponent particleDropBlockComponent;
 
     public BlockUndeadLeaves(Block.Properties properties) {
-        super(properties);
+        super(0.01F, properties);
 
-        if (MinecraftHelpers.isClientSide()) {
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
             particleDropBlockComponent = new ParticleDropBlockComponent(1.0F, 0.0F, 0.0F);
             particleDropBlockComponent.setOffset(0);
             particleDropBlockComponent.setChance(50);
@@ -42,19 +38,18 @@ public class BlockUndeadLeaves extends LeavesBlock {
     }
 
     @Override
-    public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos) {
+    public int getLightDampening(BlockState state) {
         return 1;
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource rand) {
         super.animateTick(stateIn, worldIn, pos, rand);
         particleDropBlockComponent.randomDisplayTick(stateIn, worldIn, pos, rand);
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return new ItemStack(this);
     }
 
@@ -88,8 +83,8 @@ public class BlockUndeadLeaves extends LeavesBlock {
 
                     // Add blood to existing stain
                     if (blockState.getBlock() instanceof org.cyclops.evilcraft.block.BlockBloodStain) {
-                        BlockEntityHelpers.get(worldIn, itPos, BlockEntityBloodStain.class)
-                                .ifPresent(tile -> tile.addAmount(1 + worldIn.random.nextInt(BlockUndeadLeavesConfig.maxBloodStainAmount)));
+                        IModHelpers.get().getBlockEntityHelpers().get(worldIn, itPos, BlockEntityBloodStain.class)
+                                .ifPresent(tile -> tile.addAmount(1 + worldIn.getRandom().nextInt(BlockUndeadLeavesConfig.maxBloodStainAmount), true));
                     }
 
                     break;

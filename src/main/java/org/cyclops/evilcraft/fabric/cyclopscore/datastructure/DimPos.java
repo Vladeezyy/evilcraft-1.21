@@ -5,27 +5,26 @@ package org.cyclops.evilcraft.fabric.cyclopscore.datastructure;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import lombok.Data;
-import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
  * A simple data class for a block position inside a world.
+ *
  * @author rubensworks
  */
-@Data(staticConstructor = "of")
 public class DimPos implements Comparable<DimPos> {
 
     private final String level;
@@ -37,7 +36,7 @@ public class DimPos implements Comparable<DimPos> {
             .build(new CacheLoader<String, ResourceKey<Level>>() {
                 @Override
                 public ResourceKey<Level> load(String key) {
-                    return ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(key));
+                    return ResourceKey.create(Registries.DIMENSION, Identifier.parse(key));
                 }
             });
 
@@ -51,17 +50,24 @@ public class DimPos implements Comparable<DimPos> {
         this(world, blockPos, null);
     }
 
-    @SneakyThrows
+    public static DimPos of(String level, BlockPos blockPos) {
+        return new DimPos(level, blockPos);
+    }
+
     public ResourceKey<Level> getLevelKey() {
-        return CACHE_WORLD_KEYS.get(getLevel());
+        try {
+            return CACHE_WORLD_KEYS.get(getLevel());
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Nullable
     public Level getLevel(boolean forceLoad) {
         if (worldReference == null) {
-            if (MinecraftHelpers.isClientSideThread()) {
+            if (IModHelpers.get().getMinecraftHelpers().isClientSideThread()) {
                 ClientLevel world = Minecraft.getInstance().level;
-                if (world != null && world.dimension().location().toString().equals(this.getLevel())) {
+                if (world != null && world.dimension().identifier().toString().equals(this.getLevel())) {
                     this.worldReference = new WeakReference<>(world);
                     return this.worldReference.get();
                 }
@@ -86,8 +92,8 @@ public class DimPos implements Comparable<DimPos> {
     @Override
     public int compareTo(DimPos o) {
         int compareDim = getLevel().compareTo(o.getLevel());
-        if(compareDim == 0) {
-            return MinecraftHelpers.compareBlockPos(getBlockPos(), o.getBlockPos());
+        if (compareDim == 0) {
+            return IModHelpers.get().getMinecraftHelpers().compareBlockPos(getBlockPos(), o.getBlockPos());
         }
         return compareDim;
     }
@@ -111,7 +117,26 @@ public class DimPos implements Comparable<DimPos> {
     }
 
     public static DimPos of(ResourceKey<Level> world, BlockPos blockPos) {
-        return new DimPos(world.location().toString(), blockPos);
+        return new DimPos(world.identifier().toString(), blockPos);
     }
 
+    public String getLevel() {
+        return this.level;
+    }
+
+    public BlockPos getBlockPos() {
+        return this.blockPos;
+    }
+
+    public WeakReference<Level> getWorldReference() {
+        return this.worldReference;
+    }
+
+    public void setWorldReference(WeakReference<Level> worldReference) {
+        this.worldReference = worldReference;
+    }
+
+    public String toString() {
+        return "DimPos(level=" + this.getLevel() + ", blockPos=" + this.getBlockPos() + ", worldReference=" + this.getWorldReference() + ")";
+    }
 }

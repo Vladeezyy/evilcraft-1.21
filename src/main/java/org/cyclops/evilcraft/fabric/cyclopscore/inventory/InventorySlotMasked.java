@@ -2,8 +2,9 @@ package org.cyclops.evilcraft.fabric.cyclopscore.inventory;
 
 
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.ContainerUser;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -82,12 +83,12 @@ public class InventorySlotMasked implements Container {
     }
 
     @Override
-    public void startOpen(Player player) {
+    public void startOpen(ContainerUser player) {
         inventory.startOpen(player);
     }
 
     @Override
-    public void stopOpen(Player player) {
+    public void stopOpen(ContainerUser player) {
         inventory.stopOpen(player);
     }
 

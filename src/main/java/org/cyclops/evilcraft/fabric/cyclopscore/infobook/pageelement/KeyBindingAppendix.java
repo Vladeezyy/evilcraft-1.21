@@ -2,37 +2,27 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.GuiGraphics;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBookParser;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
 
 /**
  * An appendix for key bindings.
  * @author rubensworks
  */
-public class KeyBindingAppendix extends SectionAppendix {
+public class KeyBindingAppendix extends SectionAppendix<KeyBindingAppendixClient> {
 
     public static final int WIDTH = 100;
     public static final int HEIGHT = 30;
 
-    @Environment(EnvType.CLIENT)
-    private KeyMapping keyBinding;
+    private final String keybindingName;
 
     public KeyBindingAppendix(IInfoBook infoBook, String keybindingName) throws InfoBookParser.InvalidAppendixException {
         super(infoBook);
-        if (infoBook.getMod().getModHelpers().getMinecraftHelpers().isClientSide()) {
-            this.keyBinding = KeyMapping.ALL.get(keybindingName);
-            if (this.keyBinding == null) {
-                throw new InfoBookParser.InvalidAppendixException("Could not find a keybinding by name " + keybindingName);
-            }
+        this.keybindingName = keybindingName;
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
+            getSectionAppendixClient().loadKeybinding();
         }
     }
 
@@ -52,25 +42,8 @@ public class KeyBindingAppendix extends SectionAppendix {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    protected void drawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
-        gui.drawOuterBorder(guiGraphics, x - 1, y - 1, getWidth() + 2, getHeight() + 2, 0.5F, 0.5F, 0.5F, 0.4f);
-        gui.drawTextBanner(guiGraphics, x + width / 2, y - 2);
-        gui.drawScaledCenteredString(guiGraphics, L10NHelpers.localize("gui." + getInfoBook().getMod().getModId() + ".keybinding"), x, y - 2, width, 0.9f, gui.getBannerWidth() - 6, Helpers.RGBToInt(30, 20, 120));
-
-        gui.drawScaledCenteredString(guiGraphics, ChatFormatting.ITALIC.toString() + L10NHelpers.localize(keyBinding.getName()),
-                x, y - 2 + 12, width, 0.9f, gui.getBannerWidth() + 8, Helpers.RGBToInt(30, 20, 120));
-
-        String binding = keyBinding.getTranslatedKeyMessage().getString();
-        int bindingWidth = gui.getFont().width(binding) + 2;
-        gui.drawOuterBorder(guiGraphics, x + width / 2 - bindingWidth / 2 - 1, y + 17, bindingWidth, 10, 1, 1, 1, 0.2f);
-        gui.drawScaledCenteredString(guiGraphics, binding, x, y + 22, width, 0.9f, gui.getBannerWidth() - 6, Helpers.RGBToInt(30, 20, 120));
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    protected void postDrawElement(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
-
+    public KeyBindingAppendixClient constructSectionAppendixClient() throws InfoBookParser.InvalidAppendixException {
+        return new KeyBindingAppendixClient(this);
     }
 
     @Override
@@ -83,4 +56,7 @@ public class KeyBindingAppendix extends SectionAppendix {
 
     }
 
+    public String getKeybindingName() {
+        return keybindingName;
+    }
 }

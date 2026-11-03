@@ -1,21 +1,17 @@
 package org.cyclops.evilcraft.item;
 
-import com.google.common.collect.Maps;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import net.minecraft.world.item.component.TooltipDisplay;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;
 
-import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Promise item singleton.
@@ -26,32 +22,6 @@ import java.util.Map;
  */
 public class ItemPromise extends Item {
 
-    public static final Upgrades.Upgrade[] UPGRADES = new Upgrades.Upgrade[]{
-            Upgrades.UPGRADE_TIER1,
-            Upgrades.UPGRADE_TIER2,
-            Upgrades.UPGRADE_TIER3,
-            Upgrades.UPGRADE_SPEED,
-            Upgrades.UPGRADE_EFFICIENCY
-    };
-    public static final Map<Upgrades.Upgrade, Integer> MAIN_COLORS = Maps.newHashMap();
-    public static final Map<Upgrades.Upgrade, Integer> SECONDARY_COLORS = Maps.newHashMap();
-    static {
-        MAIN_COLORS.put(Upgrades.UPGRADE_TIER1, Helpers.RGBAToInt(220, 220, 220, 255));
-        SECONDARY_COLORS.put(Upgrades.UPGRADE_TIER1, Helpers.RGBAToInt(255, 255, 255, 255));
-
-        MAIN_COLORS.put(Upgrades.UPGRADE_TIER2, Helpers.RGBAToInt(234, 238, 87, 255));
-        SECONDARY_COLORS.put(Upgrades.UPGRADE_TIER2, Helpers.RGBAToInt(230, 230, 160, 255));
-
-        MAIN_COLORS.put(Upgrades.UPGRADE_TIER3, Helpers.RGBAToInt(51, 235, 203, 255));
-        SECONDARY_COLORS.put(Upgrades.UPGRADE_TIER3, Helpers.RGBAToInt(150, 250, 200, 255));
-
-        MAIN_COLORS.put(Upgrades.UPGRADE_SPEED, Helpers.RGBAToInt(200, 90, 80, 255));
-        SECONDARY_COLORS.put(Upgrades.UPGRADE_SPEED, Helpers.RGBAToInt(240, 120, 110, 255));
-
-        MAIN_COLORS.put(Upgrades.UPGRADE_EFFICIENCY, Helpers.RGBAToInt(80, 70, 200, 255));
-        SECONDARY_COLORS.put(Upgrades.UPGRADE_EFFICIENCY, Helpers.RGBAToInt(120, 120, 210, 255));
-    }
-
     private final Upgrades.Upgrade upgrade;
 
     public ItemPromise(Properties properties, Upgrades.Upgrade upgrade) {
@@ -61,14 +31,13 @@ public class ItemPromise extends Item {
 
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        super.appendHoverText(itemStack, context, list, flag);
-        if(MinecraftHelpers.isShifted()) {
-            list.add(Component.translatable("item.evilcraft.promise.use_in")
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
+        if(IModHelpers.get().getMinecraftClientHelpers().isShifted()) {
+            tooltipAdder.accept(Component.translatable("item.evilcraft.promise.use_in")
                     .withStyle(ChatFormatting.DARK_GREEN));
-            for(BlockConfig upgradable : getUpgrade(itemStack).getUpgradables()) {
-                list.add(Component.translatable(upgradable.getTranslationKey())
+            for(BlockConfigCommon upgradable : getUpgrade(itemStack).getUpgradables()) {
+                tooltipAdder.accept(Component.translatable(upgradable.getTranslationKey())
                         .withStyle(ChatFormatting.ITALIC));
             }
         }
@@ -117,15 +86,6 @@ public class ItemPromise extends Item {
      */
     public boolean isTierUpgrade(ItemStack itemStack) {
         return !itemStack.isEmpty() && upgrade.getTier() > 0;
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
-        @Override
-        public int getColor(ItemStack itemStack, int renderPass) {
-            Upgrades.Upgrade upgrade = ((ItemPromise) itemStack.getItem()).getUpgrade(itemStack);
-            return renderPass == 0 ? SECONDARY_COLORS.get(upgrade) : MAIN_COLORS.get(upgrade);
-        }
     }
 
 }

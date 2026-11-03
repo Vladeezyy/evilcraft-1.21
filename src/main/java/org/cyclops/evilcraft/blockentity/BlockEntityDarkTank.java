@@ -6,17 +6,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.ItemAccessItemLocation;
+import org.cyclops.cyclopscore.inventory.ItemLocation;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.GeneralConfig;
@@ -63,16 +64,9 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
     }
 
     @Nullable
-    protected ItemStack fill(ItemStack itemStack) {
-        IFluidHandlerItem container = Capabilities.FluidHandler.ITEM.getCapability(itemStack, null);
-        FluidStack fluidStack = new FluidStack(getTank().getFluid().getFluid(),
-                Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()));
-        if (container.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE) > 0) {
-            int filled = container.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-            getTank().drain(filled, IFluidHandler.FluidAction.EXECUTE);
-            return container.getContainer();
-        }
-        return null;
+    protected boolean fill(ItemAccess itemAccess) {
+        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
+        return !IModHelpers.get().getFluidHelpers().move(getTank(), container, Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()), null, false, false).isEmpty();
     }
 
     @Override
@@ -88,15 +82,10 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
 
             if(!blockEntity.getTank().isEmpty() && blockEntity.isEnabled()) {
                 Direction down = Direction.DOWN;
-                IFluidHandler handler = BlockEntityHelpers.getCapability(level, pos.relative(down), down.getOpposite(),
-                        org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK).orElse(null);
+                ResourceHandler<FluidResource> handler = IModHelpers.get().getCapabilityHelpers().getCapability(level, pos.relative(down), down.getOpposite(),
+                        org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK).orElse(null);
                 if(handler != null) {
-                    FluidStack fluidStack = new FluidStack(blockEntity.getTank().getFluid().getFluid(),
-                            Math.min(GeneralConfig.mbFlowRate, blockEntity.getTank().getFluidAmount()));
-                    if(handler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE) > 0) {
-                        int filled = handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-                        blockEntity.getTank().drain(filled, IFluidHandler.FluidAction.EXECUTE);
-                    }
+                    IModHelpers.get().getFluidHelpers().move(blockEntity.getTank(), handler, Math.min(GeneralConfig.mbFlowRate, blockEntity.getTank().getFluidAmount()), null, false, false);
                 } else {
                     // Try to fill fluid container items below
                     List<Entity> entities = level.getEntitiesOfClass(Entity.class,
@@ -105,25 +94,22 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
                     for(Entity entity : entities) {
                         if(!blockEntity.getTank().isEmpty() && entity instanceof ItemEntity) {
                             ItemEntity item = (ItemEntity) entity;
-                            if (item.getItem() != null
-                                    && org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(item.getItem(), null) != null &&
+                            ItemAccess itemAccess = ItemAccess.forStack(item.getItem());
+                            if (org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemAccess, null) != null &&
                                     item.getItem().getCount() == 1) {
-                                ItemStack itemStack = item.getItem().copy();
-                                ItemStack fillItemStack;
-                                if((fillItemStack = blockEntity.fill(itemStack)) != null) {
-                                    item.setItem(fillItemStack);
+                                if(blockEntity.fill(itemAccess)) {
+                                    item.setItem(itemAccess.getResource().toStack(itemAccess.getAmount()));
                                 }
                             }
                         } else if(entity instanceof Player) {
                             Player player = (Player) entity;
                             PlayerExtendedInventoryIterator it = new PlayerExtendedInventoryIterator(player);
                             while(!blockEntity.getTank().isEmpty() && it.hasNext()) {
-                                ItemStack itemStack = it.next();
-                                ItemStack fillItemStack;
-                                if(!itemStack.isEmpty()
-                                        && org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.ITEM.getCapability(itemStack, null) != null
-                                        && (fillItemStack = blockEntity.fill(itemStack)) != null) {
-                                    it.replace(fillItemStack);
+                                ItemLocation itemLocation = it.nextIndexed();
+                                ItemAccess itemAccess = new ItemAccessItemLocation(player, itemLocation);
+                                if(itemAccess.getAmount() > 0
+                                        && org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemAccess, null) != null) {
+                                    blockEntity.fill(itemAccess);
                                 }
                             }
                         }

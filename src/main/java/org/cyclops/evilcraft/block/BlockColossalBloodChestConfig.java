@@ -1,20 +1,14 @@
 package org.cyclops.evilcraft.block;
 
 import com.google.common.collect.Sets;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.evilcraft.client.render.blockentity.RenderItemStackBlockEntityBloodChest;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;
 import org.cyclops.evilcraft.core.config.extendedconfig.UpgradableBlockContainerConfig;
 import org.cyclops.evilcraft.core.item.ItemBlockFluidContainer;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Config for the {@link BlockColossalBloodChest}.
@@ -36,14 +30,13 @@ public class BlockColossalBloodChestConfig extends UpgradableBlockContainerConfi
         super(
                 EvilCraft._instance,
             "colossal_blood_chest",
-                eConfig -> new BlockColossalBloodChest(Block.Properties.of()
+                (eConfig, properties) -> new BlockColossalBloodChest(properties
                         .requiresCorrectToolForDrops()
                         .strength(5.0F)
                         .sound(SoundType.WOOD)
                         .noOcclusion()
                         .isValidSpawn((state, level, pos, type) -> false)),
-                (eConfig, block) -> new ItemBlockFluidContainer(block, (new Item.Properties())
-                        )
+                (eConfig, block) -> new ItemBlockFluidContainer(block, eConfig.createDefaultItemProperties())
         );
     }
 

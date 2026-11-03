@@ -3,7 +3,9 @@ package org.cyclops.evilcraft.enchantment.component;
 import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
 import org.cyclops.evilcraft.fabric.event.BlockEvent;
 import com.mojang.serialization.Codec;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import org.cyclops.cyclopscore.config.extendedconfig.EnchantmentEffectComponentConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -11,7 +13,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class EnchantmentEffectComponentStopDamageConfig extends EnchantmentEffectComponentConfig<Boolean> {
+public class EnchantmentEffectComponentStopDamageConfig extends EnchantmentEffectComponentConfigCommon<Boolean, IModBase> {
     public EnchantmentEffectComponentStopDamageConfig() {
         super(
                 EvilCraft._instance,

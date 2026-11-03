@@ -1,10 +1,9 @@
 package org.cyclops.evilcraft.block;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -12,10 +11,10 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class BlockEnvironmentalAccumulatorConfig extends BlockConfig {
+public class BlockEnvironmentalAccumulatorConfig extends BlockConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to cool down")
-    public static int defaultTickCooldown = MinecraftHelpers.MINECRAFT_DAY / 20;
+    public static int defaultTickCooldown = EvilCraft._instance.getModHelpers().getMinecraftHelpers().getDayLength() / 20;
 
     @ConfigurablePropertyCommon(category = "machine", isCommandable = true, comment = "Sets the default amount of ticks the environmental accumulator takes to process an item.")
     public static int defaultProcessItemTickCount = 100;
@@ -27,7 +26,7 @@ public class BlockEnvironmentalAccumulatorConfig extends BlockConfig {
         super(
                 EvilCraft._instance,
                 "environmental_accumulator",
-                eConfig -> new BlockEnvironmentalAccumulator(Block.Properties.of()
+                (eConfig, properties) -> new BlockEnvironmentalAccumulator(properties
                         .strength(50.0F, 6000000.0F)
                         .sound(SoundType.METAL)),
                 getDefaultItemConstructor(EvilCraft._instance)

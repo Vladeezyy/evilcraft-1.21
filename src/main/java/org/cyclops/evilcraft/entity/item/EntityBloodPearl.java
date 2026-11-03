@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.item.ItemBloodPearlOfTeleportation;
 import org.cyclops.evilcraft.item.ItemBloodPearlOfTeleportationConfig;
@@ -32,7 +32,8 @@ public class EntityBloodPearl extends ThrowableProjectile implements ItemSupplie
     }
 
     public EntityBloodPearl(Level world, LivingEntity entity) {
-        super(RegistryEntries.ENTITY_BLOOD_PEARL.get(), entity, world);
+        super(RegistryEntries.ENTITY_BLOOD_PEARL.get(), entity.getX(), entity.getEyeY(), entity.getZ(), world);
+        setOwner(entity);
     }
 
     @Override
@@ -46,15 +47,16 @@ public class EntityBloodPearl extends ThrowableProjectile implements ItemSupplie
             if (this.getOwner() != null && this.getOwner() instanceof ServerPlayer) {
                 ServerPlayer entityplayermp = (ServerPlayer)this.getOwner();
 
-                if (!entityplayermp.hasDisconnected() && entityplayermp.level() == this.level()) {
-                    {
+                if (entityplayermp.connection.getConnection().isConnected() && entityplayermp.level() == this.level()) {
+                    EntityTeleportEvent event = new EntityTeleportEvent(entityplayermp, (net.minecraft.server.level.ServerLevel) entityplayermp.level(), this.getX(), this.getY(), this.getZ());
+                    if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
                         if (this.getOwner().isPassenger()) {
                             this.getOwner().stopRiding();
                         }
 
                         this.getOwner().teleportTo(this.getX(), this.getY(), this.getZ());
                         this.getOwner().fallDistance = 0.0F;
-                        ((LivingEntity) this.getOwner()).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,
+                        ((LivingEntity) this.getOwner()).addEffect(new MobEffectInstance(MobEffects.SLOWNESS,
                                 ItemBloodPearlOfTeleportationConfig.slownessDuration * 20, 2));
                     }
                 }
@@ -63,8 +65,8 @@ public class EntityBloodPearl extends ThrowableProjectile implements ItemSupplie
             this.remove(RemovalReason.DISCARDED);
         } else {
             for (int i = 0; i < 32; ++i) {
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        ParticleTypes.PORTAL, false,
+                Minecraft.getInstance().level.addParticle(
+                        ParticleTypes.PORTAL,
                         this.getX(), this.getY() + this.random.nextDouble() * 2.0D, this.getZ(),
                         this.random.nextGaussian(), 0.0D, this.random.nextGaussian());
             }

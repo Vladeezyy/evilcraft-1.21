@@ -1,8 +1,8 @@
 package org.cyclops.evilcraft.item;
 
-import net.minecraft.world.item.Item;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -10,7 +10,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class ItemVengeanceRingConfig extends ItemConfig {
+public class ItemVengeanceRingConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The area of effect in # blocks of this ring.", isCommandable = true)
     public static int areaOfEffect = 10;
@@ -19,8 +19,7 @@ public class ItemVengeanceRingConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
             "vengeance_ring",
-                eConfig -> new ItemVengeanceRing(new Item.Properties()
-
+                (eConfig, properties) -> new ItemVengeanceRing(properties
                         .stacksTo(1))
         );
     }

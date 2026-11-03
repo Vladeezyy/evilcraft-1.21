@@ -2,11 +2,12 @@ package org.cyclops.evilcraft.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodChest;
@@ -21,7 +22,7 @@ public class GameTestsBloodChest {
     public void testBloodChestRepair(GameTestHelper helper) {
         // Add infuser
         helper.setBlock(POS, RegistryEntries.BLOCK_BLOOD_CHEST.get());
-        BlockEntityBloodChest chest = helper.getBlockEntity(POS);
+        BlockEntityBloodChest chest = helper.getBlockEntity(POS, BlockEntityBloodChest.class);
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         sword.set(DataComponents.DAMAGE, 10);
         chest.getInventory().setItem(0, sword);
@@ -29,12 +30,12 @@ public class GameTestsBloodChest {
 
         // Add tank above with blood
         helper.setBlock(POS.above(), RegistryEntries.BLOCK_DARK_TANK.get());
-        BlockEntityDarkTank tank = helper.getBlockEntity(POS.above());
+        BlockEntityDarkTank tank = helper.getBlockEntity(POS.above(), BlockEntityDarkTank.class);
         tank.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, 8000));
         tank.setEnabled(true);
 
         helper.succeedWhen(() -> {
-            helper.assertValueEqual(chest.getInventory().getItem(0).getDamageValue(), 0, "Sword has not been repaired");
+            helper.assertValueEqual(chest.getInventory().getItem(0).getDamageValue(), 0, Component.literal("Sword has not been repaired"));
         });
     }
 

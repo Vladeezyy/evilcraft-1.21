@@ -1,20 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "minecraft:wither_skeleton_skull",
+    "minecraft:wither_skeleton_skull",
+    "minecraft:wither_skeleton_skull",
     {
-      "item": "minecraft:wither_skeleton_skull"
-    },
-    {
-      "item": "minecraft:wither_skeleton_skull"
-    },
-    {
-      "item": "minecraft:wither_skeleton_skull"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"

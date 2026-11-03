@@ -4,7 +4,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition;
 
 import org.apache.logging.log4j.util.Strings;
 import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 /**
  * Condition handler for checking if configs are enabled.
@@ -14,7 +14,7 @@ import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
 public class ConfigSectionConditionHandler implements ISectionConditionHandler {
 
     @Override
-    public boolean isSatisfied(ModBase<?> mod, String param) {
+    public boolean isSatisfied(ModBaseNeoForge<?> mod, String param) {
         String modId = null;
         if (param.contains(":")) {
             String[] split = param.split(":");
@@ -22,7 +22,7 @@ public class ConfigSectionConditionHandler implements ISectionConditionHandler {
             param = split[1];
         }
         if (!Strings.isEmpty(modId)) {
-            mod = ModBase.get(modId);
+            mod = ModBaseNeoForge.get(modId);
             if (mod == null) {
                 throw new IllegalArgumentException("The mod " + modId + " could not be found as ModBase.");
             }

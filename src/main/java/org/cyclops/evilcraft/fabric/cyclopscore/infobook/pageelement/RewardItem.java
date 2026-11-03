@@ -2,15 +2,9 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.ItemStackHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
-import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
  * An item reward.
@@ -34,7 +28,7 @@ public class RewardItem implements IReward {
     @Override
     public void obtain(Player player) {
         if (!player.getInventory().add(itemStack.copy())) {
-            ItemStackHelpers.spawnItemStack(player.getCommandSenderWorld(), player.blockPosition(), itemStack.copy());
+            IModHelpers.get().getItemStackHelpers().spawnItemStack(player.level(), player.blockPosition(), itemStack.copy());
         }
     }
 
@@ -49,16 +43,11 @@ public class RewardItem implements IReward {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public AdvancedButton createButton(IInfoBook infoBook) {
-        return new RecipeAppendix.ItemButton(infoBook);
+    public IRewardClient constructRewardClient() {
+        return new RewardItemClient(this);
     }
 
-    @Override
-    @Environment(EnvType.CLIENT)
-    public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my, AdvancedButton button) {
-        RecipeAppendix.renderItemForButton(gui, guiGraphics, x, y, itemStack, mx, my, true, (RecipeAppendix.ItemButton) button);
+    public ItemStack getItemStack() {
+        return itemStack;
     }
-
-
 }

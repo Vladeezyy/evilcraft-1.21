@@ -2,32 +2,27 @@ package org.cyclops.evilcraft.block;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.BlockConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.evilcraft.blockentity.BlockEntityEntangledChalice;
-import org.cyclops.evilcraft.client.render.blockentity.RenderItemStackBlockEntityEntangledChalice;
 import org.cyclops.evilcraft.item.ItemEntangledChalice;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.function.Consumer;
 
 /**
  * Config for the {@link BlockEntangledChalice}.
  * @author rubensworks
  *
  */
-public class BlockEntangledChaliceConfig extends BlockConfig {
+public class BlockEntangledChaliceConfig extends BlockConfigCommon<ModBaseNeoForge<?>> {
 
     @ConfigurablePropertyCommon(category = "machine", comment = "If the fluid should be rendered statically. Fluids won't be shown fluently, but more efficiently.", requiresMcRestart = true)
     public static boolean staticBlockRendering = false;
@@ -36,23 +31,22 @@ public class BlockEntangledChaliceConfig extends BlockConfig {
         super(
                 EvilCraft._instance,
                 "entangled_chalice",
-                eConfig -> new BlockEntangledChalice(Block.Properties.of()
+                (eConfig, properties) -> new BlockEntangledChalice(properties
                         .requiresCorrectToolForDrops()
                         .strength(2.5F)
                         .sound(SoundType.STONE)),
-                (eConfig, block) -> new ItemEntangledChalice(block, (new Item.Properties())
-                        )
+                (eConfig, block) -> new ItemEntangledChalice(block, eConfig.createDefaultItemProperties())
         );
         RegisterCapabilitiesEvent.addListener(this::registerCapability);
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     protected void registerCapability(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, context) -> new ItemEntangledChalice.FluidHandler(stack, BlockEntityEntangledChalice.BASE_CAPACITY), getInstance());
+        event.registerItem(Capabilities.Fluid.ITEM, (stack, context) -> new ItemEntangledChalice.FluidHandler(context), getInstance());
     }
 
     @Override
-    protected Collection<ItemStack> defaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }
@@ -72,11 +66,7 @@ public class BlockEntangledChaliceConfig extends BlockConfig {
     }
 
     @Override
-    public void onForgeRegistered() {
-        super.onForgeRegistered();
-        if (getMod().getModHelpers().getMinecraftHelpers().isClientSide()) {
-            RenderItemStackBlockEntityEntangledChalice.ItemRenderProperties.register(getItemInstance());
-        }
+    public BlockClientConfig<ModBaseNeoForge<?>> constructBlockClientConfig() {
+        return new BlockEntangledChaliceConfigClient(this);
     }
-
 }

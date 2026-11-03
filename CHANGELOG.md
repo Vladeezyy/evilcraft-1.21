@@ -1,1 +1,199 @@
-CHANGELOG-1.21.1.md
+# Changelog for Minecraft 26.1.2
+All notable changes to this project will be documented in this file.
+
+<a name="26.1.2-1.2.109"></a>
+## [26.1.2-1.2.109](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.108...26.1.2-1.2.109) - 2026-10-31 13:26:02
+
+
+### Added
+* Add undead wood variants to log tags (#1291), Closes #1290
+
+### Fixed
+* Fix random disconnects due to Blood Magic soul network packet race (#19)
+* Fix entities getting stuck in Blood and Poison (#1289), Closes #1288
+
+<a name="26.1.2-1.2.108"></a>
+## [26.1.2-1.2.108](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.107...26.1.2-1.2.108) - 2026-10-16 05:17:50 +0200
+
+
+### Fixed
+* Fix vengeance spirit hitbox not matching inner entity (#1286)
+* Fix vengeance spirit hitbox when inner entity matches initial random one (#1284)
+* Fix werewolf villagers from POIs being stuck at level 1 (#1285)
+
+<a name="26.1.2-1.2.107"></a>
+## [26.1.2-1.2.107](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.106...26.1.2-1.2.107) - 2026-10-03 14:51:04 +0200
+
+
+### Fixed
+* Fix vengeance spirit hitbox not matching inner entity, Closes #1278 (#1279)
+
+<a name="26.1.2-1.2.106"></a>
+## [26.1.2-1.2.106](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.105...26.1.2-1.2.106) - 2026-09-27 06:58:41 +0200
+
+
+### Fixed
+* Fix Purifier duplicating items when broken (#1276), Closes #1274
+* Fix opened player Boxes of Eternal Closure keeping player data, Closes #1272 (#1273)
+* Fix random failures of the vengeance spirit catch game test (#1266)
+* Fix server crash when a player without the mod sees a biome change (#1265)
+* Fix random failures of blood infuser game tests (#1263)
+
+<a name="26.1.2-1.2.105"></a>
+## [26.1.2-1.2.105](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.104...26.1.2-1.2.105) - 2026-09-11 17:55:29 +0200
+
+
+### Added
+* Allow reverting mob head progression in the Purifier (#1260), Closes #1258
+
+### Fixed
+* Hide blood and broom GUI overlays when the GUI is hidden (#1262), Closes #1261
+
+<a name="26.1.2-1.2.104"></a>
+## [26.1.2-1.2.104](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.103...26.1.2-1.2.104) - 2026-09-05 12:58:26 +0200
+
+
+### Fixed
+* Fix Display Stand not being rendered when it has no wood type (#1257), Closes #1255
+* Fix lightning striking inverted potentia losing stack size, Closes #1256
+* Fix Spirit Furnace tooltip being rendered at the wrong position, Closes #1252 (#1254)
+
+<a name="26.1.2-1.2.103"></a>
+## [26.1.2-1.2.103](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.102...26.1.2-1.2.103) - 2026-08-24 19:00:58 +0200
+
+
+### Added
+* Add stonecutter recipes for dark brick stairs (#1250), Closes #1248
+* Add blood fluid to the common blood tag (#1247), Closes #1246
+* Give maces a configurable attack speed (#1245), Closes #1244
+
+### Fixed
+* Fix dark tank creative tab crash, Closes #1251
+* Fix Eternal Water Block dupe with Carry On, Closes #1243
+
+<a name="26.1.2-1.2.102"></a>
+## [26.1.2-1.2.102](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.101...26.1.2-1.2.102) - 2026-08-06 15:41:12 +0200
+
+
+### Added
+* Allow clearing Dark Tanks in the crafting grid (#1242), Closes #1241
+
+<a name="26.1.2-1.2.101"></a>
+## [26.1.2-1.2.101](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.100...26.1.2-1.2.101) - 2026-07-20 08:59:59 +0200
+
+
+### Fixed
+* Fix merge conflict in tags
+
+<a name="26.1.2-1.2.100"></a>
+## [26.1.2-1.2.100](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.99...26.1.2-1.2.100) - 2026-07-20 06:48:48 +0200
+
+
+### Added
+* Add translations through Crowdin
+
+### Changed
+* Add stripped undead logs to vanilla log tags (#1238)
+
+<a name="26.1.2-1.2.99"></a>
+## [26.1.2-1.2.99](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.98...26.1.2-1.2.99) - 2026-06-28 14:08:28 +0200
+
+
+### Fixed
+* Fix Auto-Supply mode duplicating tanks, Closes #1234
+
+<a name="26.1.2-1.2.98"></a>
+## [26.1.2-1.2.98](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.97...26.1.2-1.2.98) - 2026-06-14 13:42:16 +0200
+
+
+### Added
+* Add ores/dark_gem item and block tags, Closes #1223
+
+### Fixed
+* Fix egg variants not being acceptable in reanimator, Closes #1229
+* Fix some projectiles spawning at wrong origin, Closes #1228
+* Make spirit rendering safer to avoid crashes, Closes #1227
+
+<a name="26.1.2-1.2.97"></a>
+## [26.1.2-1.2.97](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.96...26.1.2-1.2.97) - 2026-06-05 08:58:26 +0200
+
+
+### Changed
+* Update to NeoForge 26.1.2.73
+
+### Fixed
+* Fix Spirit Furnace JEI race condition sometimes breaking its recipes
+
+<a name="26.1.2-1.2.96"></a>
+## [26.1.2-1.2.96](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.95...26.1.2-1.2.96) - 2026-05-25 14:06:32 +0200
+
+
+### Fixed
+* Fix placement of tanks not considering non-default capacity, Closes #1217
+* Fix mobs spawning in multiblocks, Closes #1211
+* Remove unneeded global_loot_modifiers.json, Closes #1216
+
+<a name="26.1.2-1.2.95"></a>
+## [26.1.2-1.2.95](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.94...26.1.2-1.2.95) - 2026-05-22 09:32:54 +0200
+
+
+### Added
+* Add translations through Crowdin (#1209)
+
+### Fixed
+* Fix Spirit Furnace not restarting after draining output inv after drain, Closes #1212
+* Prevent Sanguinary Environmental Accumulator inventory double-drops (#1214), Closes #1213
+
+<a name="26.1.2-1.2.94"></a>
+## [26.1.2-1.2.94](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.93...26.1.2-1.2.94) - 2026-05-16 07:32:35 +0200
+
+
+### Added
+* Add translations through Crowdin
+
+### Fixed
+* Fix Dead Bush recipe not handling third-party shears, Closes #1210
+
+<a name="26.1.2-1.2.93"></a>
+## [26.1.2-1.2.93](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.92...26.1.2-1.2.93) - 2026-05-02 13:41:57 +0200
+
+
+### Added
+* Add translations through Crowdin
+
+### Fixed
+* Fix Spirit Furnace halting when mob loot table contains empty stacks, Closes #1204
+* Fix crash on JEI spirit furnace recipe generation for certain mobs, Closes CyclopsMC/EvilCraft#1205
+
+<a name="26.1.2-1.2.92"></a>
+## [26.1.2-1.2.92](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.91...26.1.2-1.2.92) - 2026-04-29 20:21:49 +0200
+
+
+### Fixed
+* Fix Brooms not consuming Blood when ridden
+
+<a name="26.1.2-1.2.91"></a>
+## [26.1.2-1.2.91](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.90...26.1.2-1.2.91) - 2026-04-29 17:08:58 +0200
+
+
+### Added
+* Add translations through Crowdin (#1199)
+
+### Changed
+* Lower loot chance of brooms and books
+
+### Fixed
+* Fix spirits of Ars Magica causing crashes
+
+<a name="26.1.2-1.2.90"></a>
+## [26.1.2-1.2.90](https://github.com/CyclopsMC/EvilCraft/compare/26.1.2-1.2.89...26.1.2-1.2.90) - 2026-04-25 17:14:24 +0200
+
+
+### Fixed
+* Fix broken Curios integration, Closes CyclopsMC/EvilCraft#1203
+
+<a name="26.1.2-1.2.89"></a>
+## [26.1.2-1.2.89] - 2026-04-21 20:01:28 +0200
+
+
+Initial 26.1.2 release

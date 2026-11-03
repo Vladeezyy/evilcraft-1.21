@@ -1,8 +1,8 @@
 package org.cyclops.evilcraft.item;
 
-import net.minecraft.world.item.Item;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -10,7 +10,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author immortaleeb
  *
  */
-public class ItemRedstoneGrenadeConfig extends ItemConfig {
+public class ItemRedstoneGrenadeConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "If the redstone grenade should drop again as an item after it is being thrown.", isCommandable = true)
     public static boolean dropAfterUsage = false;
@@ -19,8 +19,7 @@ public class ItemRedstoneGrenadeConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "redstone_grenade",
-                eConfig -> new ItemRedstoneGrenade(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemRedstoneGrenade(properties)
             );
     }
 }

@@ -2,16 +2,14 @@ package org.cyclops.evilcraft.network.packet;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
-import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.PlayerPositionPacket;
+import org.cyclops.cyclopscore.init.IModBase;
+import org.cyclops.cyclopscore.network.packet.PlayerPositionPacket;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.Reference;
@@ -32,7 +30,7 @@ import java.util.UUID;
  */
 public class FartPacket extends PlayerPositionPacket<FartPacket> {
 
-    public static final Type<FartPacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "fart"));
+    public static final Type<FartPacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "fart"));
     public static final StreamCodec<RegistryFriendlyByteBuf, FartPacket> CODEC = getCodec(FartPacket::new);
 
     private static final int MAX_PARTICLES = 200;
@@ -65,7 +63,6 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void actionClient(Level world, Player player) {
         if(GeneralConfig.farting)
             super.actionClient(world, player);
@@ -77,7 +74,6 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
         spawnFartParticles(world, player, position, true);
     }
 
-    @Environment(EnvType.CLIENT)
     private void spawnFartParticles(
             Level world, Player player,
             Vec3 pos, boolean isClientSidePlayer) {
@@ -85,7 +81,7 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
         if (player == null)
             return;
 
-        RandomSource rand = world.random;
+        RandomSource rand = world.getRandom();
         int numParticles = rand.nextInt(MAX_PARTICLES - MIN_PARTICLES) + MIN_PARTICLES;
         boolean rainbow = hasRainbowFart(player);
 
@@ -119,7 +115,7 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
      */
     public boolean hasRainbowFart(Player player) {
         return player.getGameProfile() != null
-                && ALLOW_RAINBOW_FARTS.contains(player.getGameProfile().getId());
+                && ALLOW_RAINBOW_FARTS.contains(player.getGameProfile().id());
     }
 
     @Override
@@ -136,7 +132,7 @@ public class FartPacket extends PlayerPositionPacket<FartPacket> {
     }
 
     @Override
-    protected ModBase getModInstance() {
+    protected IModBase getModInstance() {
         return EvilCraft._instance;
     }
 }

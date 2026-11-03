@@ -3,18 +3,13 @@ package org.cyclops.evilcraft.core.fluid;
 import org.cyclops.cyclopscore.events.IPlayerLoggedInEvent;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import com.google.common.collect.Maps;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.network.packet.UpdateWorldSharedTankClientCachePacket;
 
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,9 +26,10 @@ public class WorldSharedTankCache {
 
     private static WorldSharedTankCache _instance = null;
 
-    private Map<String, FluidStack> tankCache = Maps.newHashMap();
     private Map<String, UpdateWorldSharedTankClientCachePacket> packetBuffer = Maps.newHashMap();
     private int tick = 0;
+    // Local in-memory cache used on a dedicated client (where no local MinecraftServer exists)
+    private final Map<String, FluidStack> dedicatedClientCache = Maps.newHashMap();
 
     private WorldSharedTankCache() {
 
@@ -43,9 +39,9 @@ public class WorldSharedTankCache {
      * Reset the cache, packet buffer and tick offset.
      */
     public void reset() {
-        tankCache = Maps.newHashMap();
         packetBuffer = Maps.newHashMap();
         tick = 0;
+        dedicatedClientCache.clear();
     }
 
     /**
@@ -60,7 +56,7 @@ public class WorldSharedTankCache {
     }
 
     protected String getMapID(String tankID) {
-        return tankID + (MinecraftHelpers.isClientSide() ? "C" : "S");
+        return tankID + (IModHelpers.get().getMinecraftHelpers().isClientSide() ? "C" : "S");
     }
 
     protected String removeMapID(String mapID) {
@@ -73,12 +69,18 @@ public class WorldSharedTankCache {
      * @return The contents.
      */
     public synchronized FluidStack getTankContent(String tankID) {
-        FluidStack stack = tankCache.get(getMapID(tankID));
-        return (stack == null) ? FluidStack.EMPTY : stack.copy();
+        String key = getMapID(tankID);
+        if (ServerLifecycleHooks.getCurrentServer() == null) {
+            // On a dedicated client there is no local server; use the local in-memory cache
+            // populated via UpdateWorldSharedTankClientCachePacket
+            FluidStack cached = dedicatedClientCache.get(key);
+            return cached != null ? cached.copy() : FluidStack.EMPTY;
+        }
+        return EvilCraft.sharedTanks.get().getFluid(key).copy();
     }
 
-    protected static boolean shouldRefreshFluid(@Nullable FluidStack old, FluidStack newF) {
-        return (old == null ? 0 : old.getAmount()) != newF.getAmount();
+    protected static boolean shouldRefreshFluid(FluidStack old, FluidStack newF) {
+        return old.getAmount() != newF.getAmount();
     }
 
     /**
@@ -88,13 +90,15 @@ public class WorldSharedTankCache {
      */
     public synchronized void setTankContent(String tankID, FluidStack fluidStack) {
         String key = getMapID(tankID);
-        boolean shouldRefresh = shouldRefreshFluid(tankCache.get(key), fluidStack);
-        if(fluidStack.isEmpty()) {
-            tankCache.remove(key);
-        } else if(shouldRefresh) {
-            tankCache.put(key, fluidStack.copy());
+        if (ServerLifecycleHooks.getCurrentServer() == null) {
+            // On a dedicated client there is no local server; store in the local in-memory cache
+            dedicatedClientCache.put(key, fluidStack.copy());
+            return;
         }
-        if(!MinecraftHelpers.isClientSide() && shouldRefresh) {
+        WorldStorageSharedTank sharedTanks = EvilCraft.sharedTanks.get();
+        boolean shouldRefresh = shouldRefreshFluid(sharedTanks.getFluid(key), fluidStack);
+        sharedTanks.setFluid(key, fluidStack.copy());
+        if(!IModHelpers.get().getMinecraftHelpers().isClientSide() && shouldRefresh) {
             bufferPacket(tankID, new UpdateWorldSharedTankClientCachePacket(tankID, fluidStack));
         }
     }
@@ -124,51 +128,31 @@ public class WorldSharedTankCache {
         if(getTickOffset() > INTERPOLATION_TICK_OFFSET) {
             Iterator<Map.Entry<String, UpdateWorldSharedTankClientCachePacket>> it = packetBuffer.entrySet().iterator();
             while(it.hasNext()) {
-                EvilCraft._instance.getPacketHandler().sendToAll(it.next().getValue());
+                try {
+                    EvilCraft._instance.getPacketHandler().sendToAll(it.next().getValue());
+                } catch (UnsupportedOperationException e) {
+                    // Can occur during game testing
+                    e.printStackTrace();
+                }
                 it.remove();
             }
             tick = 0;
         }
     }
 
-    public void onLoggedIn(ServerPlayer player) {
-        if(!MinecraftHelpers.isClientSide()) {
-            for(Map.Entry<String, FluidStack> entry: tankCache.entrySet()) {
-                EvilCraft._instance.getPacketHandler().sendToPlayer(
-                        new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), player);
+    @SubscribeEvent
+    public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if(!IModHelpers.get().getMinecraftHelpers().isClientSide()) {
+            try {
+                for(Map.Entry<String, FluidStack> entry: EvilCraft.sharedTanks.get().getEntries()) {
+                    EvilCraft._instance.getPacketHandler().sendToPlayer(
+                            new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), (ServerPlayer) event.getEntity());
+                }
+            } catch (UnsupportedOperationException e) {
+                // Can occur for players without a channel for this packet, such as during game testing
+                e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Read the cache.
-     * @param tag The tag to read from.
-     */
-    public void readFromNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        if(tag != null) {
-            ListTag list = tag.getList("tankCache", 10);
-            for (int i = 0; i < list.size(); i++) {
-                CompoundTag subTag = list.getCompound(i);
-                setTankContent(subTag.getString("key"),
-                        FluidStack.CODEC.decode(holderLookupProvider.createSerializationContext(NbtOps.INSTANCE), subTag.getCompound("value")).getOrThrow().getFirst());
-            }
-        }
-    }
-
-    /**
-     * Write the cache.
-     * @param tag The tag to write to.
-     */
-    public void writeToNBT(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        ListTag list = new ListTag();
-        for(Map.Entry<String, FluidStack> entry : tankCache.entrySet()) {
-            CompoundTag subTag = new CompoundTag();
-            subTag.putString("key", removeMapID(entry.getKey()));
-            Tag fluidTag = FluidStack.CODEC.encodeStart(holderLookupProvider.createSerializationContext(NbtOps.INSTANCE), entry.getValue()).getOrThrow();
-            subTag.put("value", fluidTag);
-            list.add(subTag);
-        }
-        tag.put("tankCache", list);
     }
 
 }

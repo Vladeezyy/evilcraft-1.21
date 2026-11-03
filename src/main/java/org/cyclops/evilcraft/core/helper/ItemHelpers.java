@@ -6,11 +6,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -53,24 +55,32 @@ public class ItemHelpers {
      * @param entity The entity that holds this item.
      * @param fillBuckets If buckets should be filled.
      */
-    public static void updateAutoFill(IFluidHandlerItem toDrain, Level world, Entity entity, boolean fillBuckets) {
+    public static void updateAutoFill(ResourceHandler<FluidResource> toDrain, ItemStack toDrainItem, Level world, Entity entity, boolean fillBuckets) {
         if(entity instanceof Player && !world.isClientSide()) {
-            FluidStack tickFluid = toDrain.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+            FluidStack tickFluid = FluidUtil.getStack(toDrain, 0);
             if(!tickFluid.isEmpty()) {
                 Player player = (Player) entity;
                 for (InteractionHand hand : InteractionHand.values()) {
                     ItemStack held = player.getItemInHand(hand);
-                    if (!held.isEmpty() && (fillBuckets || held.getItem() != Items.BUCKET)) {
-                        ItemStack toFill = held.split(1);
-                        ItemStack filled = tryFillContainerForPlayer(toDrain, toFill, tickFluid, player);
-                        if (!filled.isEmpty()) {
-                            if (player.getItemInHand(hand).isEmpty()) {
-                                player.setItemInHand(hand, filled);
+                    if (held.getItem() == Items.BUCKET) {
+                        if (fillBuckets) {
+                            ItemStack toFill = held.split(1);
+                            ItemStack filled = tryFillContainerForPlayer(toDrain, toDrainItem, ItemAccess.forStack(toFill), toFill, tickFluid, player);
+                            if (!filled.isEmpty()) {
+                                if (player.getItemInHand(hand).isEmpty()) {
+                                    player.setItemInHand(hand, filled);
+                                } else {
+                                    player.addItem(filled);
+                                }
                             } else {
-                                player.addItem(filled);
+                                held.grow(1);
                             }
-                        } else {
-                            held.grow(1);
+                        }
+                    } else if (!held.isEmpty()) {
+                        ItemStack toFill = held;
+                        ItemStack filled = tryFillContainerForPlayer(toDrain, toDrainItem, ItemAccess.forStack(toFill), toFill, tickFluid, player);
+                        if (!filled.isEmpty()) {
+                            player.setItemInHand(hand, filled);
                         }
                     }
                 }
@@ -86,15 +96,16 @@ public class ItemHelpers {
      * @param player The player that is the owner of toFill.
      * @return The filled container
      */
-    public static ItemStack tryFillContainerForPlayer(IFluidHandlerItem toDrain, ItemStack toFill, FluidStack tickFluid, Player player) {
+    public static ItemStack tryFillContainerForPlayer(ResourceHandler<FluidResource> toDrain, ItemStack toDrainItem, ItemAccess toFill, ItemStack toFillItem, FluidStack tickFluid, Player player) {
         int maxFill = MB_FILL_PERTICK;
-        if (toFill.getItem() == Items.BUCKET) {
-            maxFill = FluidHelpers.BUCKET_VOLUME;
+        if (toFillItem.getItem() == Items.BUCKET) {
+            maxFill = IModHelpers.get().getFluidHelpers().getBucketVolume();
         }
-        if(!toFill.isEmpty() && toFill != toDrain.getContainer() && FluidUtil.getFluidHandler(toFill) != null
-                && player.getUseItemRemainingTicks() == 0 && FluidUtil.tryFillContainer(toFill, toDrain, Math.min(maxFill, tickFluid.getAmount()), player, false).isSuccess()) {
-            // We don't pass the player, because we don't want sounds to play.
-            return FluidUtil.tryFillContainer(toFill, toDrain, Math.min(maxFill, tickFluid.getAmount()), null, true).getResult();
+        ResourceHandler<FluidResource> toFillHandler = Capabilities.Fluid.ITEM.getCapability(toFill, null);
+        if(toFillHandler != null && toFillItem != toDrainItem
+                && player.getUseItemRemainingTicks() == 0) {
+            FluidStack moved = IModHelpers.get().getFluidHelpers().move(toDrain, toFillHandler, Math.min(maxFill, tickFluid.getAmount()), null, false, false);
+            return moved.isEmpty() ? ItemStack.EMPTY : toFill.getResource().toStack(toFill.getAmount());
         }
         return ItemStack.EMPTY;
     }

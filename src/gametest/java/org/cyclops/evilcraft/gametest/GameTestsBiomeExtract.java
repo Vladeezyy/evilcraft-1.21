@@ -2,14 +2,15 @@ package org.cyclops.evilcraft.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.component.DataComponentBiomeConfig;
@@ -26,16 +27,16 @@ public class GameTestsBiomeExtract {
         player.setPos(helper.absolutePos(POS).getBottomCenter());
         player.setXRot(90F);
         ItemStack biomeExtract = new ItemStack(RegistryEntries.ITEM_BIOME_EXTRACT);
-        biomeExtract.set(RegistryEntries.COMPONENT_BIOME.get(), new DataComponentBiomeConfig.BiomeHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "beach"), helper.getLevel().holderLookup(Registries.BIOME)));
+        biomeExtract.set(RegistryEntries.COMPONENT_BIOME.get(), new DataComponentBiomeConfig.BiomeHolder(Identifier.fromNamespaceAndPath("minecraft", "beach"), helper.getLevel().holderLookup(Registries.BIOME)));
         player.setItemInHand(InteractionHand.MAIN_HAND, biomeExtract);
         player.getItemInHand(InteractionHand.MAIN_HAND).use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 
         helper.succeedWhen(() -> {
-            helper.assertValueEqual(helper.getLevel().getBiome(helper.absolutePos(POS)).getRegisteredName(), "minecraft:beach", "Biome was not changed");
+            helper.assertValueEqual(helper.getLevel().getBiome(helper.absolutePos(POS)).getRegisteredName(), "minecraft:beach", Component.literal("Biome was not changed"));
         });
     }
 
-    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 150, batch = "biome_extract_tracking_player")
+    @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 150, environment = "evilcraft:biome_extract_tracking_player")
     public void testBiomeExtractThrowWithTrackingPlayer(GameTestHelper helper) {
         // Player that is tracking the chunk, and that has no channel for our biome update packet
         ServerPlayer trackingPlayer = helper.makeMockServerPlayerInLevel();
@@ -47,12 +48,12 @@ public class GameTestsBiomeExtract {
         player.setPos(helper.absolutePos(POS).getBottomCenter());
         player.setXRot(90F);
         ItemStack biomeExtract = new ItemStack(RegistryEntries.ITEM_BIOME_EXTRACT);
-        biomeExtract.set(RegistryEntries.COMPONENT_BIOME.get(), new DataComponentBiomeConfig.BiomeHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "beach"), helper.getLevel().holderLookup(Registries.BIOME)));
+        biomeExtract.set(RegistryEntries.COMPONENT_BIOME.get(), new DataComponentBiomeConfig.BiomeHolder(Identifier.fromNamespaceAndPath("minecraft", "beach"), helper.getLevel().holderLookup(Registries.BIOME)));
         player.setItemInHand(InteractionHand.MAIN_HAND, biomeExtract);
         player.getItemInHand(InteractionHand.MAIN_HAND).use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
 
         helper.succeedWhen(() -> {
-            helper.assertValueEqual(helper.getLevel().getBiome(helper.absolutePos(POS)).getRegisteredName(), "minecraft:beach", "Biome was not changed");
+            helper.assertValueEqual(helper.getLevel().getBiome(helper.absolutePos(POS)).getRegisteredName(), "minecraft:beach", Component.literal("Biome was not changed"));
         });
     }
 

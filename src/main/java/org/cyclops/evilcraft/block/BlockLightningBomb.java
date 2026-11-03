@@ -6,11 +6,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.evilcraft.entity.block.EntityLightningBombPrimed;
 import org.cyclops.evilcraft.entity.item.EntityLightningGrenade;
@@ -64,24 +65,24 @@ public class BlockLightningBomb extends Block {
     }
 
     @Override
-    public void neighborChanged(BlockState blockState, Level world, BlockPos blockPos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(blockState, world, blockPos, blockIn, fromPos, isMoving);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @org.jetbrains.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
 
-        if (world.hasNeighborSignal(blockPos)) {
-            this.destroy(world, blockPos, blockState.setValue(PRIMED, true));
-            world.removeBlock(blockPos, false);
+        if (level.hasNeighborSignal(pos)) {
+            this.destroy(level, pos, state.setValue(PRIMED, true));
+            level.removeBlock(pos, false);
         }
     }
 
     @Override
-    public void wasExploded(Level world, BlockPos blockPos, Explosion explosion) {
-        if (!world.isClientSide()) {
-            EntityLightningBombPrimed entityprimed = new EntityLightningBombPrimed(world,
-                    (double)((float)blockPos.getX() + 0.5F), (double)((float)blockPos.getY() + 0.5F),
-                    (double)((float)blockPos.getZ() + 0.5F), explosion.getIndirectSourceEntity());
-            entityprimed.setFuse(world.random.nextInt(entityprimed.getFuse() / 4) + entityprimed.getFuse() / 8);
-            world.addFreshEntity(entityprimed);
-            world.removeBlock(blockPos, false);
+    public void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
+        if (!level.isClientSide()) {
+            EntityLightningBombPrimed entityprimed = new EntityLightningBombPrimed(level,
+                    (double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F),
+                    (double)((float)pos.getZ() + 0.5F), explosion.getIndirectSourceEntity());
+            entityprimed.setFuse(level.getRandom().nextInt(entityprimed.getFuse() / 4) + entityprimed.getFuse() / 8);
+            level.addFreshEntity(entityprimed);
+            level.removeBlock(pos, false);
         }
     }
 
@@ -111,7 +112,7 @@ public class BlockLightningBomb extends Block {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack pStack, BlockState pState, Level world, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult pHitResult) {
+    protected InteractionResult useItemOn(ItemStack pStack, BlockState pState, Level world, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult pHitResult) {
         if (!player.getItemInHand(hand).isEmpty() &&
                 (player.getItemInHand(hand).getItem() == Items.FLINT_AND_STEEL || player.getItemInHand(hand).getItem() == Items.FIRE_CHARGE)) {
             this.primeBomb(world, blockPos, defaultBlockState().setValue(PRIMED, true), player);
@@ -119,7 +120,7 @@ public class BlockLightningBomb extends Block {
             if (world instanceof ServerLevel serverLevel) {
                 player.getItemInHand(hand).hurtAndBreak(1, serverLevel, player instanceof ServerPlayer serverPlayer ? serverPlayer : null, (e) -> {});
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         return super.useItemOn(pStack, pState, world, blockPos, player, hand, pHitResult);
     }

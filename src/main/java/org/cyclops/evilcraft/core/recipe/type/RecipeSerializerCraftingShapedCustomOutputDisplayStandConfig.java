@@ -4,9 +4,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.RecipeConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfigCommon;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.fabric.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -16,16 +18,16 @@ import org.cyclops.evilcraft.core.algorithm.Wrapper;
  * Config for display stands.
  * @author rubensworks
  */
-public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extends RecipeConfig<RecipeCraftingShapedCustomOutput> {
+public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extends RecipeConfigCommon<RecipeCraftingShapedCustomOutput, IModBase> {
 
     public RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_display_stand",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStack(RegistryEntries.BLOCK_DISPLAY_STAND.get()), (inventory, staticOutput) -> {
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DISPLAY_STAND), (inventory, staticOutput) -> {
                     Wrapper<ItemStack> plankWoodStack = new Wrapper<>(ItemStack.EMPTY);
                     for (int i = 0; i < inventory.size(); i++) {
                         int finalI = i;
-                        BuiltInRegistries.ITEM.getTag(ItemTags.PLANKS).ifPresent(tag -> {
+                        BuiltInRegistries.ITEM.get(ItemTags.PLANKS).ifPresent(tag -> {
                             tag.stream().forEach(holder -> {
                                 Item plankType = holder.value();
                                 ItemStack itemStack = inventory.getItem(finalI);
@@ -38,9 +40,9 @@ public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extend
                     if (plankWoodStack.get().isEmpty()) {
                         return null;
                     }
-                    BlockState plankWoodBlockState = BlockHelpers.getBlockStateFromItemStack(plankWoodStack.get());
+                    BlockState plankWoodBlockState = IModHelpers.get().getBlockHelpers().getBlockStateFromItemStack(plankWoodStack.get());
                     return RegistryEntries.BLOCK_DISPLAY_STAND.get().getTypedDisplayStandItem(plankWoodBlockState);
-                }));
+                }).getRecipeSerializer());
     }
 
 }

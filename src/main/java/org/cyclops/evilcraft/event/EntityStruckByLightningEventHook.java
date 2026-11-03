@@ -4,7 +4,10 @@ import org.cyclops.evilcraft.fabric.event.EntityStruckByLightningEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityWerewolf;
 import org.cyclops.evilcraft.entity.villager.VillagerProfessionWerewolfConfig;
@@ -58,11 +61,11 @@ public class EntityStruckByLightningEventHook {
                 event.setCanceled(true);
                 return;
             }
-            if(entity.level().random.nextBoolean()) {
+            if(entity.level().getRandom().nextBoolean()) {
                 event.setCanceled(false);
                 return; // 50% chance that they become a witch like vanilla does
             }
-            if(entity.getVillagerData().getProfession() != RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.get()) {
+            if(entity.getVillagerData().profession().is(RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.getKey())) {
                 event.setCanceled(true);
                 EntityWerewolf.initializeWerewolfVillagerData(entity);
             }

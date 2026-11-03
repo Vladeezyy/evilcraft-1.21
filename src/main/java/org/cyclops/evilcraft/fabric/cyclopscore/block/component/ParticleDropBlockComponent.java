@@ -2,13 +2,12 @@ package org.cyclops.evilcraft.fabric.cyclopscore.block.component;
 
 
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.client.particle.ParticleDropColoredData;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
  * Component that can show drops of a certain color underneath blocks.
@@ -57,14 +56,14 @@ public class ParticleDropBlockComponent implements IEntityDropParticleFXBlock {
     @Override
     public void randomDisplayTick(BlockState blockState, Level world, BlockPos blockPos, RandomSource rand) {
         if (rand.nextInt(chance) == 0 &&
-                (offset == 0 || BlockHelpers.doesBlockHaveSolidTopSurface(world, blockPos.offset(0, -offset, 0))) &&
+                (offset == 0 || IModHelpers.get().getBlockHelpers().doesBlockHaveSolidTopSurface(world, blockPos.offset(0, -offset, 0))) &&
                 !world.getBlockState(blockPos.offset(0, - offset - 1, 0)).blocksMotion()) {
             double px = (double) ((float) blockPos.getX() + rand.nextFloat());
             double py = (double) blockPos.getY() - 0.05D - offset;
             double pz = (double) ((float) blockPos.getZ() + rand.nextFloat());
 
-            Minecraft.getInstance().levelRenderer.addParticle(
-                    new ParticleDropColoredData(particleRed, particleGreen, particleBlue), false,
+            world.addParticle(
+                    new ParticleDropColoredData(particleRed, particleGreen, particleBlue),
                     px, py, pz, 0, 0, 0);
         }
     }

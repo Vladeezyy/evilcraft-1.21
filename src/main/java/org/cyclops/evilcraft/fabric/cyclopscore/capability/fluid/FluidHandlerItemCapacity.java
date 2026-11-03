@@ -2,85 +2,84 @@ package org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid;
 
 
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.SimpleFluidContent;
-import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidHandlerItemStack;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
-
-import javax.annotation.Nullable;
 
 /**
  * An itemfluid handler with a mutable capacity.
  * @author rubensworks
  */
-public class FluidHandlerItemCapacity extends FluidHandlerItemStack implements IFluidHandlerItemCapacity, IFluidHandlerMutable {
+public class FluidHandlerItemCapacity extends ItemAccessFluidHandler implements IFluidHandlerCapacity {
 
     private final Fluid fluid;
     private final int capacityDefault;
 
     /**
-     * @param container The container itemStack, data is stored on it directly as NBT.
+     * @param itemAccess The container item, data is stored on it directly as NBT.
      * @param capacity  The maximum capacity of this fluid tank.
      */
-    public FluidHandlerItemCapacity(ItemStack container, int capacity) {
-        this(container, capacity, null);
+    public FluidHandlerItemCapacity(ItemAccess itemAccess, int capacity) {
+        this(itemAccess, capacity, null);
     }
 
     /**
-     * @param container The container itemStack, data is stored on it directly as NBT.
+     * @param itemAccess The container item, data is stored on it directly as NBT.
      * @param capacity  The maximum capacity of this fluid tank.
      * @param fluid     The accepted fluid.
      */
-    public FluidHandlerItemCapacity(ItemStack container, int capacity, Fluid fluid) {
-        super(RegistryEntries.COMPONENT_FLUID_CONTENT, container, capacity);
+    public FluidHandlerItemCapacity(ItemAccess itemAccess, int capacity, Fluid fluid) {
+        super(itemAccess, RegistryEntries.COMPONENT_FLUID_CONTENT.get(), capacity);
         this.fluid = fluid;
         this.capacityDefault = capacity;
     }
 
     @Override
-    public boolean canFillFluidType(FluidStack resource) {
-        return fluid == null || resource == null || fluid == resource.getFluid();
+    public boolean isValid(int index, FluidResource resource) {
+        return super.isValid(index, resource) && fluid == null || fluid == resource.getFluid();
     }
 
     @Override
-    protected void setFluid(FluidStack fluid) {
-        // super.setFluid(fluid); // We override the implementation completely to avoid NBT saving for empty fluids
-
-        if (fluid.isEmpty()) {
-            this.container.remove(this.componentType.get());
-        } else {
-            this.container.set(this.componentType.get(), SimpleFluidContent.copyOf(fluid));
+    protected ItemResource update(ItemResource accessResource, int index, FluidResource newResource, int newAmount) {
+        this.capacity = getTankCapacity(0); // Force overriding protected capacity field as soon as possible.
+        if (newAmount == 0) {
+            // We override the implementation completely to avoid NBT saving for empty fluids
+            return accessResource.without(this.component);
         }
+        return super.update(accessResource, index, newResource, newAmount);
     }
 
     @Override
-    public void setCapacity(int capacity) {
+    public void setTankCapacity(int tank, int capacity, TransactionContext transaction) {
         if (capacity == this.capacityDefault) {
-            getContainer().remove(RegistryEntries.COMPONENT_CAPACITY.get());
+            itemAccess.exchange(itemAccess.getResource().without(RegistryEntries.COMPONENT_CAPACITY.get()), itemAccess.getAmount(), transaction);
         } else {
-            getContainer().set(RegistryEntries.COMPONENT_CAPACITY.get(), capacity);
+            itemAccess.exchange(itemAccess.getResource().with(RegistryEntries.COMPONENT_CAPACITY.get(), capacity), itemAccess.getAmount(), transaction);
         }
         this.capacity = capacity;
     }
 
     @Override
-    public int getCapacity() {
-        return getContainer().has(RegistryEntries.COMPONENT_CAPACITY.get()) ? getContainer().get(RegistryEntries.COMPONENT_CAPACITY.get()) : this.capacity;
-    }
-
-    @Nullable
-    @Override
-    public FluidStack getFluid() {
-        this.capacity = getCapacity(); // Force overriding protected capacity field as soon as possible.
-        return super.getFluid();
+    public int getTankCapacity(int tank) {
+        return itemAccess.getAmount() * itemAccess.getResource().getOrDefault(RegistryEntries.COMPONENT_CAPACITY.get(), this.capacity);
     }
 
     @Override
-    public void setFluidInTank(int tank, FluidStack fluidStack) {
-        if (tank == 0) {
-            setFluid(fluidStack);
-        }
+    protected int getCapacity(int index, FluidResource resource) {
+        return getTankCapacity(index);
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, FluidResource resource) {
+        return (long) itemAccess.getAmount() * itemAccess.getResource().getOrDefault(RegistryEntries.COMPONENT_CAPACITY.get(), this.capacity);
+    }
+
+    @Override
+    public int getCapacityAsInt(int index, FluidResource resource) {
+        return getTankCapacity(index);
     }
 }

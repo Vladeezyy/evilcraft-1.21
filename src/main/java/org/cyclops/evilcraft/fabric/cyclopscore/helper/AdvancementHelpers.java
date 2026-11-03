@@ -6,13 +6,13 @@ import com.google.common.collect.Sets;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientAdvancements;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.fabricmc.api.EnvType;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
-import org.cyclops.evilcraft.EvilCraft;
+import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.RequestPlayerAdvancementUnlockedPacket;
 
 import java.util.Set;
@@ -23,24 +23,24 @@ import java.util.Set;
  */
 public class AdvancementHelpers {
 
-    public static final Set<ResourceLocation> ACHIEVED_ADVANCEMENTS = Sets.newHashSet();
+    public static final Set<Identifier> ACHIEVED_ADVANCEMENTS = Sets.newHashSet();
 
     public static boolean hasAdvancementUnlocked(Player player, AdvancementHolder advancement) {
         return player instanceof ServerPlayer
-                && ((ServerPlayer) player).server.getPlayerList()
+                && ServerLifecycleHooks.getCurrentServer().getPlayerList()
                 .getPlayerAdvancements((ServerPlayer) player).getOrStartProgress(advancement).isDone();
     }
 
-    public static boolean hasAdvancementUnlocked(Player player, ResourceLocation advancementId) {
+    public static boolean hasAdvancementUnlocked(Player player, Identifier advancementId) {
         return ACHIEVED_ADVANCEMENTS.contains(advancementId);
     }
 
-    public static void requestAdvancementUnlockInfo(ResourceLocation advancementId) {
-        EvilCraft._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
+    public static void requestAdvancementUnlockInfo(Identifier advancementId) {
+        CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
     }
 
-    public static AdvancementHolder getAdvancement(EnvType dist, ResourceLocation resourceLocation) {
-        if (dist == EnvType.CLIENT) {
+    public static AdvancementHolder getAdvancement(Dist dist, Identifier resourceLocation) {
+        if (dist.isClient()) {
             return getAdvancementManagerClient().get(resourceLocation);
         }
         return getAdvancementManagerServer().get(resourceLocation);

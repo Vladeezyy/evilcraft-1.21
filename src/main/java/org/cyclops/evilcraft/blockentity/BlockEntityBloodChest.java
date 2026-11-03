@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.ContainerUser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,11 +21,12 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.item.ItemHandlerSlotMasked;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.InventorySlotMasked;
+import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.tickaction.EmptyFluidContainerInTankTickAction;
@@ -70,22 +72,26 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = FluidHelpers.BUCKET_VOLUME * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpers.get().getFluidHelpers().getBucketVolume() * 10;
 
     private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
+        @Override
         protected void onOpen(Level level, BlockPos pos, BlockState blockState) {
             BlockEntityBloodChest.playSound(level, pos, blockState, SoundEvents.CHEST_OPEN);
         }
 
+        @Override
         protected void onClose(Level level, BlockPos pos, BlockState blockState) {
             BlockEntityBloodChest.playSound(level, pos, blockState, SoundEvents.CHEST_CLOSE);
         }
 
+        @Override
         protected void openerCountChanged(Level level, BlockPos pos, BlockState blockState, int p_155364_, int p_155365_) {
             BlockEntityBloodChest.this.signalOpenCount(level, pos, blockState, p_155364_, p_155365_);
         }
 
-        protected boolean isOwnContainer(Player player) {
+        @Override
+        public boolean isOwnContainer(Player player) {
             if (!(player.containerMenu instanceof ContainerBloodChest)) {
                 return false;
             } else {
@@ -122,11 +128,11 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
         @Override
         public void registerTankInventoryCapabilitiesItem() {
             add(
-                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK,
-                    (blockEntity, direction) -> new ItemHandlerSlotMasked(
+                    org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK,
+                    (blockEntity, direction) -> VanillaContainerWrapper.of(new InventorySlotMasked(
                             blockEntity.getInventory(),
                             (direction == Direction.UP || direction == Direction.DOWN) ? IntStream.range(0, SLOTS_CHEST).toArray() : new int[]{SLOT_CONTAINER}
-                    )
+                    ))
             );
         }
     }
@@ -137,7 +143,7 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
         if (getLevel() == null) {
             return Direction.SOUTH;
         }
-        return BlockHelpers.getSafeBlockStateProperty(getBlockState(), org.cyclops.evilcraft.block.BlockBloodChest.FACING, Direction.SOUTH).getOpposite();
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(getBlockState(), org.cyclops.evilcraft.block.BlockBloodChest.FACING, Direction.SOUTH).getOpposite();
     }
 
     @Override
@@ -158,13 +164,13 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
             }
 
             @Override
-            public void startOpen(Player entityPlayer) {
+            public void startOpen(ContainerUser entityPlayer) {
                 super.startOpen(entityPlayer);
                 BlockEntityBloodChest.this.startOpen(entityPlayer);
             }
 
             @Override
-            public void stopOpen(Player entityPlayer) {
+            public void stopOpen(ContainerUser entityPlayer) {
                 super.stopOpen(entityPlayer);
                 BlockEntityBloodChest.this.stopOpen(entityPlayer);
             }
@@ -188,7 +194,7 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
     }
 
     static void playSound(Level level, BlockPos pos, BlockState blockState, SoundEvent soundEvent) {
-        level.playSound((Player)null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, soundEvent, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
+        level.playSound((Player)null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, soundEvent, SoundSource.BLOCKS, 0.5F, level.getRandom().nextFloat() * 0.1F + 0.9F);
     }
 
     @Override
@@ -201,16 +207,16 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
         }
     }
 
-    public void startOpen(Player player) {
-        if (!this.remove && !player.isSpectator()) {
-            this.openersCounter.incrementOpeners(player, this.getLevel(), this.getBlockPos(), this.getBlockState());
+    public void startOpen(ContainerUser player) {
+        if (!this.remove) {
+            this.openersCounter.incrementOpeners(player.getLivingEntity(), this.getLevel(), this.getBlockPos(), this.getBlockState(), player.getContainerInteractionRange());
         }
 
     }
 
-    public void stopOpen(Player player) {
-        if (!this.remove && !player.isSpectator()) {
-            this.openersCounter.decrementOpeners(player, this.getLevel(), this.getBlockPos(), this.getBlockState());
+    public void stopOpen(ContainerUser player) {
+        if (!this.remove) {
+            this.openersCounter.decrementOpeners(player.getLivingEntity(), this.getLevel(), this.getBlockPos(), this.getBlockState());
         }
     }
 

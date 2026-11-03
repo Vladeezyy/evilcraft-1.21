@@ -1,23 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "#c:ingots/gold",
     {
-      "tag": "c:ingots/gold"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"
         ]
       }
     },
-    {
-      "tag": "c:ingots/gold"
-    }
+    "#c:ingots/gold"
   ],
   "result": {
     "id": "evilcraft:broom_part",

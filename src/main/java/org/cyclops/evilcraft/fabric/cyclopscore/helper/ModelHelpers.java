@@ -3,22 +3,31 @@ package org.cyclops.evilcraft.fabric.cyclopscore.helper;
 
 
 import com.google.common.collect.Maps;
+import com.mojang.math.Transformation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemTransform;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.renderer.block.dispatch.SingleVariant;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.ItemDisplayContext;
-import org.cyclops.evilcraft.fabric.client.model.ModelData;
-import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +62,10 @@ public final class ModelHelpers {
             new Vector3f(0, 0, 0),
             new Vector3f(0, 0, 0),
             new Vector3f(0.5f, 0.5f, 0.5f));
+    public static final ItemTransform ON_SHELF = new ItemTransform(
+            new Vector3f(0, 0, 0),
+            new Vector3f(0, 0, 0),
+            new Vector3f(0.5f, 0.5f, 0.5f));
     public static final ItemTransform GUI = new ItemTransform(
             new Vector3f(30, 225, 0),
             new Vector3f(0, 0, 0),
@@ -65,8 +78,10 @@ public final class ModelHelpers {
             HEAD,
             GUI,
             GROUND,
-            FIXED
+            FIXED,
+            ON_SHELF
     );
+    public static final Map<ItemDisplayContext, ModelState> DEFAULT_MODEL_STATES = convertModelState(DEFAULT_CAMERA_TRANSFORMS);
 
     public static final ItemTransform THIRD_PERSON_RIGHT_HAND_ITEM = new ItemTransform(
             new Vector3f(0, 0, 0),
@@ -93,6 +108,10 @@ public final class ModelHelpers {
             new Vector3f(0, 0, 0),
             new Vector3f(0, 0, 0),
             new Vector3f(1f, 1f, 1f));
+    public static final ItemTransform ON_SHELF_ITEM = new ItemTransform(
+            new Vector3f(0, 0, 0),
+            new Vector3f(0, 0, 0),
+            new Vector3f(1f, 1f, 1f));
     public static final ItemTransform GUI_ITEM = new ItemTransform(
             new Vector3f(0, 0, 0),
             new Vector3f(0, 0, 0),
@@ -105,7 +124,8 @@ public final class ModelHelpers {
             HEAD_ITEM,
             GUI_ITEM,
             GROUND_ITEM,
-            FIXED_ITEM
+            FIXED_ITEM,
+            ON_SHELF_ITEM
     );
 
     // An empty list^2 for quads.
@@ -118,15 +138,15 @@ public final class ModelHelpers {
     }
 
     /**
-     * Read the given model location to a {@link BlockModel}.
+     * Read the given model location to a {@link CuboidModel}.
      * @param modelLocation A model location (without .json suffix)
      * @return The corresponding model.
      * @throws IOException If the model file was invalid.
      */
-    public static BlockModel loadModelBlock(ResourceLocation modelLocation) throws IOException {
+    public static CuboidModel loadModelBlock(Identifier modelLocation) throws IOException {
         Resource resource = Minecraft.getInstance().getResourceManager().getResource(
-                ResourceLocation.fromNamespaceAndPath(modelLocation.getNamespace(), modelLocation.getPath() + ".json")).get();
-        return BlockModel.fromStream(resource.openAsReader());
+                Identifier.fromNamespaceAndPath(modelLocation.getNamespace(), modelLocation.getPath() + ".json")).get();
+        return CuboidModel.fromStream(resource.openAsReader());
     }
 
     /**
@@ -167,8 +187,41 @@ public final class ModelHelpers {
                 overrides.getOrDefault(ItemDisplayContext.HEAD, HEAD),
                 overrides.getOrDefault(ItemDisplayContext.GUI, GUI),
                 overrides.getOrDefault(ItemDisplayContext.GROUND, GROUND),
-                overrides.getOrDefault(ItemDisplayContext.FIXED, FIXED)
+                overrides.getOrDefault(ItemDisplayContext.FIXED, FIXED),
+                overrides.getOrDefault(ItemDisplayContext.ON_SHELF, ON_SHELF)
         );
 
+    }
+
+    private static Map<ItemDisplayContext, ModelState> convertModelState(ItemTransforms itemTransforms) {
+        Map<ItemDisplayContext, ModelState> map = new EnumMap<>(ItemDisplayContext.class);
+        for (ItemDisplayContext key : ItemDisplayContext.values()) {
+            ItemTransform itemTransform = itemTransforms.getTransform(key);
+            Transformation transformation = new Transformation(
+                    new Vector3f(itemTransform.translation()),
+                    eulerToQuaternion(itemTransform.rotation()),
+                    new Vector3f(itemTransform.scale()),
+                    eulerToQuaternion(itemTransform.rightRotation())
+            );
+            map.put(key, new ModelState() {
+                @Override
+                public Transformation transformation() {
+                    return transformation;
+                }
+            });
+        }
+        return map;
+    }
+
+    public static Quaternionf eulerToQuaternion(Vector3fc euler) {
+        return new Quaternionf().rotationXYZ(
+                (float) Math.toRadians(euler.x()),
+                (float) Math.toRadians(euler.y()),
+                (float) Math.toRadians(euler.z())
+        );
+    }
+
+    public static BlockStateModel bakeSingleBlockStateModel(ModelBaker baker, Identifier id, ModelState modelState) {
+        return new SingleVariant(SimpleModelWrapper.bake(baker, id, modelState));
     }
 }

@@ -13,7 +13,8 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.MonsterRoomFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import net.neoforged.neoforge.common.MonsterRoomHooks;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 
@@ -95,9 +96,9 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
                             world.removeBlock(loopPos, false);
                         } else if (world.getBlockState(loopPos).isSolid()) {
                             if (yr == y - 1 && random.nextInt(4) != 0) {
-                                world.setBlock(loopPos, RegistryEntries.BLOCK_BLOODY_COBBLESTONE.get().defaultBlockState(), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+                                world.setBlock(loopPos, RegistryEntries.BLOCK_BLOODY_COBBLESTONE.get().defaultBlockState(), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
                             } else {
-                                world.setBlock(loopPos, Blocks.COBBLESTONE.defaultBlockState(), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+                                world.setBlock(loopPos, Blocks.COBBLESTONE.defaultBlockState(), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
                             }
                         }
                     }
@@ -127,7 +128,7 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
                         ++wallCounter;
 
                     if (wallCounter == 1) {
-                        world.setBlock(loopPos, Blocks.CHEST.defaultBlockState(), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+                        world.setBlock(loopPos, Blocks.CHEST.defaultBlockState(), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
                          // Static method used instead of manual tile fetch -> member setLootTable to provide compatibility with Lootr.
                         RandomizableContainer.setBlockEntityLootTable(world, random, loopPos, BuiltInLootTables.SIMPLE_DUNGEON);
 
@@ -140,7 +141,7 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
             for(int xs = x - 1; xs <= x + 1; xs += 2) {
                 for(int zs = z - 1; zs <= z + 1; zs += 2) {
                     BlockPos loopPos = new BlockPos(xs, y, zs);
-                    world.setBlock(loopPos, Blocks.SPAWNER.defaultBlockState(), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+                    world.setBlock(loopPos, Blocks.SPAWNER.defaultBlockState(), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
                     BlockEntity tile = world.getBlockEntity(loopPos);
 
                     if (tile instanceof SpawnerBlockEntity) {

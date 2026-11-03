@@ -15,7 +15,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -34,12 +34,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.evilcraft.ExtendedDamageSources;
-import org.cyclops.evilcraft.GeneralConfig;
-import org.cyclops.evilcraft.Reference;
-import org.cyclops.evilcraft.RegistryEntries;
+import net.neoforged.bus.api.EventPriority;
+import org.cyclops.evilcraft.fabric.CommonHooks;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.*;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 import org.cyclops.evilcraft.core.broom.PotionEffectBroomCollision;
 import org.cyclops.evilcraft.entity.item.EntityBroom;
@@ -106,88 +109,88 @@ public class BroomModifiers {
     protected static void loadPre() {
         // Base modifiers
         MODIFIER_COUNT = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "modifier_count"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "modifier_count"),
                 BroomModifier.Type.ADDITIVE, 0F, 1F, 3, true,
-                ChatFormatting.BOLD, Helpers.RGBToInt(0, 0, 0)));
+                ChatFormatting.BOLD, IModHelpers.get().getBaseHelpers().RGBToInt(0, 0, 0)));
         REGISTRY.overrideDefaultModifierPart(MODIFIER_COUNT, null);
         SPEED = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "speed"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "speed"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, true,
-                ChatFormatting.RED, Helpers.RGBToInt(230, 20, 20)));
+                ChatFormatting.RED, IModHelpers.get().getBaseHelpers().RGBToInt(230, 20, 20)));
         ACCELERATION = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "acceleration"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "acceleration"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, true,
-                ChatFormatting.DARK_GRAY, Helpers.RGBToInt(20, 20, 20)));
+                ChatFormatting.DARK_GRAY, IModHelpers.get().getBaseHelpers().RGBToInt(20, 20, 20)));
         MANEUVERABILITY = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "maneuverability"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "maneuverability"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, true,
-                ChatFormatting.YELLOW, Helpers.RGBToInt(160, 160, 20)));
+                ChatFormatting.YELLOW, IModHelpers.get().getBaseHelpers().RGBToInt(160, 160, 20)));
         LEVITATION = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "levitation"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "levitation"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, true,
-                ChatFormatting.WHITE, Helpers.RGBToInt(230, 230, 230)));
+                ChatFormatting.WHITE, IModHelpers.get().getBaseHelpers().RGBToInt(230, 230, 230)));
 
         // Optional modifiers
         DAMAGE = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "damage"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "damage"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, false,
-                ChatFormatting.GRAY, Helpers.RGBToInt(100, 100, 100)));
+                ChatFormatting.GRAY, IModHelpers.get().getBaseHelpers().RGBToInt(100, 100, 100)));
         PARTICLES = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "particles"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "particles"),
                 BroomModifier.Type.ADDITIVE, 0F, 50F, 1, false,
-                ChatFormatting.LIGHT_PURPLE, Helpers.RGBToInt(160, 20, 160)));
+                ChatFormatting.LIGHT_PURPLE, IModHelpers.get().getBaseHelpers().RGBToInt(160, 20, 160)));
         FLAME = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "flame"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "flame"),
                 BroomModifier.Type.ADDITIVE, 0F, 4F, 3, false,
-                ChatFormatting.GOLD, Helpers.RGBToInt(100, 100, 0)));
+                ChatFormatting.GOLD, IModHelpers.get().getBaseHelpers().RGBToInt(100, 100, 0)));
         SMASH = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "smash"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "smash"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 2, false,
-                ChatFormatting.AQUA, Helpers.RGBToInt(20, 60, 60)));
+                ChatFormatting.AQUA, IModHelpers.get().getBaseHelpers().RGBToInt(20, 60, 60)));
         BOUNCY = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "bouncy"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "bouncy"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.GREEN, Helpers.RGBToInt(20, 200, 60)));
+                ChatFormatting.GREEN, IModHelpers.get().getBaseHelpers().RGBToInt(20, 200, 60)));
         WITHERER = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "witherer"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "witherer"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.DARK_GRAY, Helpers.RGBToInt(20, 20, 20)));
+                ChatFormatting.DARK_GRAY, IModHelpers.get().getBaseHelpers().RGBToInt(20, 20, 20)));
         HUNGERER = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "hungerer"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "hungerer"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.DARK_GREEN, Helpers.RGBToInt(20, 120, 20)));
+                ChatFormatting.DARK_GREEN, IModHelpers.get().getBaseHelpers().RGBToInt(20, 120, 20)));
         KAMIKAZE = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "kamikaze"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "kamikaze"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.DARK_GREEN, Helpers.RGBToInt(20, 120, 20)));
+                ChatFormatting.DARK_GREEN, IModHelpers.get().getBaseHelpers().RGBToInt(20, 120, 20)));
         WITHERSHIELD = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "withershield"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "withershield"),
                 BroomModifier.Type.ADDITIVE, 0F, 5F, 4, false,
-                ChatFormatting.DARK_BLUE, Helpers.RGBToInt(20, 20, 120)));
+                ChatFormatting.DARK_BLUE, IModHelpers.get().getBaseHelpers().RGBToInt(20, 20, 120)));
         STURDYNESS = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "sturdyness"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "sturdyness"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, false,
-                ChatFormatting.GRAY, Helpers.RGBToInt(100, 100, 100)));
+                ChatFormatting.GRAY, IModHelpers.get().getBaseHelpers().RGBToInt(100, 100, 100)));
         /*LUCK = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "luck"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "luck"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, false,
-                TextFormatting.BLUE, Helpers.RGBToInt(30, 20, 210)));*/
+                TextFormatting.BLUE, IModHelpers.get().getBaseHelpers().RGBToInt(30, 20, 210)));*/
         EFFICIENCY = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "efficiency"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "efficiency"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.DARK_RED, Helpers.RGBToInt(92, 29, 29)));
+                ChatFormatting.DARK_RED, IModHelpers.get().getBaseHelpers().RGBToInt(92, 29, 29)));
         SWIMMING = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "swimming"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "swimming"),
                 BroomModifier.Type.ADDITIVE, 0F, 100F, 3, false,
-                ChatFormatting.AQUA, Helpers.RGBToInt(150, 150, 235)));
+                ChatFormatting.AQUA, IModHelpers.get().getBaseHelpers().RGBToInt(150, 150, 235)));
         ICY = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "icy"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "icy"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.WHITE, Helpers.RGBToInt(220, 220, 240)));
+                ChatFormatting.WHITE, IModHelpers.get().getBaseHelpers().RGBToInt(220, 220, 240)));
         STICKY = REGISTRY.registerModifier(new BroomModifier(
-                ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "sticky"),
+                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "sticky"),
                 BroomModifier.Type.ADDITIVE, 0F, 10F, 3, false,
-                ChatFormatting.GOLD, Helpers.RGBToInt(78, 58, 12)));
+                ChatFormatting.GOLD, IModHelpers.get().getBaseHelpers().RGBToInt(78, 58, 12)));
 
         // Set modifier events
         DAMAGE.addCollisionListener(new BroomModifier.ICollisionListener() {
@@ -261,11 +264,11 @@ public class BroomModifiers {
                                             // Destroy the block
                                             if (!broom.level().isClientSide()) {
                                                 ServerPlayer playerMp = (ServerPlayer) player;
-                                                BlockEvent.BreakEvent breakEvent = CommonHooks.fireBlockBreak(world, playerMp.gameMode.getGameModeForPlayer(), (ServerPlayer) player, pos, blockState);
+                                                BreakBlockEvent breakEvent = CommonHooks.fireBlockBreak(world, playerMp.gameMode.getGameModeForPlayer(), (ServerPlayer) player, pos, blockState);
                                                 if (!breakEvent.isCanceled()) {
                                                     // Block breaking sequence
                                                     block.playerWillDestroy(world, pos, blockState, player);
-                                                    if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
+                                                    if(block.onDestroyedByPlayer(blockState, world, pos, player, broom.getBroomStack(), true, fluidState)) {
                                                         block.destroy(world, pos, blockState);
                                                         block.playerDestroy(world, player, pos, blockState, world.getBlockEntity(pos), ItemStack.EMPTY);
                                                     }
@@ -276,7 +279,7 @@ public class BroomModifiers {
                                             } else if (Minecraft.getInstance().hitResult.getType() == HitResult.Type.BLOCK) {
                                                 // Play sound and client-side block breaking sequence
                                                 world.globalLevelEvent(2001, pos, Block.getId(blockState));
-                                                if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
+                                                if(block.onDestroyedByPlayer(blockState, world, pos, player, broom.getBroomStack(), true, fluidState)) {
                                                     block.destroy(world, pos, blockState);
                                                 }
 
@@ -334,7 +337,7 @@ public class BroomModifiers {
                 }
             }
         });
-        ICY.addCollisionListener(new PotionEffectBroomCollision(MobEffects.MOVEMENT_SLOWDOWN, 2));
+        ICY.addCollisionListener(new PotionEffectBroomCollision(MobEffects.SLOWNESS, 2));
         STICKY.addCollisionListener(new BroomModifier.ICollisionListener() {
             @Override
             public void onCollide(EntityBroom broom, Entity entity, float modifierValue) {
@@ -378,10 +381,10 @@ public class BroomModifiers {
         REGISTRY.registerModifiersItem(BOUNCY, 1F, () -> new ItemStack(Items.SLIME_BALL));
         REGISTRY.registerModifiersItem(BOUNCY, 9F, () -> new ItemStack(Blocks.SLIME_BLOCK));
 
-        registerModifierTagItem(STURDYNESS, 1F, ResourceLocation.fromNamespaceAndPath("c", "stones"));
+        registerModifierTagItem(STURDYNESS, 1F, Identifier.fromNamespaceAndPath("c", "stones"));
         REGISTRY.registerModifiersItem(STURDYNESS, 10F, () -> new ItemStack(Blocks.OBSIDIAN));
 
-        registerModifierTagItem(EFFICIENCY, 1F, ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "gems/dark_power"));
+        registerModifierTagItem(EFFICIENCY, 1F, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "gems/dark_power"));
 
         REGISTRY.registerModifiersItem(SWIMMING, 1F, () -> new ItemStack(Items.PRISMARINE_SHARD));
         REGISTRY.registerModifiersItem(SWIMMING, 4F, () -> new ItemStack(Blocks.PRISMARINE));
@@ -406,14 +409,14 @@ public class BroomModifiers {
                 && event.getContainer().getSource().getDirectEntity() instanceof Projectile) {
             EntityBroom broom = (EntityBroom) event.getEntity().getVehicle();
             float modifierValue = broom.getModifier(BroomModifiers.WITHERSHIELD);
-            if (modifierValue > 0 && modifierValue > broom.level().random.nextInt((int) BroomModifiers.WITHERSHIELD.getMaxTierValue())) {
+            if (modifierValue > 0 && modifierValue > broom.level().getRandom().nextInt((int) BroomModifiers.WITHERSHIELD.getMaxTierValue())) {
                 event.getContainer().setNewDamage(0);
             }
         }
     }
 
-    public static void registerModifierTagItem(BroomModifier modifier, float value, ResourceLocation name) {
-        Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, name));
+    public static void registerModifierTagItem(BroomModifier modifier, float value, Identifier name) {
+        Optional<HolderSet.Named<Item>> tag = BuiltInRegistries.ITEM.get(TagKey.create(Registries.ITEM, name));
         if (tag.isPresent()) {
             tag.get().stream().forEach(holder -> REGISTRY.registerModifiersItem(modifier, value, () -> new ItemStack(holder.value())));
         } else {

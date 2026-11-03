@@ -1,14 +1,10 @@
 package org.cyclops.evilcraft.entity.item;
 
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 /**
@@ -16,7 +12,7 @@ import org.cyclops.evilcraft.EvilCraft;
  * @author rubensworks
  *
  */
-public class EntityLightningGrenadeConfig extends EntityConfig<EntityLightningGrenade> {
+public class EntityLightningGrenadeConfig extends EntityConfigCommon<IModBase, EntityLightningGrenade> {
 
     public EntityLightningGrenadeConfig() {
         super(
@@ -26,9 +22,8 @@ public class EntityLightningGrenadeConfig extends EntityConfig<EntityLightningGr
         );
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public EntityRenderer<EntityLightningGrenade> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
-        return new ThrownItemRenderer<>(renderContext);
+    public EntityClientConfig<IModBase, EntityLightningGrenade> constructEntityClientConfig() {
+        return new EntityLightningGrenadeConfigClient(this);
     }
 }

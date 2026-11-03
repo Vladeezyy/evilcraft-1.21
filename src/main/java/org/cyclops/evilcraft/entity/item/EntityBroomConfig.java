@@ -1,22 +1,18 @@
 package org.cyclops.evilcraft.entity.item;
 
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.evilcraft.client.render.entity.RenderBroom;
 
 /**
  * Config for the {@link EntityBroom}.
  * @author rubensworks
  *
  */
-public class EntityBroomConfig extends EntityConfig<EntityBroom> {
+public class EntityBroomConfig extends EntityConfigCommon<IModBase, EntityBroom> {
 
     public EntityBroomConfig() {
         super(
@@ -28,9 +24,8 @@ public class EntityBroomConfig extends EntityConfig<EntityBroom> {
         );
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public EntityRenderer<EntityBroom> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
-        return new RenderBroom(renderContext, this);
+    public EntityClientConfig<IModBase, EntityBroom> constructEntityClientConfig() {
+        return new EntityBroomConfigClient(this);
     }
 }

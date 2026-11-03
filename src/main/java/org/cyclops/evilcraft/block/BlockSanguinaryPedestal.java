@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.cyclops.evilcraft.fabric.cyclopscore.block.BlockWithEntity;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.block.BlockWithEntity;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntitySanguinaryPedestal;
 import org.cyclops.evilcraft.core.block.IBlockRarityProvider;
@@ -47,7 +47,7 @@ public class BlockSanguinaryPedestal extends BlockWithEntity implements IBlockRa
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_SANGUINARY_PEDESTAL.get(), new BlockEntitySanguinaryPedestal.TickerServer());
+        return level.isClientSide() ? null : createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_SANGUINARY_PEDESTAL.get(), new BlockEntitySanguinaryPedestal.TickerServer());
     }
 
     public int getTier() {
@@ -61,19 +61,19 @@ public class BlockSanguinaryPedestal extends BlockWithEntity implements IBlockRa
 
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult p_225533_6_) {
-        BlockEntityHelpers.get(worldIn, pos, BlockEntitySanguinaryPedestal.class)
+        IModHelpers.get().getBlockEntityHelpers().get(worldIn, pos, BlockEntitySanguinaryPedestal.class)
                 .ifPresent(tile -> {
-                    player.displayClientMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
+                    player.sendOverlayMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
                             .append(" / ")
                             .append(String.format(Locale.ROOT, "%,d", tile.getTank().getCapacity()))
-                            .append(" mB"), true);
+                            .append(" mB"));
                 });
         return super.useWithoutItem(state, worldIn, pos, player, p_225533_6_);
     }
 
     @Override
     public int getDefaultCapacity() {
-        return FluidHelpers.BUCKET_VOLUME * BlockEntitySanguinaryPedestal.TANK_BUCKETS;
+        return IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntitySanguinaryPedestal.TANK_BUCKETS;
     }
 
     @Override

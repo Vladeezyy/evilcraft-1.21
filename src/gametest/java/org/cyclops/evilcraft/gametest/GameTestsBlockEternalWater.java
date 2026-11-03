@@ -2,7 +2,6 @@ package org.cyclops.evilcraft.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -11,6 +10,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
@@ -25,11 +25,11 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterAutoOutputEnabled(GameTestHelper helper) {
         // Place eternal water block
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
 
         // Place an empty dark tank below to catch water
         helper.setBlock(POS.below(), RegistryEntries.BLOCK_DARK_TANK.get());
-        BlockEntityDarkTank tank = helper.getBlockEntity(POS.below());
+        BlockEntityDarkTank tank = helper.getBlockEntity(POS.below(), BlockEntityDarkTank.class);
 
         helper.succeedWhen(() -> {
             // Check that eternal water block is enabled by default
@@ -45,7 +45,7 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterToggleDisable(GameTestHelper helper) {
         // Place eternal water block
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
 
         // Create a player to interact with the block
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -71,7 +71,7 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterToggleEnable(GameTestHelper helper) {
         // Place eternal water block and disable it
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
         eternalWater.setEnabled(false);
 
         // Create a player to interact with the block
@@ -98,12 +98,12 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterNoOutputWhenDisabled(GameTestHelper helper) {
         // Place eternal water block and disable it
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
         eternalWater.setEnabled(false);
 
         // Place an empty dark tank below
         helper.setBlock(POS.below(), RegistryEntries.BLOCK_DARK_TANK.get());
-        BlockEntityDarkTank tank = helper.getBlockEntity(POS.below());
+        BlockEntityDarkTank tank = helper.getBlockEntity(POS.below(), BlockEntityDarkTank.class);
 
         // Wait for a few ticks to ensure ticker runs
         helper.runAfterDelay(150, () -> {
@@ -121,7 +121,7 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterOutputMultipleDirections(GameTestHelper helper) {
         // Place eternal water block
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
 
         // Place empty dark tanks in multiple directions
         helper.setBlock(POS.below(), RegistryEntries.BLOCK_DARK_TANK.get());
@@ -131,12 +131,12 @@ public class GameTestsBlockEternalWater {
         helper.setBlock(POS.east(), RegistryEntries.BLOCK_DARK_TANK.get());
         helper.setBlock(POS.west(), RegistryEntries.BLOCK_DARK_TANK.get());
 
-        BlockEntityDarkTank tankBelow = helper.getBlockEntity(POS.below());
-        BlockEntityDarkTank tankAbove = helper.getBlockEntity(POS.above());
-        BlockEntityDarkTank tankNorth = helper.getBlockEntity(POS.north());
-        BlockEntityDarkTank tankSouth = helper.getBlockEntity(POS.south());
-        BlockEntityDarkTank tankEast = helper.getBlockEntity(POS.east());
-        BlockEntityDarkTank tankWest = helper.getBlockEntity(POS.west());
+        BlockEntityDarkTank tankBelow = helper.getBlockEntity(POS.below(), BlockEntityDarkTank.class);
+        BlockEntityDarkTank tankAbove = helper.getBlockEntity(POS.above(), BlockEntityDarkTank.class);
+        BlockEntityDarkTank tankNorth = helper.getBlockEntity(POS.north(), BlockEntityDarkTank.class);
+        BlockEntityDarkTank tankSouth = helper.getBlockEntity(POS.south(), BlockEntityDarkTank.class);
+        BlockEntityDarkTank tankEast = helper.getBlockEntity(POS.east(), BlockEntityDarkTank.class);
+        BlockEntityDarkTank tankWest = helper.getBlockEntity(POS.west(), BlockEntityDarkTank.class);
 
         helper.succeedWhen(() -> {
             // Check that eternal water block is enabled
@@ -156,7 +156,7 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterExtractWithBucket(GameTestHelper helper) {
         // Place eternal water block
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
 
         // Create a player with a bucket
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -191,7 +191,7 @@ public class GameTestsBlockEternalWater {
     public void testBlockEternalWaterExtractWhenDisabled(GameTestHelper helper) {
         // Place eternal water block and disable it
         helper.setBlock(POS, RegistryEntries.BLOCK_ETERNAL_WATER.get());
-        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS);
+        BlockEntityEternalWater eternalWater = helper.getBlockEntity(POS, BlockEntityEternalWater.class);
         eternalWater.setEnabled(false);
 
         // Create a player with a bucket

@@ -2,18 +2,19 @@ package org.cyclops.evilcraft.item;
 
 import com.google.common.collect.Lists;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.WorldHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 
 /**
@@ -23,7 +24,7 @@ import java.util.Iterator;
  */
 public class ItemInvigoratingPendant extends ItemBloodContainer {
 
-    private static final int TICK_MODULUS = MinecraftHelpers.SECOND_IN_TICKS / 2;
+    private static final int TICK_MODULUS = IModHelpers.get().getMinecraftHelpers().getSecondInTicks() / 2;
 
     public ItemInvigoratingPendant(Item.Properties properties) {
         super(properties, ItemInvigoratingPendantConfig.capacity);
@@ -42,7 +43,7 @@ public class ItemInvigoratingPendant extends ItemBloodContainer {
         int amount = ItemInvigoratingPendantConfig.usage;
         if(canConsume(amount, itemStack, player)) {
 
-            int originalReducableDuration = ItemInvigoratingPendantConfig.reduceDuration * MinecraftHelpers.SECOND_IN_TICKS;
+            int originalReducableDuration = ItemInvigoratingPendantConfig.reduceDuration * IModHelpers.get().getMinecraftHelpers().getSecondInTicks();
             int reducableDuration = originalReducableDuration;
 
             Iterator<MobEffectInstance> it = Lists.newLinkedList(player.getActiveEffects()).iterator();
@@ -85,12 +86,12 @@ public class ItemInvigoratingPendant extends ItemBloodContainer {
     }
 
     @Override
-    public void inventoryTick(ItemStack itemStack, Level world, Entity entity, int par4, boolean par5) {
-        if(entity instanceof Player
-                && WorldHelpers.efficientTick(world, TICK_MODULUS, entity.getId())) {
-            clearBadEffects(itemStack, (Player) entity);
+    public void inventoryTick(ItemStack itemStack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if(entity instanceof Player player
+                && IModHelpers.get().getWorldHelpers().efficientTick(level, TICK_MODULUS, entity.getId())) {
+            clearBadEffects(itemStack, player);
         }
-        super.inventoryTick(itemStack, world, entity, par4, par5);
+        super.inventoryTick(itemStack, level, entity, slot);
     }
 
 }

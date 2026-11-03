@@ -1,29 +1,30 @@
 package org.cyclops.evilcraft.core.item;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerMutable;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.item.ItemBlockNBT;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.block.BlockDarkTankConfig;
@@ -31,8 +32,9 @@ import org.cyclops.evilcraft.core.block.IBlockTank;
 import org.cyclops.evilcraft.core.helper.BlockTankHelpers;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
 
-import java.util.List;
+import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * {@link BlockItem} that can be used for blocks that have a tile entity with a fluid container.
@@ -54,8 +56,8 @@ public class ItemBlockFluidContainer extends ItemBlockNBT {
     }
 
     private void registerCapability(RegisterCapabilitiesEvent event) {
-        event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidHandlerItemCapacity(stack, block.getDefaultCapacity()), this);
-        event.registerItem(org.cyclops.evilcraft.fabric.cyclopscore.Capabilities.Item.FLUID_HANDLER_CAPACITY, (stack, ctx) -> new FluidHandlerItemCapacity(stack, block.getDefaultCapacity()), this);
+        event.registerItem(Capabilities.Fluid.ITEM, (stack, ctx) -> new FluidHandlerItemCapacity(ctx, block.getDefaultCapacity()), this);
+        event.registerItem(org.cyclops.evilcraft.fabric.cyclopscore.Capabilities.Item.FLUID_HANDLER_CAPACITY, (stack, ctx) -> new FluidHandlerItemCapacity(ctx, block.getDefaultCapacity()), this);
     }
 
     @Override
@@ -65,15 +67,21 @@ public class ItemBlockFluidContainer extends ItemBlockNBT {
 
     @Override
     protected boolean itemStackDataToTile(ItemStack itemStack, BlockEntity tile) {
-        BlockEntityHelpers.getCapability(tile.getLevel(), tile.getBlockPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK)
+        IModHelpers.get().getCapabilityHelpers().getCapability(tile.getLevel(), tile.getBlockPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                 .ifPresent(fluidHandlerTile -> {
-                    Optional.ofNullable(Capabilities.FluidHandler.ITEM.getCapability(itemStack, null))
+                    Optional.ofNullable(Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack)))
                             .ifPresent(fluidHandlerItem -> {
-                                if (fluidHandlerTile instanceof IFluidHandlerMutable) {
-                                    ((IFluidHandlerMutable) fluidHandlerTile).setFluidInTank(0, fluidHandlerItem.getFluidInTank(0));
-                                }
                                 if (fluidHandlerTile instanceof IFluidHandlerCapacity) {
-                                    ((IFluidHandlerCapacity) fluidHandlerTile).setTankCapacity(0, fluidHandlerItem.getTankCapacity(0));
+                                    try (var tx = Transaction.openRoot()) {
+                                        ((IFluidHandlerCapacity) fluidHandlerTile).setTankCapacity(0, fluidHandlerItem.getCapacityAsInt(0, FluidResource.EMPTY), tx);
+                                        tx.commit();
+                                    }
+                                }
+                                if (!fluidHandlerItem.getResource(0).isEmpty()) {
+                                    try (var tx = Transaction.openRoot()) {
+                                        fluidHandlerTile.insert(fluidHandlerItem.getResource(0), fluidHandlerItem.getAmountAsInt(0), tx);
+                                        tx.commit();
+                                    }
                                 }
                             });
                 });
@@ -81,33 +89,31 @@ public class ItemBlockFluidContainer extends ItemBlockNBT {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         if(block.isActivatable()) {
-            return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, block.toggleActivation(player.getItemInHand(hand), world, player));
+            return InteractionResult.SUCCESS.heldItemTransformedTo(block.toggleActivation(player.getItemInHand(hand), world, player));
         }
         return super.use(world, player, hand);
     }
 
-    protected void autofill(int itemSlot, IFluidHandlerItem source, Level world, Entity entity) {
-        ItemHelpers.updateAutoFill(source, world, entity, BlockDarkTankConfig.autoFillBuckets);
+    protected void autofill(@Nullable EquipmentSlot itemSlot, ResourceHandler<FluidResource> source, ItemStack sourceItem, Level world, Entity entity) {
+        ItemHelpers.updateAutoFill(source, sourceItem, world, entity, BlockDarkTankConfig.autoFillBuckets);
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if(block.isActivatable() && block.isActivated(stack, Item.TooltipContext.of(worldIn))) {
-            FluidUtil.getFluidHandler(stack)
-                    .ifPresent(fluidHandler -> autofill(itemSlot, fluidHandler, worldIn, entityIn));
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if(block.isActivatable() && block.isActivated(stack, Item.TooltipContext.of(level))) {
+            autofill(slot, Capabilities.Fluid.ITEM.getCapability(stack, ItemAccess.forStack(stack)), stack, level, entity);
         }
-        super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
+        super.inventoryTick(stack, level, entity, slot);
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        super.appendHoverText(itemStack, context, list, flag);
-        list.add(BlockTankHelpers.getInfoTank(itemStack));
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
+        tooltipAdder.accept(BlockTankHelpers.getInfoTank(itemStack));
         if(block.isActivatable()) {
-            L10NHelpers.addStatusInfo(list, block.isActivated(itemStack, context),
+            IModHelpers.get().getL10NHelpers().addStatusInfo(tooltipAdder, block.isActivated(itemStack, context),
                     getDescriptionId() + ".info.auto_supply");
         }
     }

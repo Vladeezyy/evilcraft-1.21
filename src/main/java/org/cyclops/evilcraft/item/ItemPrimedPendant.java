@@ -9,16 +9,17 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
@@ -26,10 +27,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.inventory.InventoryLocationPlayer;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.NBTSimpleInventoryItemHeld;
@@ -40,6 +42,7 @@ import org.cyclops.evilcraft.inventory.container.ContainerPrimedPendant;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * One potion can be inserted to continuously apply it to the player.
@@ -48,41 +51,37 @@ import java.util.List;
  */
 public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppedByPlayer {
 
-    private static final int TICK_MODULUS = MinecraftHelpers.SECOND_IN_TICKS / 2;
+    private static final int TICK_MODULUS = IModHelpers.get().getMinecraftHelpers().getSecondInTicks() / 2;
 
     public ItemPrimedPendant(Item.Properties properties) {
         super(properties, ItemPrimedPendantConfig.capacity);
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        super.appendHoverText(itemStack, context, list, flag);
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
         ItemStack potionStack = getPotionStack(itemStack);
         if(!potionStack.isEmpty()) {
             PotionContents contents = potionStack.get(DataComponents.POTION_CONTENTS);
             if (contents != null) {
                 List<MobEffectInstance> potionEffects = contents.customEffects();
                 for (MobEffectInstance potionEffect : potionEffects) {
-                    MutableComponent textComponent = Component.translatable(super.getDescriptionId(itemStack) + ".potion",
+                    MutableComponent textComponent = Component.translatable(super.getDescriptionId() + ".potion",
                             Component.translatable(potionEffect.getDescriptionId()),
                             Component.translatable("enchantment.level." + (potionEffect.getAmplifier() + 1)));
                     Double multiplier = ItemPrimedPendantConfig.getMultiplier(potionEffect.getEffect());
                     if (multiplier != null && multiplier < 0) {
                         textComponent.withStyle(ChatFormatting.STRIKETHROUGH);
                     }
-                    list.add(textComponent);
+                    tooltipAdder.accept(textComponent);
                 }
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void inventoryTick(ItemStack itemStack, Level world, Entity entity, int par4, boolean par5) {
-        if(entity instanceof Player
-                && world.getGameTime() % TICK_MODULUS == 0) {
-            Player player = (Player) entity;
+    public void inventoryTick(ItemStack itemStack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if(entity instanceof Player player && level.getGameTime() % TICK_MODULUS == 0) {
             ItemStack potionStack = getPotionStack(itemStack);
             if(!potionStack.isEmpty()) {
                 PotionContents contents = potionStack.get(DataComponents.POTION_CONTENTS);
@@ -101,14 +100,14 @@ public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppe
                         if ((multiplier == null || multiplier >= 0) && canConsume(toDrain, itemStack, player)) {
                             player.addEffect(
                                     new MobEffectInstance(potionEffect.getEffect(), TICK_MODULUS * 27, potionEffect.getAmplifier(),
-                                            true, true)); // NeoForge: ambient when the effect is curable, which all vanilla effects are
+                                            potionEffect.isAmbient(), true));
                             consume(toDrain, itemStack, player);
                         }
                     }
                 }
             }
         }
-        super.inventoryTick(itemStack, world, entity, par4, par5);
+        super.inventoryTick(itemStack, level, entity, slot);
     }
 
     public boolean hasPotionStack(ItemStack itemStack) {
@@ -116,12 +115,11 @@ public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppe
     }
 
     public ItemStack getPotionStack(ItemStack itemStack) {
-        Container inventory = getSupplementaryInventory(itemStack);
+        Container inventory = getSupplementaryInventory(ItemAccess.forStack(itemStack));
         return inventory.getItem(0);
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public boolean isFoil(ItemStack itemStack) {
         return hasPotionStack(itemStack);
     }
@@ -138,14 +136,14 @@ public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppe
 
     /**
      * Get the supplementary inventory of the item.
-     * @param itemStack The item stack.
+     * @param itemAccess The item access.
      * @return The inventory.
      */
-    public Container getSupplementaryInventory(ItemStack itemStack) {
-        return new NBTSimpleInventoryItemStack(itemStack, 1, 64, "inventoryItem");
+    public Container getSupplementaryInventory(ItemAccess itemAccess) {
+        return new NBTSimpleInventoryItemStack(itemAccess, 1, 64, "inventoryItem");
     }
 
-    // --- TODO: copy of ItemGui methods, clean this up with Cyclops for 1.8 ---
+    // --- TODO: copy of ItemGui methods, clean this up future
 
     @Nullable
     public MenuProvider getContainer(Level world, Player playerEntity, ItemLocation itemLocation) {
@@ -172,7 +170,7 @@ public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppe
                 IModHelpers.get().getMinecraftHelpers().openMenu(player, containerProvider, (packetBuffer) -> {
                     this.writeExtraGuiData(packetBuffer, world, player, itemLocation);
                 });
-                Stat<ResourceLocation> openStat = this.getOpenStat();
+                Stat<Identifier> openStat = this.getOpenStat();
                 if (openStat != null) {
                     player.awardStat(openStat);
                 }
@@ -187,20 +185,20 @@ public class ItemPrimedPendant extends ItemBloodContainer implements IItemDroppe
     }
 
     @Nullable
-    protected Stat<ResourceLocation> getOpenStat() {
+    protected Stat<Identifier> getOpenStat() {
         return null;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (player instanceof FakePlayer) {
-            return new InteractionResultHolder(InteractionResult.FAIL, itemStack);
+            return InteractionResult.FAIL;
         } else {
             if (player instanceof ServerPlayer) {
-                openScreenForItemIndex(world, (ServerPlayer) player, InventoryLocationPlayer.getInstance().handToLocation(player, hand, player.getInventory().selected));
+                openScreenForItemIndex(world, (ServerPlayer) player, InventoryLocationPlayer.getInstance().handToLocation(player, hand, player.getInventory().getSelectedSlot()));
             }
 
-            return new InteractionResultHolder(InteractionResult.SUCCESS, itemStack);
+            return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
         }
     }
 

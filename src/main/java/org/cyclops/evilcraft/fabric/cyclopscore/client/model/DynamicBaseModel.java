@@ -2,27 +2,35 @@ package org.cyclops.evilcraft.fabric.cyclopscore.client.model;
 
 
 
-import com.google.common.primitives.Ints;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import net.neoforged.neoforge.client.model.quad.BakedColors;
+import net.neoforged.neoforge.client.model.quad.BakedNormals;
+import net.neoforged.neoforge.model.data.ModelData;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * A model that can be used as a basis for flexible baked models.
  * @author rubensworks
  */
-public abstract class DynamicBaseModel implements BakedModel {
+public abstract class DynamicBaseModel implements BlockStateModel {
 
     // Rotation UV coordinates
     protected static final float[][] ROTATION_UV = {{1, 0}, {1, 1}, {0, 1}, {0, 0}};
@@ -37,14 +45,14 @@ public abstract class DynamicBaseModel implements BakedModel {
      * @param side The side to rotate by.
      * @return The rotated vector.
      */
-    protected static Vec3 rotate(Vec3 vec, Direction side) {
+    protected static Vector3f rotate(Vector3f vec, Direction side) {
         switch(side) {
-            case DOWN:  return new Vec3( vec.x, -vec.y, -vec.z);
-            case UP:    return new Vec3( vec.x,  vec.y,  vec.z);
-            case NORTH: return new Vec3( vec.x,  vec.z, -vec.y);
-            case SOUTH: return new Vec3( vec.x, -vec.z,  vec.y);
-            case WEST:  return new Vec3(-vec.y,  vec.x,  vec.z);
-            case EAST:  return new Vec3( vec.y, -vec.x,  vec.z);
+            case DOWN:  return new Vector3f( vec.x, -vec.y, -vec.z);
+            case UP:    return new Vector3f( vec.x,  vec.y,  vec.z);
+            case NORTH: return new Vector3f( vec.x,  vec.z, -vec.y);
+            case SOUTH: return new Vector3f( vec.x, -vec.z,  vec.y);
+            case WEST:  return new Vector3f(-vec.y,  vec.x,  vec.z);
+            case EAST:  return new Vector3f( vec.y, -vec.x,  vec.z);
         }
         return vec;
     }
@@ -65,32 +73,6 @@ public abstract class DynamicBaseModel implements BakedModel {
             case EAST:  return new Vec3(-vec.y,  vec.x,  vec.z);
         }
         return vec;
-    }
-
-    /**
-     * Make an int array of the given information so that it can be fed into a
-     * {@link BakedQuad}.
-     * @param x X
-     * @param y Y
-     * @param z Z
-     * @param color Color
-     * @param texture Texture
-     * @param u Icon U
-     * @param v Icon V
-     * @return The assembled int array.
-     */
-    protected static int[] vertexToInts(float x, float y, float z, int color, TextureAtlasSprite texture, float u,
-                                        float v) { // See FaceBakery#fillVertex for inspiration in case this would break.
-        return new int[] {
-                Float.floatToRawIntBits(x),
-                Float.floatToRawIntBits(y),
-                Float.floatToRawIntBits(z),
-                color,
-                Float.floatToRawIntBits(texture.getU(u / 16F)),
-                Float.floatToRawIntBits(texture.getV(v / 16F)),
-                0,
-                0
-        };
     }
 
     /**
@@ -140,7 +122,7 @@ public abstract class DynamicBaseModel implements BakedModel {
      */
     protected static void addColoredBakedQuad(List<BakedQuad> quads, float x1, float x2, float z1, float z2, float y,
                                               TextureAtlasSprite texture, Color shadeColor, Direction side) {
-        int color = Helpers.RGBAToInt(shadeColor.getBlue(), shadeColor.getGreen(), shadeColor.getRed(), shadeColor.getAlpha());
+        int color = IModHelpers.get().getBaseHelpers().RGBAToInt(shadeColor.getBlue(), shadeColor.getGreen(), shadeColor.getRed(), shadeColor.getAlpha());
         addColoredBakedQuad(quads, x1, x2, z1, z2, y, texture, color, side);
     }
 
@@ -215,62 +197,59 @@ public abstract class DynamicBaseModel implements BakedModel {
     protected static void addBakedQuadRotated(List<BakedQuad> quads, float x1, float x2, float z1, float z2, float y,
                                               TextureAtlasSprite texture, Direction side, int rotation,
                                               boolean isColored, int shadeColor, float[][] uvs) {
-        Vec3 v1 = rotate(new Vec3(x1 - .5, y - .5, z1 - .5), side).add(.5, .5, .5);
-        Vec3 v2 = rotate(new Vec3(x1 - .5, y - .5, z2 - .5), side).add(.5, .5, .5);
-        Vec3 v3 = rotate(new Vec3(x2 - .5, y - .5, z2 - .5), side).add(.5, .5, .5);
-        Vec3 v4 = rotate(new Vec3(x2 - .5, y - .5, z1 - .5), side).add(.5, .5, .5);
-        int[] data =  Ints.concat(
-                vertexToInts((float) v1.x, (float) v1.y, (float) v1.z, shadeColor, texture, uvs[(0 + rotation) % 4][0] * 16, uvs[(0 + rotation) % 4][1] * 16),
-                vertexToInts((float) v2.x, (float) v2.y, (float) v2.z, shadeColor, texture, uvs[(1 + rotation) % 4][0] * 16, uvs[(1 + rotation) % 4][1] * 16),
-                vertexToInts((float) v3.x, (float) v3.y, (float) v3.z, shadeColor, texture, uvs[(2 + rotation) % 4][0] * 16, uvs[(2 + rotation) % 4][1] * 16),
-                vertexToInts((float) v4.x, (float) v4.y, (float) v4.z, shadeColor, texture, uvs[(3 + rotation) % 4][0] * 16, uvs[(3 + rotation) % 4][1] * 16)
-        );
-        fillNormal(data, side); // This fixes lighting issues when item is rendered in hand/inventory
-        quads.add(new BakedQuad(data, -1, side, texture, false));
+        // If needed, these Vector3fc's could be cached using ModelBaker: modelBaker.parts().vector(...)
+        Vector3f v1 = rotate(new Vector3f(x1 - .5f, y - .5f, z1 - .5f), side).add(.5f, .5f, .5f);
+        Vector3f v2 = rotate(new Vector3f(x1 - .5f, y - .5f, z2 - .5f), side).add(.5f, .5f, .5f);
+        Vector3f v3 = rotate(new Vector3f(x2 - .5f, y - .5f, z2 - .5f), side).add(.5f, .5f, .5f);
+        Vector3f v4 = rotate(new Vector3f(x2 - .5f, y - .5f, z1 - .5f), side).add(.5f, .5f, .5f);
+        // See QuadBakingVertexConsumer for examples on how BakedQuad is constructed
+        quads.add(new BakedQuad(
+                v1,
+                v2,
+                v3,
+                v4,
+                UVPair.pack(texture.getU(uvs[(0 + rotation) % 4][0]), texture.getV(uvs[(0 + rotation) % 4][1])),
+                UVPair.pack(texture.getU(uvs[(1 + rotation) % 4][0]), texture.getV(uvs[(1 + rotation) % 4][1])),
+                UVPair.pack(texture.getU(uvs[(2 + rotation) % 4][0]), texture.getV(uvs[(2 + rotation) % 4][1])),
+                UVPair.pack(texture.getU(uvs[(3 + rotation) % 4][0]), texture.getV(uvs[(3 + rotation) % 4][1])),
+                side,
+                new BakedQuad.MaterialInfo(texture, ChunkSectionLayer.CUTOUT, RenderTypes.entityCutout(texture.atlasLocation()), -1, false, 0, true),
+                BakedNormals.UNSPECIFIED,
+                isColored ? BakedColors.of(shadeColor) : BakedColors.DEFAULT
+        ));
     }
 
-    /**
-     * Store the face normal in the normal element of the four vertices (8 ints per vertex, normal at index 7).
-     */
-    protected static void fillNormal(int[] data, Direction side) {
-        org.joml.Vector3f a = new org.joml.Vector3f(Float.intBitsToFloat(data[0]), Float.intBitsToFloat(data[1]), Float.intBitsToFloat(data[2]));
-        org.joml.Vector3f b = new org.joml.Vector3f(Float.intBitsToFloat(data[8]), Float.intBitsToFloat(data[9]), Float.intBitsToFloat(data[10]));
-        org.joml.Vector3f c = new org.joml.Vector3f(Float.intBitsToFloat(data[16]), Float.intBitsToFloat(data[17]), Float.intBitsToFloat(data[18]));
-        org.joml.Vector3f normal = c.sub(b, new org.joml.Vector3f()).cross(a.sub(b, new org.joml.Vector3f()));
-        if (normal.lengthSquared() < 1.0E-8F) {
-            normal.set(side.getStepX(), side.getStepY(), side.getStepZ());
+    public abstract List<BakedQuad> handleBlockState(BlockAndTintGetter level, BlockPos pos,
+                                                     BlockState state, Direction side,
+                                                     RandomSource rand, ModelData extraData,
+                                                     ChunkSectionLayer renderType);
+
+    @Override
+    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+        ModelData extraData = getModelData(level, pos, state, level.getModelData(pos));
+        for (ChunkSectionLayer renderType : getRenderTypes(state, random, extraData)) {
+            for (Direction side : Direction.values()) {
+                QuadCollection.Builder quadCollectionBuilder = new QuadCollection.Builder();
+                for (BakedQuad blockStateQuad : handleBlockState(level, pos, state, side, random, extraData, renderType)) {
+                    quadCollectionBuilder = quadCollectionBuilder.addCulledFace(side, blockStateQuad);
+                }
+                parts.add(new SimpleModelWrapper(
+                        quadCollectionBuilder.build(),
+                        usesBlockLight(),
+                        particleMaterial(level, pos, state)
+                ));
+            }
         }
-        normal.normalize();
-        int packed = ((byte) Math.round(normal.x() * 127) & 0xFF)
-                | (((byte) Math.round(normal.y() * 127) & 0xFF) << 8)
-                | (((byte) Math.round(normal.z() * 127) & 0xFF) << 16);
-        for (int i = 0; i < 4; i++) {
-            data[i * 8 + 7] = packed;
-        }
     }
 
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
-        return Collections.emptyList();
+    public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
+        // Do nothing, as it's should be never called.
     }
 
-    @Override
-    public boolean isGui3d() {
-        return true;
-    }
+    public abstract ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData);
 
-    @Override
-    public boolean useAmbientOcclusion() {
-        return true;
-    }
+    public abstract List<ChunkSectionLayer> getRenderTypes(BlockState state, RandomSource rand, ModelData data);
 
-    @Override
-    public boolean isCustomRenderer() {
-        return false;
-    }
-
-    @Override
-    public ItemOverrides getOverrides() {
-        return ItemOverrides.EMPTY;
-    }
+    public abstract boolean usesBlockLight();
 }

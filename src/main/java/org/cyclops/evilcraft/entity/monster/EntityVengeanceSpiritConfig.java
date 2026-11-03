@@ -2,22 +2,18 @@ package org.cyclops.evilcraft.entity.monster;
 
 import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.EntityConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.EntityConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
-import org.cyclops.evilcraft.client.render.entity.RenderVengeanceSpirit;
 
 import java.util.List;
 
@@ -26,11 +22,10 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpirit> {
+public class EntityVengeanceSpiritConfig extends EntityConfigCommon<IModBase, EntityVengeanceSpirit> {
 
-    // TODO: set to false in nextmajor
     @ConfigurablePropertyCommon(category = "mob", comment = "If vengeance spirits should also spawn when entities are killed by non-player damage sources.", isCommandable = true)
-    public static boolean spawnOnNonPlayerKills = true;
+    public static boolean spawnOnNonPlayerKills = false;
 
     @ConfigurablePropertyCommon(category = "mob", comment = "The maximum amount of vengeance spirits naturally spawnable in the spawnLimitArea.")
     public static int spawnLimit = 5;
@@ -60,21 +55,28 @@ public class EntityVengeanceSpiritConfig extends EntityConfig<EntityVengeanceSpi
                 eConfig -> EntityType.Builder.<EntityVengeanceSpirit>of(EntityVengeanceSpirit::new, MobCategory.MONSTER)
                         .sized(1, 1) // Dummy size, to avoid rare bounding box crashes before inner entity is init.
                         .fireImmune(),
-                getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "vengeance_spirit_spawn_egg", Helpers.RGBToInt(64, 16, 93), Helpers.RGBToInt(134, 60, 169))
+                getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "vengeance_spirit_spawn_egg")
         );
         EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public EntityRenderer<? super EntityVengeanceSpirit> getRender(EntityRendererProvider.Context renderContext, ItemRenderer itemRenderer) {
-        return new RenderVengeanceSpirit(renderContext, this);
+    public EntityClientConfig<IModBase, EntityVengeanceSpirit> constructEntityClientConfig() {
+        return new EntityVengeanceSpiritConfigClient(this);
     }
 
     @Override
     public void onRegistered() {
         super.onRegistered();
-        LivingDeathEvent.addListener(EntityVengeanceSpirit::vengeanceEvent);
+        EvilCraft._instance.getImcHandler().registerAction(Reference.IMC_BLACKLIST_VENGEANCESPIRIT, message -> {
+            Object value = message.messageSupplier().get();
+            if (value instanceof String) {
+                EntityVengeanceSpirit.addToBlacklistIMC((String) value);
+                return true;
+            }
+            return false;
+        });
+        NeoForge.EVENT_BUS.register(EntityVengeanceSpirit.class);
     }
 
     public void onEntityAttributeCreationEvent(EntityAttributeCreationEvent event) {

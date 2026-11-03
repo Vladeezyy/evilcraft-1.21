@@ -3,13 +3,13 @@ package org.cyclops.evilcraft.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.EntityType;
 import org.cyclops.evilcraft.entity.item.EntityItemDarkStick;
-import org.cyclops.evilcraft.entity.item.EntityItemDarkStickConfig;
 
 /**
  * Renderer for a dark stick
@@ -17,32 +17,51 @@ import org.cyclops.evilcraft.entity.item.EntityItemDarkStickConfig;
  * @author rubensworks
  *
  */
-public class RenderDarkStick extends EntityRenderer<EntityItemDarkStick> {
+public class RenderDarkStick extends EntityRenderer<EntityItemDarkStick, RenderStateDarkStick> {
 
-    public RenderDarkStick(EntityRendererProvider.Context renderContext, EntityItemDarkStickConfig config) {
+    private final ItemModelResolver itemModelResolver;
+
+    public RenderDarkStick(EntityRendererProvider.Context renderContext) {
         super(renderContext);
+        this.itemModelResolver = renderContext.getItemModelResolver();
     }
 
     @Override
-    public void render(EntityItemDarkStick entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    public RenderStateDarkStick createRenderState() {
+        return new RenderStateDarkStick();
+    }
+
+    @Override
+    public void extractRenderState(EntityItemDarkStick entity, RenderStateDarkStick state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+
+        state.ageInTicks = (float)entity.getAge() + partialTick;
+        state.bobOffset = entity.bobOffs;
+        state.shouldBob = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(entity.getItem()).shouldBobAsEntity(entity.getItem());
+        state.shouldSpread = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(entity.getItem()).shouldSpreadAsEntity(entity.getItem());
+        state.extractItemGroupRenderState(entity, entity.getItem(), this.itemModelResolver);
+        state.valid = entity.isValid();
+        state.angle = entity.getAngle();
+    }
+
+    @Override
+    public void submit(RenderStateDarkStick renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+        super.submit(renderState, poseStack, nodeCollector, cameraRenderState);
+
         float rotation;
-        if (entity.isValid()) {
-            rotation = entity.getAngle();
+        if (renderState.valid) {
+            rotation = renderState.angle;
         } else {
-            rotation = (((float)entity.getAge()) / 20.0F + entity.bobOffs) * (180F / (float)Math.PI);
+            rotation = (((float)renderState.ageInTicks) / 20.0F + renderState.bobOffset) * (180F / (float)Math.PI);
         }
 
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(rotation));
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(-90));
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(25));
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-90));
+        poseStack.mulPose(Axis.XP.rotationDegrees(25));
 
-        ((EntityRenderer) Minecraft.getInstance().getEntityRenderDispatcher().renderers.get(EntityType.ITEM))
-                .render(entity, 0, entity.isValid() ? -entity.bobOffs * 20/* to undo hoverstart in ItemRenderer */ : partialTicks, matrixStackIn, bufferIn, packedLightIn);
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityItemDarkStick entity) {
-        return null;
+        // , renderState.isValid() ? -renderState.bobOffset * 20/* to undo hoverstart in ItemRenderer */ : renderState.partialTick
+        EntityRenderer entityRenderer = Minecraft.getInstance().getEntityRenderDispatcher().renderers.get(EntityType.ITEM);
+        entityRenderer.submit(renderState, poseStack, nodeCollector, cameraRenderState);
     }
 
 }

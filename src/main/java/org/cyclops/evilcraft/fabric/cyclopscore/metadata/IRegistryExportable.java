@@ -8,9 +8,11 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
-import org.cyclops.evilcraft.EvilCraft;
+import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
  * A registry export handler.
@@ -36,7 +38,7 @@ public interface IRegistryExportable {
         try {
             componentsString = componentsToString(ServerLifecycleHooks.getCurrentServer().registryAccess(), itemStack.getComponentsPatch());
         } catch (IllegalStateException e) {
-            org.cyclops.evilcraft.EvilCraft.clog(e.getMessage());
+            CyclopsCoreNeoForge.clog(e.getMessage());
         }
         if(!"{}".equals(componentsString)) {
             object.addProperty("components", componentsString);
@@ -54,7 +56,7 @@ public interface IRegistryExportable {
         try {
             componentsString = componentsToString(ServerLifecycleHooks.getCurrentServer().registryAccess(), fluidStack.getComponentsPatch());
         } catch (IllegalStateException e) {
-            org.cyclops.evilcraft.EvilCraft.clog(e.getMessage());
+            CyclopsCoreNeoForge.clog(e.getMessage());
         }
         if(!"{}".equals(componentsString)) {
             object.addProperty("components", componentsString);
@@ -65,6 +67,10 @@ public interface IRegistryExportable {
 
     public static String componentsToString(HolderLookup.Provider lookupProvider, DataComponentPatch components) {
         return DataComponentPatch.CODEC.encodeStart(lookupProvider.createSerializationContext(NbtOps.INSTANCE), components).getOrThrow().toString();
+    }
+
+    public static ItemStack getRecipeOutput(RecipeHolder<?> recipe) {
+        return IModHelpers.get().getMinecraftHelpers().getRecipeOutput(recipe, IModHelpers.get().getMinecraftHelpers().getCurrentServer().overworld());
     }
 
 }

@@ -5,8 +5,9 @@ package org.cyclops.evilcraft.fabric.cyclopscore.recipe.type;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 
 /**
  * Default implementation of {@link IInventoryFluid}.
@@ -14,28 +15,20 @@ import org.cyclops.evilcraft.fabric.fluids.capability.templates.FluidTank;
  */
 public class InventoryFluid implements IInventoryFluid {
 
-    // Not a Container (as in Cyclops Core on NeoForge): a class that is both a Container and a RecipeInput cannot be
-    // remapped to intermediary names (isEmpty, getItem have different names in the two interfaces)
-    private final NonNullList<ItemStack> itemStacks;
-    private final IFluidHandler fluidHandler;
+    private final ResourceHandler<FluidResource> fluidHandler;
 
     public InventoryFluid(NonNullList<ItemStack> itemStacks, NonNullList<FluidStack> fluidStacks) {
         this.itemStacks = NonNullList.withSize(itemStacks.size(), ItemStack.EMPTY);
         for (int slot = 0; slot < itemStacks.size(); slot++) {
             this.itemStacks.set(slot, itemStacks.get(slot));
         }
-        if (fluidStacks.size() == 1) {
-            this.fluidHandler = new FluidTank(Integer.MAX_VALUE);
-            this.fluidHandler.fill(fluidStacks.get(0), IFluidHandler.FluidAction.EXECUTE);
-        } else {
-            this.fluidHandler = new FluidHandlerListReadOnly(fluidStacks);
-        }
+        this.fluidHandler = new FluidStacksResourceHandler(fluidStacks, Integer.MAX_VALUE);
     }
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < getFluidHandler().getTanks(); i++) {
-            if (!getFluidHandler().getFluidInTank(i).isEmpty()) {
+        for (int i = 0; i < getFluidHandler().size(); i++) {
+            if (!getFluidHandler().getResource(i).isEmpty()) {
                 return false;
             }
         }
@@ -48,7 +41,7 @@ public class InventoryFluid implements IInventoryFluid {
     }
 
     @Override
-    public IFluidHandler getFluidHandler() {
+    public ResourceHandler<FluidResource> getFluidHandler() {
         return this.fluidHandler;
     }
 

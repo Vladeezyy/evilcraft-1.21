@@ -5,8 +5,12 @@ package org.cyclops.evilcraft.fabric.cyclopscore.client.key;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.client.KeyMapping;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.L10NHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
+import org.cyclops.evilcraft.fabric.cyclopscore.proxy.IClientProxy;
 
 /**
  * Enum that contains all custom hotkeys that
@@ -27,10 +31,9 @@ public class KeyRegistry implements IKeyRegistry {
      * @param defaultKey The keycode.
      * @return A new keybinding.
      */
-    public static KeyMapping newKeyMapping(ModBase mod, String name, int defaultKey) {
-        String id = L10NHelpers.localize("key." + mod.getModId() + "." + name);
-        String category = L10NHelpers.localize("key.categories." + mod.getModId());
-        return new KeyMapping(id, defaultKey, category);
+    public static KeyMapping newKeyMapping(ModBaseNeoForge mod, String name, int defaultKey) {
+        String id = IModHelpers.get().getL10NHelpers().localize("key." + mod.getModId() + "." + name);
+        return new KeyMapping(id, defaultKey, ((IClientProxy) mod.getProxy()).getMainKeyCategory());
     }
 
     @Override

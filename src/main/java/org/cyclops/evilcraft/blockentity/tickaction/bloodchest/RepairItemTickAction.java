@@ -1,7 +1,8 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodchest;
 
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.api.tileentity.bloodchest.IBloodChestRepairActionRegistry;
@@ -29,7 +30,10 @@ public class RepairItemTickAction implements ITickAction<BlockEntityBloodChest> 
     }
 
     private void drainTank(BlockEntityBloodChest tile, float usageMultiplier) {
-        tile.getTank().drain((int) Math.ceil((float) BlockBloodChestConfig.mBPerDamage * usageMultiplier), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            tile.getTank().extract(FluidResource.of(tile.getTank().getFluidType()), (int) Math.ceil((float) BlockBloodChestConfig.mBPerDamage * usageMultiplier), tx);
+            tx.commit();
+        }
     }
 
     @Override
@@ -42,9 +46,9 @@ public class RepairItemTickAction implements ITickAction<BlockEntityBloodChest> 
                         getRegistry(IBloodChestRepairActionRegistry.class);
                 int actionID = actions.canRepair(itemStack, tick);
                 if(actionID > -1) {
-                    float simulateMultiplier = actions.repair(itemStack, tile.getLevel().random, actionID, false, false, tile.getLevel().registryAccess()).getLeft();
+                    float simulateMultiplier = actions.repair(itemStack, tile.getLevel().getRandom(), actionID, false, false, tile.getLevel().registryAccess()).getLeft();
                     if(tile.getTank().getFluidAmount() >= BlockBloodChestConfig.mBPerDamage * simulateMultiplier) {
-                        Pair<Float, ItemStack> repairResult = actions.repair(itemStack, tile.getLevel().random, actionID, true, false, tile.getLevel().registryAccess());
+                        Pair<Float, ItemStack> repairResult = actions.repair(itemStack, tile.getLevel().getRandom(), actionID, true, false, tile.getLevel().registryAccess());
                         itemStack = repairResult.getRight();
                         drainTank(tile, repairResult.getLeft());
                     }

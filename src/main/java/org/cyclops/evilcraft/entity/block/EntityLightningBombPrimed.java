@@ -2,10 +2,7 @@ package org.cyclops.evilcraft.entity.block;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -34,7 +31,7 @@ public class EntityLightningBombPrimed extends PrimedTnt {
     public EntityLightningBombPrimed(Level world, double x, double y, double z, @Nullable LivingEntity placer) {
         this(RegistryEntries.ENTITY_LIGHTNING_BOMB_PRIMED.get(), world);
         this.setPos(x, y, z);
-        double d0 = world.random.nextDouble() * (double)((float)Math.PI * 2F);
+        double d0 = world.getRandom().nextDouble() * (double)((float)Math.PI * 2F);
         this.setDeltaMovement(-Math.sin(d0) * 0.02D, (double)0.2F, -Math.cos(d0) * 0.02D);
         this.setFuse(80);
         this.xo = x;
@@ -84,13 +81,13 @@ public class EntityLightningBombPrimed extends PrimedTnt {
     private void explode(Level world, double x, double y, double z) {
         if (!world.isClientSide()) {
             this.level().explode(this, this.getX(), this.getY(), this.getZ(), EXPLOSION_STRENGTH, Level.ExplosionInteraction.MOB);
-            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(world);
-            bolt.moveTo(x, y, z);
+            LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(world, EntitySpawnReason.TRIGGERED);
+            bolt.snapTo(x, y, z);
         } else {
             Random rand = new Random();
             for (int i = 0; i < 32; ++i) {
-                Minecraft.getInstance().levelRenderer.addParticle(
-                        ParticleTypes.CRIT, false,
+                Minecraft.getInstance().level.addParticle(
+                        ParticleTypes.CRIT,
                         x, y + rand.nextDouble() * 2.0D, z,
                         rand.nextGaussian(), 0.0D, rand.nextGaussian());
             }

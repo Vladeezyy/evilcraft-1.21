@@ -4,7 +4,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.datastructure.EvictingStack;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface IInfoBook {
 
-    public ModBase<?> getMod();
+    public ModBaseNeoForge<?> getMod();
     public int getPagesPerView();
     public String getBaseUrl();
 

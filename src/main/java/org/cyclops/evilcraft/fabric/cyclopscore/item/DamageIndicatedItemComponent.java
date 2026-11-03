@@ -9,17 +9,17 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.material.Fluid;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerItemCapacity;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 /**
  * A component that has to be added for classes that want to implement the DamageIndicator behaviour.
@@ -58,12 +58,15 @@ public class DamageIndicatedItemComponent {
      */
     public void fillDefaultCreativeTabEntries(NonNullList<ItemStack> items, Fluid fluid) {
         // Add the 'full' container.
-        ItemStack itemStackFull = new ItemStack(this.item);
-        IFluidHandlerItemCapacity fluidHanderFull = FluidHelpers.getFluidHandlerItemCapacity(itemStackFull).orElse(null);
+        ItemAccess itemStackFullAccess = ItemAccess.forStack(new ItemStack(this.item));
+        IFluidHandlerCapacity fluidHanderFull = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemStackFullAccess).orElse(null);
         if (fluidHanderFull != null) {
-            fluidHanderFull.fill(new FluidStack(fluid, fluidHanderFull.getCapacity()), IFluidHandler.FluidAction.EXECUTE);
+            try (var tx = Transaction.openRoot()) {
+                fluidHanderFull.insert(FluidResource.of(fluid), fluidHanderFull.getTankCapacity(0), tx);
+                tx.commit();
+            }
         }
-        items.add(itemStackFull);
+        items.add(itemStackFullAccess.getResource().toStack());
 
         // Add the 'empty' container.
         ItemStack itemStackEmpty = new ItemStack(item);
@@ -77,11 +80,11 @@ public class DamageIndicatedItemComponent {
      */
     public MutableComponent getInfo(ItemStack itemStack) {
         int amount = 0;
-        IFluidHandlerItemCapacity fluidHander = FluidHelpers.getFluidHandlerItemCapacity(itemStack).orElse(null);
-        FluidStack fluidStack = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
+        FluidStack fluidStack = net.neoforged.neoforge.transfer.fluid.FluidUtil.getFirstStackContained(itemStack);
         if (!fluidStack.isEmpty())
             amount = fluidStack.getAmount();
-        return getInfo(fluidStack, amount, fluidHander == null ? 0 : fluidHander.getCapacity());
+        IFluidHandlerCapacity fluidHander = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        return getInfo(fluidStack, amount, fluidHander == null ? 0 : fluidHander.getTankCapacity(0));
     }
 
     /**
@@ -91,7 +94,6 @@ public class DamageIndicatedItemComponent {
      * @param capacity The capacity to show.
      * @return The info generated from the given parameters.
      */
-    @Environment(EnvType.CLIENT)
     public static MutableComponent getInfo(FluidStack fluidStack, int amount, int capacity) {
         MutableComponent prefix = Component.literal("");
         if (!fluidStack.isEmpty()) {
@@ -106,13 +108,15 @@ public class DamageIndicatedItemComponent {
 
     /**
      * Add information to the given list for the given item.
-     * @param itemStack The {@link ItemStack} to add info for.
-     * @param context The context that will see the info.
-     * @param list The info list where the info will be added.
-     * @param flag the tooltip flag
+     *
+     * @param itemStack      The {@link ItemStack} to add info for.
+     * @param context        The context that will see the info.
+     * @param tooltipDisplay
+     * @param tooltipAdder   The info list where the info will be added.
+     * @param flag           the tooltip flag
      */
-    public void addInformation(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
-        list.add(((IInformationProvider) itemStack.getItem()).getInfo(itemStack)
+    public void addInformation(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        tooltipAdder.accept(((IInformationProvider) itemStack.getItem()).getInfo(itemStack)
                 .setStyle(Style.EMPTY.withColor(IInformationProvider.ITEM_PREFIX)));
     }
 
@@ -122,10 +126,10 @@ public class DamageIndicatedItemComponent {
      * @return The displayed durability.
      */
     public int getDurability(ItemStack itemStack) {
-        IFluidHandlerItemCapacity fluidHander = FluidHelpers.getFluidHandlerItemCapacity(itemStack).orElse(null);
-        FluidStack fluidStack = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
-        double capacity = fluidHander == null ? 0 : fluidHander.getCapacity();
-        double amount = FluidHelpers.getAmount(fluidStack);
+        FluidStack fluidStack = net.neoforged.neoforge.transfer.fluid.FluidUtil.getFirstStackContained(itemStack);
+        IFluidHandlerCapacity fluidHander = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        double capacity = fluidHander == null ? 0 : fluidHander.getTankCapacity(0);
+        double amount = IModHelpers.get().getFluidHelpers().getAmount(fluidStack);
         return (int) Math.round(amount * 13 / capacity);
     }
 

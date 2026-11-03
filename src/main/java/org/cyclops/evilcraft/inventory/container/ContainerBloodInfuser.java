@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotRemoveOnly;
+import org.cyclops.cyclopscore.inventory.slot.SlotRemoveOnly;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.gameevent.BloodInfuserRemoveEvent;
 import org.cyclops.evilcraft.block.BlockBloodInfuser;

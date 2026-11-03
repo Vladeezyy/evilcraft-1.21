@@ -3,8 +3,11 @@ package org.cyclops.evilcraft.fabric.cyclopscore.persist.world;
 
 
 import com.google.common.collect.Maps;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
-import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import java.util.Map;
 
@@ -12,13 +15,12 @@ import java.util.Map;
  * Global counter that is shared over all dimensions, persisted, and consistent over server and clients.
  * @author rubensworks
  */
-public class GlobalCounters extends WorldStorage {
+public class GlobalCounters extends WorldStorage<GlobalCounters> {
 
-    @NBTPersist
-    private Map<String, Integer> counters = Maps.newHashMap();
+    private final Map<String, Integer> counters;
 
-    public GlobalCounters(ModBase mod) {
-        super(mod);
+    public GlobalCounters(Map<String, Integer> counters) {
+        this.counters = Maps.newHashMap(counters);
     }
 
     /**
@@ -42,18 +44,22 @@ public class GlobalCounters extends WorldStorage {
 
         // Store value for next call
         counters.put(key, incr);
+        setDirty();
 
         return next;
     }
 
-    @Override
-    public void reset() {
-        counters.clear();
-    }
+    public static class Access extends WorldStorage.Access<GlobalCounters> {
 
-    @Override
-    protected String getDataId() {
-        return "GlobalCounterData";
+        public Access(ModBaseNeoForge<?> mod) {
+            super(new SavedDataType<>(
+                    Identifier.fromNamespaceAndPath(mod.getModId(), "globalcounters"),
+                    (ctx) -> new GlobalCounters(Maps.newHashMap()),
+                    ctx -> RecordCodecBuilder.create(instance -> instance.group(
+                            Codec.dispatchedMap(Codec.STRING, (key) -> Codec.INT).fieldOf("counters").forGetter(data -> data.counters)
+                    ).apply(instance, GlobalCounters::new))
+            ), mod);
+        }
     }
 
 }

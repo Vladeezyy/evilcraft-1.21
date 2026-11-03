@@ -1,23 +1,17 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
+    "minecraft:honey_block",
     {
-      "item": "minecraft:honey_block"
-    },
-    {
-      "fabric:type": "fabric:components",
-      "base": {
-        "item": "evilcraft:broom_part"
-      },
+      "neoforge:ingredient_type": "neoforge:components",
+      "items": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:brush_bare"
         ]
       }
     },
-    {
-      "item": "minecraft:honey_block"
-    }
+    "minecraft:honey_block"
   ],
   "result": {
     "id": "evilcraft:broom_part",

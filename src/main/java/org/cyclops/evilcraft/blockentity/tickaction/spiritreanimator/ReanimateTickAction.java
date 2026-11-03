@@ -3,9 +3,10 @@ package org.cyclops.evilcraft.blockentity.tickaction.spiritreanimator;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
-import org.cyclops.evilcraft.fabric.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.InventoryHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSpiritReanimatorConfig;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritReanimator;
@@ -29,14 +30,17 @@ public class ReanimateTickAction implements ITickAction<BlockEntitySpiritReanima
     @Override
     public void onTick(BlockEntitySpiritReanimator tile, ItemStack itemStack, int slot, int tick) {
         // Drain the tank a bit.
-        tile.getTank().drain(getRequiredMb(tile, tick), IFluidHandler.FluidAction.EXECUTE);
+        try (var tx = Transaction.openRoot()) {
+            tile.getTank().extract(FluidResource.of(tile.getTank().getFluidType()), getRequiredMb(tile, tick), tx);
+            tx.commit();
+        }
         if(tick >= getRequiredTicks(tile, slot, tick)) {
             ItemStack spawnEgg = ItemStack.EMPTY;
             EntityType<?> entityType = tile.getEntityType();
             if(entityType != null) {
-                SpawnEggItem spawnEggItem = SpawnEggItem.byId(entityType);
-                if (spawnEggItem != null) {
-                    spawnEgg = new ItemStack(spawnEggItem);
+                java.util.Optional<net.minecraft.core.Holder<net.minecraft.world.item.Item>> spawnEggOpt = SpawnEggItem.byId(entityType);
+                if (spawnEggOpt.isPresent() && spawnEggOpt.get().value() instanceof SpawnEggItem) {
+                    spawnEgg = new ItemStack(spawnEggOpt.get().value());
                 }
             }
             if(!spawnEgg.isEmpty() && addToProduceSlot(tile, spawnEgg)) {
@@ -71,7 +75,7 @@ public class ReanimateTickAction implements ITickAction<BlockEntitySpiritReanima
      * @return If the item could be added or joined in the output slot.
      */
     public boolean addToProduceSlot(BlockEntitySpiritReanimator tile, ItemStack itemStack) {
-        return InventoryHelpers.addToSlot(tile.getInventory(), BlockEntitySpiritReanimator.SLOTS_OUTPUT, itemStack);
+        return IModHelpers.get().getInventoryHelpers().addToSlot(tile.getInventory(), BlockEntitySpiritReanimator.SLOTS_OUTPUT, itemStack);
     }
 
 }

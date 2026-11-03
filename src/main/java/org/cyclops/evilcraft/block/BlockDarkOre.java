@@ -21,10 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.item.IInformationProvider;
 import org.cyclops.evilcraft.item.ItemDarkGem;
 import org.jetbrains.annotations.Nullable;
@@ -86,7 +83,7 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     }
 
     private boolean isGlowing(Level world, BlockPos blockPos) {
-        return BlockHelpers.getSafeBlockStateProperty(world.getBlockState(blockPos), GLOWING, true);
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(world.getBlockState(blockPos), GLOWING, true);
     }
 
     private void glow(Level world, BlockPos blockPos) {
@@ -94,7 +91,7 @@ public class BlockDarkOre extends Block implements IInformationProvider {
             this.sparkle(world, blockPos);
 
         if (!isGlowing(world, blockPos)) {
-            world.setBlock(blockPos, defaultBlockState().setValue(GLOWING, true), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+            world.setBlock(blockPos, defaultBlockState().setValue(GLOWING, true), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
         }
     }
 
@@ -106,21 +103,19 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     @Override
     public void tick(BlockState state, ServerLevel world, BlockPos blockPos, RandomSource rand) {
         if (isGlowing(world, blockPos)) {
-            world.setBlock(blockPos, defaultBlockState().setValue(GLOWING, false), MinecraftHelpers.BLOCK_NOTIFY_CLIENT);
+            world.setBlock(blockPos, defaultBlockState().setValue(GLOWING, false), IModHelpers.get().getMinecraftHelpers().getBlockNotifyClient());
         }
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void animateTick(BlockState stateIn, Level world, BlockPos blockPos, RandomSource rand) {
         if (isGlowing(world, blockPos)) {
             this.sparkle(world, blockPos);
         }
     }
 
-    @Environment(EnvType.CLIENT)
     private void sparkle(Level world, BlockPos blockPos) {
-        RandomSource random = world.random;
+        RandomSource random = world.getRandom();
         double offset = 0.0625D;
 
         for (int l = 0; l < 6; ++l) {
@@ -171,7 +166,6 @@ public class BlockDarkOre extends Block implements IInformationProvider {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void provideInformation(ItemStack itemStack, Level world, List<Component> list, TooltipFlag iTooltipFlag) {
 
     }

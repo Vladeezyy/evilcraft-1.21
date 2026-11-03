@@ -3,7 +3,8 @@ package org.cyclops.evilcraft.fluid;
 import org.cyclops.evilcraft.fabric.fluids.SoundActions;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Rarity;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfig;
+import org.cyclops.evilcraft.fabric.fluids.SoundActions;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfigNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -12,18 +13,18 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  *
  */
-public class BloodConfig extends FluidConfig {
+public class BloodConfig extends FluidConfigNeoForge {
 
     public BloodConfig() {
         super(
                 EvilCraft._instance,
                 "blood",
-                fluidConfig -> getDefaultFluidProperties(EvilCraft._instance,
-                        "block/blood",
+                fluidConfig -> getDefaultFluidProperties(fluidConfig,
                         builder -> builder
                                 .density(1500)
                                 .viscosity(3000)
                                 .temperature(309)
+                                .isWaterLike(true)
                                 .rarity(Rarity.COMMON)
                                 .descriptionId("block.evilcraft.blood")
                                 .supportsBoating(true)

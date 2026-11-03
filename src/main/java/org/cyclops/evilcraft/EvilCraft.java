@@ -13,13 +13,14 @@ import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentInventory
 import org.cyclops.evilcraft.fabric.cyclopscore.component.DataComponentFluidContentConfig;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigHandler;
+import org.cyclops.cyclopscore.config.ConfigHandlerCommon;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBookRegistry;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoBookRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseVersionable;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.modcompat.ModCompatLoader;
 import org.cyclops.evilcraft.fabric.cyclopscore.persist.world.GlobalCounters;
 import org.cyclops.evilcraft.fabric.cyclopscore.proxy.IClientProxy;
@@ -34,7 +35,6 @@ import org.cyclops.evilcraft.api.broom.IBroomPartRegistry;
 import org.cyclops.evilcraft.api.degradation.IDegradationRegistry;
 import org.cyclops.evilcraft.api.tileentity.bloodchest.IBloodChestRepairActionRegistry;
 import org.cyclops.evilcraft.api.tileentity.purifier.IPurifierActionRegistry;
-import org.cyclops.evilcraft.armormaterial.ArmorMaterialSpectralGlassesConfig;
 import org.cyclops.evilcraft.block.*;
 import org.cyclops.evilcraft.blockentity.*;
 import org.cyclops.evilcraft.blockentity.tickaction.bloodchest.BloodChestRepairActionRegistry;
@@ -47,7 +47,11 @@ import org.cyclops.evilcraft.core.broom.BroomPartRegistry;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 import org.cyclops.evilcraft.core.degradation.DegradationRegistry;
 import org.cyclops.evilcraft.core.degradation.effect.*;
-import org.cyclops.evilcraft.core.fluid.WorldSharedTank;
+import org.cyclops.evilcraft.core.fluid.WorldStorageSharedTank;
+import org.cyclops.evilcraft.core.recipe.category.RecipeBookCategoryBloodInfuserConfig;
+import org.cyclops.evilcraft.core.recipe.category.RecipeBookCategoryEnvironmentalAccumulatorConfig;
+import org.cyclops.evilcraft.core.recipe.display.RecipeDisplayBloodInfuserConfig;
+import org.cyclops.evilcraft.core.recipe.display.RecipeDisplayEnvironmentalAccumulatorConfig;
 import org.cyclops.evilcraft.core.recipe.type.*;
 import org.cyclops.evilcraft.enchantment.component.EnchantmentEffectComponentAmplifyDamageConfig;
 import org.cyclops.evilcraft.enchantment.component.EnchantmentEffectComponentStopDamageConfig;
@@ -63,9 +67,14 @@ import org.cyclops.evilcraft.entity.villager.PoiWerewolvianConfig;
 import org.cyclops.evilcraft.entity.villager.VillagerProfessionWerewolfConfig;
 import org.cyclops.evilcraft.fluid.BloodConfig;
 import org.cyclops.evilcraft.fluid.PoisonConfig;
+import org.cyclops.evilcraft.gametest.*;
 import org.cyclops.evilcraft.infobook.OriginsOfDarknessBook;
 import org.cyclops.evilcraft.inventory.container.*;
 import org.cyclops.evilcraft.item.*;
+import org.cyclops.evilcraft.itemtintsource.ItemTintSourceBiomeExtractConfig;
+import org.cyclops.evilcraft.itemtintsource.ItemTintSourceBowlOfPromisesTypeConfig;
+import org.cyclops.evilcraft.itemtintsource.ItemTintSourceBroomPartConfig;
+import org.cyclops.evilcraft.itemtintsource.ItemTintSourceWeatherContainerTypeConfig;
 import org.cyclops.evilcraft.loot.functions.LootFunctionCopyBoxOfEternalClosureDataConfig;
 import org.cyclops.evilcraft.loot.functions.LootFunctionCopyDisplayStandDataConfig;
 import org.cyclops.evilcraft.loot.functions.LootFunctionCopyEntangledChaliceDataConfig;
@@ -88,21 +97,23 @@ import org.cyclops.evilcraftcompat.EvilCraftCompat;
  * @author rubensworks
  *
  */
-public class EvilCraft extends ModBaseVersionable<EvilCraft> {
+@Mod(Reference.MOD_ID)
+public class EvilCraft extends ModBaseNeoForge<EvilCraft> {
 
     /**
      * The unique instance of this mod.
      */
     public static EvilCraft _instance;
 
-    public static GlobalCounters globalCounters = null;
+    public static GlobalCounters.Access globalCounters = null;
+    public static WorldStorageSharedTank.Access sharedTanks = null;
 
     public EvilCraft() {
         super(Reference.MOD_ID, (instance) -> _instance = instance);
 
         // Register world storages
-        registerWorldStorage(new WorldSharedTank.TankData(this));
-        registerWorldStorage(globalCounters = new GlobalCounters(this));
+        registerWorldStorage(sharedTanks = new WorldStorageSharedTank.Access(this));
+        registerWorldStorage(globalCounters = new GlobalCounters.Access(this));
 
         // Create registries
         getRegistryManager().addRegistry(IDegradationRegistry.class, new DegradationRegistry());
@@ -158,7 +169,7 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
     }
 
     @Override
-    protected void onConfigsRegister(ConfigHandler configHandler) {
+    protected void onConfigsRegister(ConfigHandlerCommon configHandler) {
         super.onConfigsRegister(configHandler);
 
         configHandler.addConfigurable(new GeneralConfig());
@@ -398,6 +409,14 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         configHandler.addConfigurable(new RecipeTypeBloodInfuserConfig());
         configHandler.addConfigurable(new RecipeTypeEnvironmentalAccumulatorConfig());
 
+        // Recipe book categories
+        configHandler.addConfigurable(new RecipeBookCategoryBloodInfuserConfig());
+        configHandler.addConfigurable(new RecipeBookCategoryEnvironmentalAccumulatorConfig());
+
+        // Recipe display types
+        configHandler.addConfigurable(new RecipeDisplayBloodInfuserConfig());
+        configHandler.addConfigurable(new RecipeDisplayEnvironmentalAccumulatorConfig());
+
         // Recipes
         configHandler.addConfigurable(new RecipeSerializerBloodInfuserConfig());
         configHandler.addConfigurable(new RecipeSerializerEnvironmentalAccumulatorConfig());
@@ -444,9 +463,6 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         configHandler.addConfigurable(new SoundEventMobVengeanceSpiritAmbientConfig());
         configHandler.addConfigurable(new SoundEventMobVengeanceSpiritDeathConfig());
 
-        // Armor materials
-        configHandler.addConfigurable(new ArmorMaterialSpectralGlassesConfig());
-
         // Data components
         configHandler.addConfigurable(new DataComponentActivatedConfig());
         configHandler.addConfigurable(new DataComponentBiomeConfig());
@@ -461,6 +477,12 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
         configHandler.addConfigurable(new DataComponentWeatherContainerTypeConfig());
         configHandler.addConfigurable(new DataComponentWorldSharedTankIdConfig());
 
+        // Item tint sources
+        configHandler.addConfigurable(new ItemTintSourceBiomeExtractConfig());
+        configHandler.addConfigurable(new ItemTintSourceBowlOfPromisesTypeConfig());
+        configHandler.addConfigurable(new ItemTintSourceBroomPartConfig());
+        configHandler.addConfigurable(new ItemTintSourceWeatherContainerTypeConfig());
+
         // POIs
         configHandler.addConfigurable(new PoiWerewolvianConfig());
     }
@@ -473,6 +495,30 @@ public class EvilCraft extends ModBaseVersionable<EvilCraft> {
     @Override
     protected ICommonProxy constructCommonProxy() {
         return new CommonProxy();
+    }
+
+    @Override
+    public Class<?>[] getGameTestClasses() {
+        return new Class<?>[]{
+                GameTestsAdvancements.class,
+                GameTestsBiomeExtract.class,
+                GameTestsBlockEternalWater.class,
+                GameTestsBloodChest.class,
+                GameTestsBloodInfuser.class,
+                GameTestsDarkTank.class,
+                GameTestsEntangledChalice.class,
+                GameTestsItemEmpowering.class,
+                GameTestsItemEternalWater.class,
+                GameTestsItemStacking.class,
+                GameTestsOriginsOfDarkness.class,
+                GameTestsPurifier.class,
+                GameTestsRecipes.class,
+                GameTestsSanguinaryEnvironmentalAccumulator.class,
+                GameTestsSpiritFurnace.class,
+                GameTestsSpiritReanimator.class,
+                GameTestsVengeanceSpirits.class,
+                GameTestsWerewolfVillager.class,
+        };
     }
 
     /**

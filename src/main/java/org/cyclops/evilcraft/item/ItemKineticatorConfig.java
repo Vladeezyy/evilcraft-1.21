@@ -2,11 +2,11 @@ package org.cyclops.evilcraft.item;
 
 import com.google.common.collect.Lists;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author rubensworks
  *
  */
-public class ItemKineticatorConfig extends ItemConfig {
+public class ItemKineticatorConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "If the Kineticator should also attract XP orbs.", isCommandable = true)
     public static boolean moveXP = true;
@@ -39,14 +39,13 @@ public class ItemKineticatorConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "kineticator" + (repelling ? "_repelling" : ""),
-                eConfig -> new ItemKineticator(new Item.Properties()
-                        , repelling)
+                (eConfig, properties) -> new ItemKineticator(properties, repelling)
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

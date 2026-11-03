@@ -1,12 +1,11 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -17,26 +16,25 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemNecromancerStaffConfig extends ItemConfig {
+public class ItemNecromancerStaffConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The capacity of the container.", requiresMcRestart = true)
-    public static int capacity = FluidHelpers.BUCKET_VOLUME * 10;
+    public static int capacity = 1000 * 10;
 
     @ConfigurablePropertyCommon(category = "item", comment = "The amount of Blood that will be drained per usage.", isCommandable = true)
-    public static int usage = FluidHelpers.BUCKET_VOLUME * 2;
+    public static int usage = 1000 * 2;
 
     public ItemNecromancerStaffConfig() {
         super(
                 EvilCraft._instance,
             "necromancer_staff",
-                eConfig -> new ItemNecromancerStaff(new Item.Properties()
-                        )
+                (eConfig, properties) -> new ItemNecromancerStaff(properties)
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

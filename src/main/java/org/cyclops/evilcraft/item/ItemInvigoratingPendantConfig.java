@@ -1,12 +1,11 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -17,10 +16,10 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemInvigoratingPendantConfig extends ItemConfig {
+public class ItemInvigoratingPendantConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The capacity of the pendant.", requiresMcRestart = true)
-    public static int capacity = FluidHelpers.BUCKET_VOLUME * 5;
+    public static int capacity = 1000 * 5;
 
     @ConfigurablePropertyCommon(category = "item", comment = "The amount of blood to drain after each clearing of one bad effect.", isCommandable = true)
     public static int usage = 100;
@@ -35,8 +34,7 @@ public class ItemInvigoratingPendantConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "invigorating_pendant",
-                eConfig -> new ItemInvigoratingPendant(new Item.Properties()
-
+                (eConfig, properties) -> new ItemInvigoratingPendant(properties
                         .stacksTo(1))
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
@@ -48,7 +46,7 @@ public class ItemInvigoratingPendantConfig extends ItemConfig {
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

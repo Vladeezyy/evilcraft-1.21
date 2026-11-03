@@ -5,13 +5,12 @@ import com.google.common.collect.Maps;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.Level;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.FluidHelpers;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -24,12 +23,12 @@ import java.util.Map;
  * @author rubensworks
  *
  */
-public class ItemPrimedPendantConfig extends ItemConfig {
+public class ItemPrimedPendantConfig extends ItemConfigCommon<IModBase> {
 
     private static final String DELIMITER = ";";
 
     @ConfigurablePropertyCommon(category = "item", comment = "The capacity of the pendant.", requiresMcRestart = true)
-    public static int capacity = FluidHelpers.BUCKET_VOLUME * 5;
+    public static int capacity = 1000 * 5;
 
     @ConfigurablePropertyCommon(category = "item", comment = "The amount of Blood to drain after one effect application.", isCommandable = true)
     public static int usage = 10;
@@ -45,8 +44,7 @@ public class ItemPrimedPendantConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "primed_pendant",
-                eConfig -> new ItemPrimedPendant(new Item.Properties()
-
+                (eConfig, properties) -> new ItemPrimedPendant(properties
                         .stacksTo(1))
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
@@ -82,7 +80,7 @@ public class ItemPrimedPendantConfig extends ItemConfig {
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

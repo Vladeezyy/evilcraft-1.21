@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.container.ItemInventoryContainer;
+import org.cyclops.cyclopscore.inventory.container.ItemInventoryContainer;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.inventory.NBTCraftingGrid;
 import org.cyclops.evilcraft.item.ItemExaltedCrafter;
@@ -196,8 +196,8 @@ public class ContainerExaltedCrafter extends ItemInventoryContainer<ItemExaltedC
 
             // Slightly altered logic from Container#slotChangedCraftingGrid
             RecipeHolder<CraftingRecipe> irecipe = world.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingGrid.asCraftInput(), world).orElse(null);
-            if (irecipe != null && result.setRecipeUsed(world, (ServerPlayer) player, irecipe)) {
-                itemstack = irecipe.value().assemble(craftingGrid.asCraftInput(), world.registryAccess());
+            if (irecipe != null && result.setRecipeUsed((ServerPlayer) player, irecipe)) {
+                itemstack = irecipe.value().assemble(craftingGrid.asCraftInput());
             }
             result.setItem(0, itemstack);
             ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetSlotPacket(this.containerId, getStateId(), 9, itemstack));

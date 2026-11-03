@@ -10,28 +10,24 @@ import java.util.List;
 import org.cyclops.evilcraft.fabric.client.model.ModelLoaders;
 import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBase;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.proxy.ClientProxyComponent;
 import org.cyclops.evilcraft.EvilCraft;
-import org.cyclops.evilcraft.Reference;
+import org.cyclops.evilcraft.RegistryEntries;
+import org.cyclops.evilcraft.block.BlockEntangledChaliceConfig;
 import org.cyclops.evilcraft.client.key.ExaltedCrafterKeyHandler;
 import org.cyclops.evilcraft.client.key.FartKeyHandler;
 import org.cyclops.evilcraft.client.key.Keys;
-import org.cyclops.evilcraft.client.render.model.ModelBoxOfEternalClosure;
-import org.cyclops.evilcraft.client.render.model.ModelEntangledChaliceBaked;
-import org.cyclops.evilcraft.core.broom.BroomParts;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderBoxOfEternalClosure;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderBroom;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderBroomPart;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderDarkTank;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderDisplayStand;
-import org.cyclops.evilcraft.core.client.model.ModelLoaderEntangledChalice;
+import org.cyclops.evilcraft.client.render.blockentity.*;
 import org.cyclops.evilcraft.event.RenderOverlayEventHook;
+
+import java.lang.reflect.Field;
 
 /**
  * Proxy for the client side.
@@ -43,26 +39,25 @@ public class ClientProxy extends ClientProxyComponent {
 
     public ClientProxy() {
         super(new CommonProxy());
-        this.onModelLoad();
-        this.onModelRegisterAdditional();
-        ModelLoaders.init(Reference.MOD_ID);
-        ModelRenderTypes.init(Reference.MOD_ID);
+        EvilCraft._instance.getModEventBus().addListener(this::onModelBakingCompleted);
     }
 
     @Override
-    public void registerRenderers() {
-        super.registerRenderers();
-        // The fluid rendered inside the tank model
-        BlockRenderLayerMap.INSTANCE.putBlock(RegistryEntries.BLOCK_DARK_TANK.get(), RenderType.translucent());
-    }
-
-    @Override
-    public ModBase getMod() {
+    public ModBaseNeoForge<EvilCraft> getMod() {
         return EvilCraft._instance;
     }
 
     @Override
     public void registerKeyBindings(IKeyRegistry keyRegistry, RegisterKeyMappingsEvent event) {
+        Options settings;
+        try {
+            Field field = RegisterKeyMappingsEvent.class.getDeclaredField("options");
+            field.setAccessible(true);
+            settings = (Options) field.get(event);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         for (KeyMapping key : Keys.KEYS)
             event.register(key);
 
@@ -81,27 +76,28 @@ public class ClientProxy extends ClientProxyComponent {
     public void registerEventHooks() {
         super.registerEventHooks();
 
-        RenderGuiEvent.Post.addListener(new RenderOverlayEventHook()::onRenderOverlayEvent);
+        NeoForge.EVENT_BUS.register(new RenderOverlayEventHook());
     }
 
-    public void onModelLoad() {
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "broom"), new ModelLoaderBroom());
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "broom_part"), new ModelLoaderBroomPart());
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "box_of_eternal_closure"), new ModelLoaderBoxOfEternalClosure());
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "dark_tank"), new ModelLoaderDarkTank());
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "entangled_chalice"), new ModelLoaderEntangledChalice());
-        ModelLoaders.registerLoader(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "display_stand"), new ModelLoaderDisplayStand());
+    @Override
+    public void registerRenderers() {
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_BLOOD_CHEST.get(), RenderBlockEntityBloodChest::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_BOX_OF_ETERNAL_CLOSURE.get(), RenderBlockEntityBoxOfEternalClosure::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_COLOSSAL_BLOOD_CHEST.get(), RenderBlockEntityColossalBloodChest::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_DARK_TANK.get(), RenderBlockEntityDarkTank::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_DISPLAY_STAND.get(), RenderBlockEntityDisplayStand::new);
+        if (!BlockEntangledChaliceConfig.staticBlockRendering) {
+            registerRenderer(RegistryEntries.BLOCK_ENTITY_ENTANGLED_CHALICE.get(), RenderBlockEntityEntangledChalice::new);
+        }
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_ENVIRONMENTAL_ACCUMULATOR.get(), RenderBlockEntityEnvironmentalAccumulator::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_PURIFIER.get(), RenderBlockEntityPurifier::new);
+        registerRenderer(RegistryEntries.BLOCK_ENTITY_SPIRIT_PORTAL.get(), RenderBlockEntitySpiritPortal::new);
+
+        super.registerRenderers();
     }
 
-    public void onModelRegisterAdditional() {
-        // Box of eternal closure
-        ModelLoaders.registerAdditionalModels(() -> List.of(ModelBoxOfEternalClosure.boxModel,
-                ModelBoxOfEternalClosure.boxLidModel, ModelBoxOfEternalClosure.boxLidRotatedModel));
-        // Broom
-        ModelLoaders.registerAdditionalModels(() -> BroomParts.REGISTRY.getPartModels());
-        // Entangled chalice
-        ModelLoaders.registerAdditionalModels(() -> List.of(ModelEntangledChaliceBaked.chaliceModelName,
-                ModelEntangledChaliceBaked.gemsModelName));
+    public void onModelBakingCompleted(ModelEvent.BakingCompleted event) {
+        this.modelBakery = event.getModelBakery();
     }
 
 }

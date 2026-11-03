@@ -3,8 +3,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.proxy;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import org.cyclops.cyclopscore.proxy.ClientProxyComponentCommon;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.client.key.RegisterKeyMappingsEvent;
-import org.cyclops.evilcraft.fabric.cyclopscore.network.PacketHandler;
+import org.cyclops.cyclopscore.network.IPacketHandler;
 
 /**
  * Base proxy for the client side.
@@ -21,12 +20,14 @@ public abstract class ClientProxyComponent extends ClientProxyComponentCommon im
 
     @Override
     public void registerKeyBindings(IKeyRegistry keyRegistry, RegisterKeyMappingsEvent event) {
-
+        getMod().getLoggerHelper().log(Level.TRACE, "Registered key bindings");
+        event.registerCategory(getMainKeyCategory());
     }
 
     @Override
-    public void registerPacketHandlers(PacketHandler packetHandler) {
-        commonProxyComponent.registerPacketHandlers(packetHandler);
+    public void registerPackets(IPacketHandler packetHandler) {
+        getCommonProxyComponent().registerPackets(packetHandler);
+        getMod().getLoggerHelper().log(Level.TRACE, "Registered packet handlers");
     }
 
     @Override

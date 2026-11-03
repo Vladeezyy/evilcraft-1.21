@@ -14,25 +14,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.Helpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.MinecraftHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.weather.WeatherType;
 import org.cyclops.evilcraft.entity.item.EntityWeatherContainer;
 
-import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 /**
  * Class for the WeatherContainer item. Each weather container has a specific
@@ -62,15 +56,15 @@ public class ItemWeatherContainer extends Item {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack itemStack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack itemStack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if(!world.isClientSide() && getWeatherType(itemStack) != WeatherContainerType.EMPTY) {
-            world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.random.nextFloat() * 0.4F + 0.8F));
+            world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
             EntityWeatherContainer entity = new EntityWeatherContainer(world, player, itemStack.copy());
             // MCP: shoot
             entity.shootFromRotation(player, player.getXRot(), player.getYRot(), -20.0F, 0.5F, 1.0F);
@@ -79,7 +73,7 @@ public class ItemWeatherContainer extends Item {
             itemStack.shrink(1);
         }
 
-        return MinecraftHelpers.successAction(itemStack);
+        return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
     }
 
     /**
@@ -101,10 +95,10 @@ public class ItemWeatherContainer extends Item {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> list, TooltipFlag flag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag flag) {
+        super.appendHoverText(itemStack, context, tooltipDisplay, tooltipAdder, flag);
         WeatherContainerType type = getWeatherType(itemStack);
-        list.add(type.description.withStyle(type.damageColor));
+        tooltipAdder.accept(type.description.withStyle(type.damageColor));
     }
 
     public void fillItemCategory(NonNullList<ItemStack> items) {
@@ -126,19 +120,19 @@ public class ItemWeatherContainer extends Item {
         /**
          * Empty weather container.
          */
-        EMPTY(null, "empty", ChatFormatting.GRAY, Helpers.RGBAToInt(125, 125, 125, 255), Rarity.COMMON),
+        EMPTY(null, "empty", ChatFormatting.GRAY, IModHelpers.get().getBaseHelpers().RGBAToInt(125, 125, 125, 255), Rarity.COMMON),
         /**
          * Clear weather container.
          */
-        CLEAR(WeatherType.CLEAR, "clear", ChatFormatting.AQUA, Helpers.RGBAToInt(30, 150, 230, 255), Rarity.UNCOMMON),
+        CLEAR(WeatherType.CLEAR, "clear", ChatFormatting.AQUA, IModHelpers.get().getBaseHelpers().RGBAToInt(30, 150, 230, 255), Rarity.UNCOMMON),
         /**
          * Rain weather container.
          */
-        RAIN(WeatherType.RAIN, "rain", ChatFormatting.DARK_BLUE, Helpers.RGBAToInt(0, 0, 255, 255), Rarity.UNCOMMON),
+        RAIN(WeatherType.RAIN, "rain", ChatFormatting.DARK_BLUE, IModHelpers.get().getBaseHelpers().RGBAToInt(0, 0, 255, 255), Rarity.UNCOMMON),
         /**
          * Lightning weather container.
          */
-        LIGHTNING(WeatherType.LIGHTNING, "lightning", ChatFormatting.GOLD, Helpers.RGBToInt(255, 215, 0), Rarity.RARE);
+        LIGHTNING(WeatherType.LIGHTNING, "lightning", ChatFormatting.GOLD, IModHelpers.get().getBaseHelpers().RGBAToInt(255, 215, 0, 255), Rarity.RARE);
 
         public static final Codec<WeatherContainerType> CODEC = Codec.STRING.xmap(
                 name -> {
@@ -223,13 +217,9 @@ public class ItemWeatherContainer extends Item {
 
             return null;
         }
-    }
 
-    @Environment(EnvType.CLIENT)
-    public static class ItemColor implements net.minecraft.client.color.item.ItemColor {
-        @Override
-        public int getColor(ItemStack itemStack, int renderPass) {
-            return renderPass > 0 ? -1 : getWeatherType(itemStack).damageRenderColor;
+        public int getDamageRenderColor() {
+            return damageRenderColor;
         }
     }
 }

@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.core.blockentity.upgrade.IUpgradable;
 import org.cyclops.evilcraft.core.blockentity.upgrade.IUpgradeBehaviour;
 import org.cyclops.evilcraft.core.blockentity.upgrade.Upgrades;

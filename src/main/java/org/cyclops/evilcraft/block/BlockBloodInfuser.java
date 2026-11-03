@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -17,19 +18,16 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockEntityHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
+import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
-import org.cyclops.evilcraft.client.particle.ParticleBloodBubble;
 import org.cyclops.evilcraft.core.block.BlockWithEntityGuiTank;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityWorking;
+import org.cyclops.evilcraft.core.helper.ParticleHelpers;
 
 import javax.annotation.Nullable;
 
@@ -42,7 +40,7 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynami
 
     public static final MapCodec<BlockBloodChest> CODEC = simpleCodec(BlockBloodChest::new);
 
-    public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
+    public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
     public BlockBloodInfuser(Block.Properties properties) {
@@ -61,7 +59,7 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynami
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_BLOOD_INFUSER.get(), level.isClientSide ? new BlockEntityBloodInfuser.TickerClient<>() : new BlockEntityBloodInfuser.TickerServer<BlockEntityBloodInfuser, MutableInt>());
+        return createTickerHelper(blockEntityType, RegistryEntries.BLOCK_ENTITY_BLOOD_INFUSER.get(), level.isClientSide() ? new BlockEntityBloodInfuser.TickerClient<>() : new BlockEntityBloodInfuser.TickerServer<BlockEntityBloodInfuser, MutableInt>());
     }
 
     @Override
@@ -82,27 +80,26 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynami
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, RandomSource rand) {
-        ParticleBloodBubble.randomDisplayTick((BlockEntityWorking) worldIn.getBlockEntity(pos), worldIn, pos,
-                rand, BlockHelpers.getSafeBlockStateProperty(stateIn, FACING, Direction.NORTH));
+        ParticleHelpers.spawnRandomBloodBubbleParticles((BlockEntityWorking) worldIn.getBlockEntity(pos), worldIn, pos,
+                rand, IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(stateIn, FACING, Direction.NORTH));
         super.animateTick(stateIn, worldIn, pos, rand);
     }
 
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
-        return BlockEntityHelpers.get(world, pos, BlockEntityBloodInfuser.class)
-                .map(tile -> tile.isVisuallyWorking() ? 4 : state.getLightEmission())
+        return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityBloodInfuser.class)
+                .map(tile -> tile.isVisuallyWorking() ? 4 : super.getLightEmission(state, world, pos))
                 .orElse(0);
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        BlockEntityHelpers.get(world, pos, BlockEntityBloodInfuser.class)
+    public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
+        IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityBloodInfuser.class)
                 .ifPresent(tile -> {
                     EntityHelpers.spawnXpAtPlayer(player.level(), player, (int) Math.floor(tile.getXp()));
                     tile.resetXp();
                 });
-        return super.playerWillDestroy(world, pos, state, player);
+        return super.onDestroyedByPlayer(state, world, pos, player, toolStack, willHarvest, fluid);
     }
 }

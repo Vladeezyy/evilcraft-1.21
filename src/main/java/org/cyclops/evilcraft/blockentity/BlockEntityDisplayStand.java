@@ -2,16 +2,24 @@ package org.cyclops.evilcraft.blockentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import org.cyclops.evilcraft.fabric.cyclopscore.blockentity.CyclopsBlockEntity;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.transaction.RootCommitJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.BlockHelpers;
-import org.cyclops.evilcraft.fabric.cyclopscore.inventory.SimpleInventory;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDisplayStand;
@@ -44,8 +52,8 @@ public class BlockEntityDisplayStand extends CyclopsBlockEntity {
 
         @Override
         public void populate() {
-            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.ItemHandler.BLOCK, (blockEntity, direction) -> blockEntity.getInventory().getItemHandler());
-            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.FluidHandler.BLOCK, (blockEntity, direction) -> Capabilities.FluidHandler.ITEM.getCapability(blockEntity.getContents(), null));
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK, (blockEntity, direction) -> VanillaContainerWrapper.of(blockEntity.getInventory()));
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK, (blockEntity, direction) -> Capabilities.Fluid.ITEM.getCapability(blockEntity.getContents(), new ItemAccessDisplayStand(blockEntity, blockEntity.getContents())));
         }
     }
 
@@ -78,7 +86,7 @@ public class BlockEntityDisplayStand extends CyclopsBlockEntity {
     }
 
     protected Direction getFacing() {
-        return BlockHelpers.getSafeBlockStateProperty(getLevel().getBlockState(getBlockPos()), BlockDisplayStand.FACING, Direction.NORTH);
+        return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(getLevel().getBlockState(getBlockPos()), BlockDisplayStand.FACING, Direction.NORTH);
     }
 
     protected ItemStack getContents() {
@@ -86,20 +94,72 @@ public class BlockEntityDisplayStand extends CyclopsBlockEntity {
     }
 
     @Override
-    public void read(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        super.read(tag, holderLookupProvider);
-        inventory.readFromNBT(holderLookupProvider, tag, "inventory");
+    public void read(ValueInput input) {
+        super.read(input);
+        inventory.readFromNBT(input, "inventory");
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider holderLookupProvider) {
-        inventory.writeToNBT(holderLookupProvider, tag, "inventory");
-        super.saveAdditional(tag, holderLookupProvider);
+    public void saveAdditional(ValueOutput output) {
+        inventory.writeToNBT(output, "inventory");
+        super.saveAdditional(output);
     }
 
     @Override
+    public void onDataPacket(Connection net, ValueInput valueInput) {
+        super.onDataPacket(net, valueInput);
+        onUpdateReceived();
+    }
+
     public void onUpdateReceived() {
-        super.onUpdateReceived();
-        BlockHelpers.markForUpdate(level, worldPosition);
+        IModHelpers.get().getBlockHelpers().markForUpdate(level, worldPosition);
+    }
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        IModHelpers.get().getInventoryHelpers().dropItems(getLevel(), getInventory(), pos);
+    }
+
+    // Inspired by StackItemAccess
+    public static class ItemAccessDisplayStand implements ItemAccess {
+
+        private final BlockEntityDisplayStand blockEntity;
+        private final ResourceHandler<ItemResource> wrapper;
+        private final RootCommitJournal journal;
+
+        public ItemAccessDisplayStand(BlockEntityDisplayStand blockEntity, ItemStack stack) {
+            this.blockEntity = blockEntity;
+            this.wrapper = VanillaContainerWrapper.of(new SimpleContainer(stack) {
+                public void setItem(int slot, ItemStack stack, boolean performSideEffects) {
+                    this.getItems().set(slot, stack);
+                }
+            });
+            this.journal = new RootCommitJournal(() -> {
+                this.blockEntity.getInventory().setItem(0, getResource().toStack(getAmount()));
+            });
+        }
+
+        @Override
+        public ItemResource getResource() {
+            return this.wrapper.getResource(0);
+        }
+
+        @Override
+        public int getAmount() {
+            return this.wrapper.getAmountAsInt(0);
+        }
+
+        @Override
+        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+            this.journal.updateSnapshots(transaction);
+            return this.wrapper.insert(resource, amount, transaction);
+        }
+
+        @Override
+        public int extract(ItemResource resource, int amount, TransactionContext transaction) {
+            this.journal.updateSnapshots(transaction);
+            return this.wrapper.extract(resource, amount, transaction);
+        }
     }
 }

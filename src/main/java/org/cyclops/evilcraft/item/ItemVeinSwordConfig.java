@@ -1,13 +1,11 @@
 package org.cyclops.evilcraft.item;
 
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
-import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.ItemConfig;
+import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
+import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
 
 import java.util.Collection;
@@ -18,7 +16,7 @@ import java.util.Collections;
  * @author rubensworks
  *
  */
-public class ItemVeinSwordConfig extends ItemConfig {
+public class ItemVeinSwordConfig extends ItemConfigCommon<IModBase> {
 
     @ConfigurablePropertyCommon(category = "item", comment = "The multiply boost this sword has on the blood that is obtained.", isCommandable = true)
     public static double extractionBoost = 2.0;
@@ -30,14 +28,13 @@ public class ItemVeinSwordConfig extends ItemConfig {
         super(
                 EvilCraft._instance,
                 "vein_sword",
-                eConfig -> new ItemVeinSword(new Item.Properties()
-                            .attributes(SwordItem.createAttributes(Tiers.GOLD, 3, -2.4F)))
+                (eConfig, properties) -> new ItemVeinSword(properties)
         );
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);
     }
 
     @Override
-    protected Collection<ItemStack> getDefaultCreativeTabEntries() {
+    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
         return Collections.emptyList();
     }
 

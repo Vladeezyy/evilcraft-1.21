@@ -2,14 +2,15 @@ package org.cyclops.evilcraft.fabric.cyclopscore.client.model;
 
 
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import org.cyclops.evilcraft.fabric.client.model.ModelData;
+import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nullable;
 
@@ -20,53 +21,52 @@ import javax.annotation.Nullable;
 public abstract class DelegatingDynamicItemAndBlockModel extends DynamicItemAndBlockModel {
 
     @Nullable
+    protected final BlockAndTintGetter level;
+    @Nullable
     protected final BlockState blockState;
     @Nullable
     protected final Direction facing;
     protected final RandomSource rand;
     protected final ModelData modelData;
-    protected final RenderType renderType;
-
+    protected final ChunkSectionLayer renderType;
+    @Nullable
     protected final ItemStack itemStack;
-    protected final Level world;
-    protected final LivingEntity entity;
+    @Nullable
+    protected final ItemOwner entity;
 
     public DelegatingDynamicItemAndBlockModel() {
         super(true, false);
+        this.level = null;
         this.blockState = null;
         this.facing = null;
         this.rand = RandomSource.create();
         this.modelData = ModelData.EMPTY;
-        this.renderType = RenderType.cutout();
-
+        this.renderType = ChunkSectionLayer.CUTOUT;
         this.itemStack = null;
-        this.world = null;
         this.entity = null;
     }
 
-    public DelegatingDynamicItemAndBlockModel(BlockState blockState, Direction facing, RandomSource rand, ModelData modelData, RenderType renderType) {
+    public DelegatingDynamicItemAndBlockModel(BlockAndTintGetter level, BlockState blockState, Direction facing, RandomSource rand, ModelData modelData, ChunkSectionLayer renderType) {
         super(false, false);
+        this.level = level;
         this.blockState = blockState;
         this.facing = facing;
         this.rand = rand;
         this.modelData = modelData;
         this.renderType = renderType;
-
         this.itemStack = null;
-        this.world = null;
         this.entity = null;
     }
 
-    public DelegatingDynamicItemAndBlockModel(ItemStack itemStack, Level world, LivingEntity entity) {
+    public DelegatingDynamicItemAndBlockModel(ItemStack itemStack, @Nullable ClientLevel level, ItemOwner entity) {
         super(false, true);
+        this.level = level;
         this.blockState = null;
         this.facing = null;
         this.rand = RandomSource.create();
         this.modelData = ModelData.EMPTY;
-        this.renderType = RenderType.cutout();
-
+        this.renderType = ChunkSectionLayer.CUTOUT;
         this.itemStack = itemStack;
-        this.world = world;
         this.entity = entity;
     }
 
