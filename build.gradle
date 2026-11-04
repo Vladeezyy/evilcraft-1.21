@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
     id 'maven-publish'
 }
 
@@ -21,15 +21,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = 'ParchmentMC'
-                url = 'https://maven.parchmentmc.org/'
-            }
-        }
-        filter { includeGroup('org.parchmentmc.data') }
-    }
     exclusiveContent {
         forRepository {
             maven {
@@ -124,24 +115,21 @@ loom {
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchment_minecraft_version}:${parchment_version}@zip")
-    }
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    // 26.x: no obfuscation, no mappings, plain configurations (no mod* ones)
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    modImplementation "maven.modrinth:cyclops-core:${cyclopscore_modrinth_version}"
-    modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeconfigapiport_version}"
+    implementation "maven.modrinth:cyclops-core:${cyclopscore_modrinth_version}"
+    implementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forgeconfigapiport_version}"
 
     // Optional integrations of EvilCraft-Compat (bundled into EvilCraft by the original): JEI and Jade
-    modCompileOnly "maven.modrinth:jei:${jei_modrinth_version}"
-    modCompileOnly "maven.modrinth:jade:${jade_modrinth_version}"
+    compileOnly "maven.modrinth:jei:${jei_modrinth_version}"
+    compileOnly "maven.modrinth:jade:${jade_modrinth_version}"
     if (!project.hasProperty('no_compat_runtime')) {
-        modLocalRuntime "maven.modrinth:jei:${jei_modrinth_version}"
+        localRuntime "maven.modrinth:jei:${jei_modrinth_version}"
         // JEI on Fabric needs MezzConfig (players install it with JEI)
-        modLocalRuntime "maven.modrinth:mezzconfig:${mezzconfig_modrinth_version}"
-        modLocalRuntime "maven.modrinth:jade:${jade_modrinth_version}"
+        localRuntime "maven.modrinth:mezzconfig:${mezzconfig_modrinth_version}"
+        localRuntime "maven.modrinth:jade:${jade_modrinth_version}"
     }
 
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
@@ -178,8 +166,8 @@ jar {
     from('licenses') { into "licenses/${mod_id}" }
 }
 
-// Production runs (tools/prodtest.sh): Minecraft with intermediary names, as players have it. The release jar on a
-// real Fabric server; the release jar plus the scene mod (remapped) on a production client
+// Production runs (tools/prodtest.sh): the release jar on a real Fabric server; the release jar plus the scene mod on a
+// production client. 26.x has no remapping: the jars of the jar tasks are what players get
 configurations {
     productionMods { transitive = false }
 }
@@ -190,21 +178,14 @@ dependencies {
 }
 var sceneJar = tasks.register('sceneJar', Jar) {
     from sourceSets.scene.output
-    archiveClassifier = 'scene-dev'
-}
-var remapSceneJar = tasks.register('remapSceneJar', net.fabricmc.loom.task.RemapJarTask) {
-    inputFile = sceneJar.flatMap { it.archiveFile }
     archiveClassifier = 'scene'
-    addNestedDependencies = false
-    // The scene calls inherited Minecraft methods on classes of the mod: the remapper needs their hierarchy
-    classpath.from(sourceSets.main.output)
 }
 tasks.register('prodScene', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
-    mods.setFrom(tasks.named('remapJar'), remapSceneJar, configurations.productionMods)
+    mods.setFrom(tasks.named('jar'), sceneJar, configurations.productionMods)
     jvmArgs.add('-Devilcraft.scene=true')
     runDir = file('run-prod')
 }
 tasks.register('prodServer', net.fabricmc.loom.task.prod.ServerProductionRunTask) {
-    mods.setFrom(tasks.named('remapJar'), configurations.productionMods)
+    mods.setFrom(tasks.named('jar'), configurations.productionMods)
     runDir = file('run-prod-server')
 }
