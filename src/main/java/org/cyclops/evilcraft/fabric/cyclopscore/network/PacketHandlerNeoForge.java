@@ -46,8 +46,9 @@ public final class PacketHandlerNeoForge implements IPacketHandler {
                 .executesOn(HandlerThread.NETWORK)
                 .optional();
 
-    public PacketHandler(IPacketHandler delegate) {
-        this.delegate = delegate;
+        for (Pair<CustomPacketPayload.Type, StreamCodec> pendingPacketRegistration : (List<Pair<CustomPacketPayload.Type, StreamCodec>>) (List) this.pendingPacketRegistrations) {
+            this.registerActual(registrar, pendingPacketRegistration.getLeft(), pendingPacketRegistration.getRight());
+        }
     }
 
     protected void initClient(RegisterClientPayloadHandlersEvent event) {

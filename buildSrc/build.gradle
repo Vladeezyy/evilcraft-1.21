@@ -6,7 +6,9 @@ repositories {
     mavenCentral()
 }
 
+// buildSrc classes are loaded before the plugins' ones: this ASM also replaces Loom's. It must read Java 25 classes
+// (9.8+), or Loom silently merges a Minecraft jar without any classes
 dependencies {
-    implementation 'org.ow2.asm:asm:9.7.1'
-    implementation 'org.ow2.asm:asm-tree:9.7.1'
+    implementation 'org.ow2.asm:asm:9.10.1'
+    implementation 'org.ow2.asm:asm-tree:9.10.1'
 }

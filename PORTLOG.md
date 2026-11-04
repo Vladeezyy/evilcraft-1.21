@@ -30,9 +30,10 @@ up for 26.x and stops at `compileJava`.
 ## Next steps
 1. Done: build.gradle for 26.x (`net.fabricmc.fabric-loom` 1.18-SNAPSHOT, no mappings/parchment, plain configurations,
    jar task instead of remapJar) and the access widener header. Local runs need JAVA_HOME = JDK 25
-   (`~/.gradle/jdks/eclipse_adoptium-25-amd64-windows.2`). `compileJava` now stops on the syntax errors of
-   `fabric/cyclopscore/network/PacketHandlerNeoForge.java:49` (a method body cut by the merge); the other compile errors
-   only show up after that.
+   (`~/.gradle/jdks/eclipse_adoptium-25-amd64-windows.2`). ASM in `buildSrc` is 9.10.1: with 9.7.1 Loom silently merged
+   a Minecraft jar without classes. Syntax errors are gone; `compileJava` reports **2,319 errors in 338 files**
+   (2026-11-04), about 30% of them in `fabric/cyclopscore` (685), which step 2 mostly removes. Count them again after
+   each step, the number can grow as classes start to resolve.
 2. EvilCraft extends ModBaseFabric (instead of the ModBaseVersionable shim); re-check the 1.21.1 fixes
    (registration order, setup after registries, Cyclops Core entrypoint order, NBT types) against CC 26 Fabric.
 3. Transfer API shim, then compile and fix errors (`tools/port/errs.sh`), with the saved conflict notes.
