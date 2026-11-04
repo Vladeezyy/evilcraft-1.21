@@ -1,9 +1,11 @@
 package org.cyclops.evilcraft.proxy;
 
-import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.network.IPacketHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.proxy.CommonProxyComponent;
+import org.cyclops.evilcraft.fabric.event.EntityStruckByLightningEvent;
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.core.fluid.WorldSharedTankCache;
 import org.cyclops.evilcraft.event.EntityStruckByLightningEventHook;
@@ -33,14 +35,16 @@ public class CommonProxy extends CommonProxyComponent {
         packetHandler.register(UpdateWorldSharedTankClientCachePacket.class, UpdateWorldSharedTankClientCachePacket.ID, UpdateWorldSharedTankClientCachePacket.CODEC);
         packetHandler.register(ResetChunkColorsPacket.class, ResetChunkColorsPacket.ID, ResetChunkColorsPacket.CODEC);
 
-        // Cyclops Core's packets, which it only has on NeoForge
-        packetHandler.register(ButtonClickPacket.TYPE, ButtonClickPacket.CODEC);
-        packetHandler.register(ValueNotifyPacket.TYPE, ValueNotifyPacket.CODEC);
-        packetHandler.register(AdvancementRewardsObtainPacket.TYPE, AdvancementRewardsObtainPacket.CODEC);
-        packetHandler.register(RequestPlayerAdvancementUnlockedPacket.TYPE, RequestPlayerAdvancementUnlockedPacket.CODEC);
-        packetHandler.register(SendPlayerAdvancementUnlockedPacket.TYPE, SendPlayerAdvancementUnlockedPacket.CODEC);
-        packetHandler.register(RequestPlayerNbtPacket.TYPE, RequestPlayerNbtPacket.CODEC);
-        packetHandler.register(SendPlayerNbtPacket.TYPE, SendPlayerNbtPacket.CODEC);
+        // Cyclops Core's packets, which it only has on NeoForge (it registers the other ones itself on Fabric)
+        packetHandler.register(AdvancementRewardsObtainPacket.class, AdvancementRewardsObtainPacket.TYPE, AdvancementRewardsObtainPacket.CODEC);
+        packetHandler.register(RequestPlayerNbtPacket.class, RequestPlayerNbtPacket.TYPE, RequestPlayerNbtPacket.CODEC);
+        packetHandler.register(SendPlayerNbtPacket.class, SendPlayerNbtPacket.TYPE, SendPlayerNbtPacket.CODEC);
+        packetHandler.register(RequestPlayerAdvancementUnlockedPacket.class, RequestPlayerAdvancementUnlockedPacket.TYPE, RequestPlayerAdvancementUnlockedPacket.CODEC);
+        packetHandler.register(SendPlayerAdvancementUnlockedPacket.class, SendPlayerAdvancementUnlockedPacket.TYPE, SendPlayerAdvancementUnlockedPacket.CODEC);
+        packetHandler.register(RequestRecipeDisplayPacket.class, RequestRecipeDisplayPacket.TYPE, RequestRecipeDisplayPacket.CODEC);
+        packetHandler.register(RequestRecipeDisplaysRegexPacket.class, RequestRecipeDisplaysRegexPacket.TYPE, RequestRecipeDisplaysRegexPacket.CODEC);
+        packetHandler.register(SendRecipeDisplayPacket.class, SendRecipeDisplayPacket.TYPE, SendRecipeDisplayPacket.CODEC);
+        packetHandler.register(SendRecipeDisplaysRegexDonePacket.class, SendRecipeDisplaysRegexDonePacket.TYPE, SendRecipeDisplaysRegexDonePacket.CODEC);
 
         EvilCraft.clog("Registered packet handler.");
     }

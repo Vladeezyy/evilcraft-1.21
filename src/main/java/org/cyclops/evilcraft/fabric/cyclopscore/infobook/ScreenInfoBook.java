@@ -20,7 +20,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.inventory.container.ContainerExtended;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.RequestPlayerNbtPacket;
@@ -75,7 +75,7 @@ public abstract class ScreenInfoBook<T extends ContainerExtended> extends Abstra
         }
 
         // Request an up-to-date persisted player NBT tag to make sure our advancement reward status is synced.
-        CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new RequestPlayerNbtPacket());
+        EvilCraft._instance.getPacketHandler().sendToServer(new RequestPlayerNbtPacket());
     }
 
     protected abstract Identifier constructGuiTexture();
@@ -181,7 +181,7 @@ public abstract class ScreenInfoBook<T extends ContainerExtended> extends Abstra
         for (int innerPage = page; innerPage <= page + getPages() - 1; innerPage++) {
             for (HyperLink link : infoBook.getCurrentSection().getLinks(innerPage)) {
                 if (link.getTranslationKey().equals(IModHelpers.get().getL10NHelpers().localize(link.getTranslationKey()))) {
-                    CyclopsCoreNeoForge.clog(Level.WARN, "Could not find hyperlink localization for " + link.getTranslationKey());
+                    EvilCraft._instance.getLoggerHelper().log(Level.WARN, "Could not find hyperlink localization for " + link.getTranslationKey());
                 }
                 int xOffset = getOffsetXForPageWithWidths(innerPage % getPages());
                 this.addRenderableWidget(new TextOverlayButton(link, left + xOffset + link.getX(), top + getPageYOffset() / 2 + link.getY(),

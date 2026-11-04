@@ -12,7 +12,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.Reference;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.network.CodecField;
@@ -62,10 +62,10 @@ public class RequestRecipeDisplaysRegexPacket extends PacketCodec<RequestRecipeD
                 recipeRegex
         );
         for (Pair<Identifier, RecipeDisplayEntry> entry : recipeDisplays) {
-            CyclopsCoreNeoForge._instance.getPacketHandler().sendToPlayer(
+            EvilCraft._instance.getPacketHandler().sendToPlayer(
                     new SendRecipeDisplayPacket(recipeType, entry.getLeft().toString(), entry.getRight()), player);
         }
-        CyclopsCoreNeoForge._instance.getPacketHandler().sendToPlayer(new SendRecipeDisplaysRegexDonePacket(recipeType, recipeRegex), player);
+        EvilCraft._instance.getPacketHandler().sendToPlayer(new SendRecipeDisplaysRegexDonePacket(recipeType, recipeRegex), player);
     }
 
 }

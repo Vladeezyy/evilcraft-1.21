@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.client.key;
 
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 
 /**
@@ -8,6 +8,6 @@ import net.minecraft.client.KeyMapping;
  */
 public class RegisterKeyMappingsEvent {
     public void register(KeyMapping keyMapping) {
-        KeyBindingHelper.registerKeyBinding(keyMapping);
+        KeyMappingHelper.registerKeyMapping(keyMapping);
     }
 }

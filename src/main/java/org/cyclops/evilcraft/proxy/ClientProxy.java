@@ -1,20 +1,9 @@
 package org.cyclops.evilcraft.proxy;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import org.cyclops.evilcraft.RegistryEntries;
-import net.minecraft.client.renderer.RenderType;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import org.cyclops.evilcraft.fabric.client.ModelRenderTypes;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.RegisterKeyMappingsEvent;
-import java.util.List;
-import org.cyclops.evilcraft.fabric.client.model.ModelLoaders;
 import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Options;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyRegistry;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.fabric.cyclopscore.proxy.ClientProxyComponent;
@@ -27,8 +16,6 @@ import org.cyclops.evilcraft.client.key.Keys;
 import org.cyclops.evilcraft.client.render.blockentity.*;
 import org.cyclops.evilcraft.event.RenderOverlayEventHook;
 
-import java.lang.reflect.Field;
-
 /**
  * Proxy for the client side.
  *
@@ -39,7 +26,6 @@ public class ClientProxy extends ClientProxyComponent {
 
     public ClientProxy() {
         super(new CommonProxy());
-        EvilCraft._instance.getModEventBus().addListener(this::onModelBakingCompleted);
     }
 
     @Override
@@ -49,15 +35,6 @@ public class ClientProxy extends ClientProxyComponent {
 
     @Override
     public void registerKeyBindings(IKeyRegistry keyRegistry, RegisterKeyMappingsEvent event) {
-        Options settings;
-        try {
-            Field field = RegisterKeyMappingsEvent.class.getDeclaredField("options");
-            field.setAccessible(true);
-            settings = (Options) field.get(event);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
         for (KeyMapping key : Keys.KEYS)
             event.register(key);
 
@@ -76,7 +53,7 @@ public class ClientProxy extends ClientProxyComponent {
     public void registerEventHooks() {
         super.registerEventHooks();
 
-        NeoForge.EVENT_BUS.register(new RenderOverlayEventHook());
+        RenderGuiEvent.Post.addListener(new RenderOverlayEventHook()::onRenderOverlayEvent);
     }
 
     @Override
@@ -94,10 +71,6 @@ public class ClientProxy extends ClientProxyComponent {
         registerRenderer(RegistryEntries.BLOCK_ENTITY_SPIRIT_PORTAL.get(), RenderBlockEntitySpiritPortal::new);
 
         super.registerRenderers();
-    }
-
-    public void onModelBakingCompleted(ModelEvent.BakingCompleted event) {
-        this.modelBakery = event.getModelBakery();
     }
 
 }

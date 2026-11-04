@@ -2,64 +2,37 @@ package org.cyclops.evilcraft.fabric.cyclopscore.init;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.registries.NewRegistryEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
-import org.apache.logging.log4j.Level;
+import lombok.Data;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.server.MinecraftServer;
+import org.cyclops.cyclopscore.CyclopsCoreFabric;
+import org.cyclops.cyclopscore.helper.CyclopsCoreInstance;
+import org.cyclops.cyclopscore.helper.ModBaseCommon;
+import org.cyclops.cyclopscore.init.ModBaseFabric;
+import org.cyclops.cyclopscore.proxy.ICommonProxyCommon;
+import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.IKeyRegistry;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.key.KeyRegistry;
-import org.cyclops.evilcraft.fabric.cyclopscore.command.CommandVersion;
-import org.cyclops.cyclopscore.config.ConfigHandlerCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigHandlerNeoForge;
-import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigurableTypesNeoForge;
-import org.cyclops.cyclopscore.gametest.GameTestLoaderHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.LoggerHelper;
-import org.cyclops.cyclopscore.helper.ModBaseCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModHelpersNeoForge;
-import org.cyclops.evilcraft.fabric.cyclopscore.modcompat.IMCHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.modcompat.capabilities.CapabilityConstructorRegistry;
-import org.cyclops.cyclopscore.network.IPacketHandler;
-import org.cyclops.evilcraft.fabric.cyclopscore.network.PacketHandlerNeoForge;
+import org.cyclops.evilcraft.fabric.cyclopscore.config.ConfigHandler;
 import org.cyclops.evilcraft.fabric.cyclopscore.persist.world.WorldStorage;
 import org.cyclops.evilcraft.fabric.cyclopscore.proxy.ICommonProxy;
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-
 /**
- * Base class for mods which adds a few convenience methods.
- *
+ * Base class of the mod on Fabric, on top of Cyclops Core's {@link ModBaseFabric}, with the parts of its NeoForge mod
+ * base that EvilCraft uses. It keeps the name of the NeoForge class so the merges of upstream stay small.
  * @author rubensworks
  */
-public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModBaseCommon<T> {
-
-    static {
-        ConfigurableTypesNeoForge.load();
-    }
+public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModBaseFabric<T> {
 
     public static final EnumReferenceKey<String> REFKEY_TEXTURE_PATH_GUI = EnumReferenceKey.create("texture_path_gui", String.class);
     public static final EnumReferenceKey<String> REFKEY_TEXTURE_PATH_MODELS = EnumReferenceKey.create("texture_path_models", String.class);
@@ -69,55 +42,31 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
     public static final EnumReferenceKey<Boolean> REFKEY_CRASH_ON_MODCOMPAT_CRASH = EnumReferenceKey.create("crash_on_modcompat_crash", Boolean.class);
     public static final EnumReferenceKey<Boolean> REFKEY_INFOBOOK_REWARDS = EnumReferenceKey.create("rewards", Boolean.class);
 
-    private final ICommonProxy proxy;
-    private final ConfigHandlerCommon configHandler;
-    private final Map<EnumReferenceKey<?>, Object> genericReference = Maps.newHashMap();
-    private final List<WorldStorage.Access<?>> worldStorages = Lists.newLinkedList();
-    private final IKeyRegistry keyRegistry;
-    private final PacketHandlerNeoForge packetHandler;
-    private final CapabilityConstructorRegistry capabilityConstructorRegistry;
-    private final IMCHandler imcHandler;
-    private final IEventBus modEventBus;
-
+    // Not final and created on first use: the Fabric mod base registers the configs from its constructor,
+    // before the fields of this class are initialized.
+    private Map<EnumReferenceKey<?>, Object> genericReference;
+    private List<WorldStorage.Access<?>> worldStorages;
+    private IKeyRegistry keyRegistry;
     private ModContainer container;
 
-    public ModBaseNeoForge(String modId, Consumer<T> instanceSetter, IEventBus modEventBus) {
-        super(modId, instanceSetter);
-        this.modEventBus = modEventBus;
-        this.proxy = getModHelpers().getMinecraftHelpers().isClientSide() ? this.constructClientProxy() : this.constructCommonProxy();
-        this.configHandler = constructConfigHandler();
-        this.keyRegistry = new KeyRegistry();
-        this.packetHandler = constructPacketHandler();
-        this.capabilityConstructorRegistry = constructCapabilityConstructorRegistry();
-        this.imcHandler = constructIMCHandler();
-
-        // Register listeners
-        getModEventBus().addListener(this::setup);
-        getModEventBus().addListener(EventPriority.LOWEST, this::afterRegistriesCreated);
-        getModEventBus().addListener(EventPriority.HIGHEST, this::beforeRegistriedFilled);
-        getModEventBus().addListener(this::registerGameTests);
-        if (getModHelpers().getMinecraftHelpers().isClientSide()) {
-            getModEventBus().addListener(this::setupClient);
-            getModEventBus().addListener(this::onRegisterKeyMappings);
-        }
-        NeoForge.EVENT_BUS.addListener(this::onServerStarting);
-        NeoForge.EVENT_BUS.addListener(this::onServerStarted);
-        NeoForge.EVENT_BUS.addListener(this::onServerStopping);
-        NeoForge.EVENT_BUS.addListener(this::onRegisterCommands);
-
-        populateDefaultGenericReferences();
-
-        // Initialize config handler
-        this.onConfigsRegister((ConfigHandlerCommon) getConfigHandler());
-        ((ConfigHandlerNeoForge) getConfigHandler()).initialize(Lists.newArrayList());
-        getConfigHandler().loadModInit();
-
-        loadModCompats(getModCompatLoader());
+    public ModBaseNeoForge(String modId, Consumer<T> instanceSetter) {
+        super(constructCyclopsCore(modId), instanceSetter);
     }
 
-    protected abstract IClientProxy constructClientProxy();
-
-    protected abstract ICommonProxy constructCommonProxy();
+    /**
+     * Fabric does not run the entrypoints of dependencies first (in dev this mod comes before Cyclops Core), while this
+     * mod uses Cyclops Core from its constructor on: create Cyclops Core's entrypoint first (Fabric caches the instance).
+     */
+    private static String constructCyclopsCore(String modId) {
+        if (CyclopsCoreInstance.MOD == null) {
+            for (EntrypointContainer<ModInitializer> container : FabricLoader.getInstance().getEntrypointContainers("main", ModInitializer.class)) {
+                if (container.getProvider().getMetadata().getId().equals("cyclopscore")) {
+                    container.getEntrypoint();
+                }
+            }
+        }
+        return modId;
+    }
 
     @Override
     protected ConfigHandler constructConfigHandler() {
@@ -125,13 +74,36 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
     }
 
     @Override
-    public ICommonProxy getProxy() {
-        return proxy;
+    public ConfigHandler getConfigHandler() {
+        return (ConfigHandler) super.getConfigHandler();
     }
 
     @Override
-    public ConfigHandlerCommon getConfigHandler() {
-        return configHandler;
+    public void onInitialize() {
+        // Cyclops Core registers its own data components and hooks there; its second call is skipped (CyclopsCoreFabricMixin)
+        if (CyclopsCoreFabric._instance != null && !CyclopsCoreFabric._instance.isLoaded()) {
+            CyclopsCoreFabric._instance.onInitialize();
+        }
+        super.onInitialize();
+
+        ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
+
+        if (getModHelpers().getMinecraftHelpers().isClientSide() && getProxy() instanceof ICommonProxy commonProxy) {
+            commonProxy.registerKeyBindings(getKeyRegistry());
+        }
+
+        // Everything is registered now
+        RegisterCapabilitiesEvent.fire();
+        ModLifecycle.fireAfterRegistries();
+        setup();
+    }
+
+    /**
+     * Called at the end of mod initialization, when all registries of this mod are filled.
+     */
+    protected void setup() {
+
     }
 
     public Map<EnumReferenceKey<?>, Object> getGenericReference() {
@@ -143,6 +115,9 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
     }
 
     public List<WorldStorage.Access<?>> getWorldStorages() {
+        if (worldStorages == null) {
+            worldStorages = Lists.newLinkedList();
+        }
         return worldStorages;
     }
 
@@ -151,19 +126,6 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
             keyRegistry = new KeyRegistry();
         }
         return keyRegistry;
-    }
-
-    @Override
-    public IPacketHandler getPacketHandler() {
-        return packetHandler;
-    }
-
-    public CapabilityConstructorRegistry getCapabilityConstructorRegistry() {
-        return capabilityConstructorRegistry;
-    }
-
-    public IMCHandler getImcHandler() {
-        return imcHandler;
     }
 
     public String getModName() {
@@ -177,43 +139,8 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
         return container;
     }
 
-    protected LoggerHelper constructLoggerHelper() {
-        return new LoggerHelper(getModId());
-    }
-
-    protected ConfigHandlerCommon constructConfigHandler() {
-        return new ConfigHandlerNeoForge(this);
-    }
-
-    protected PacketHandlerNeoForge constructPacketHandler() {
-        return new PacketHandlerNeoForge(this);
-    }
-
-    protected CapabilityConstructorRegistry constructCapabilityConstructorRegistry() {
-        return new CapabilityConstructorRegistry(this);
-    }
-
-    protected IMCHandler constructIMCHandler() {
-        return new IMCHandler(this);
-    }
-
-    protected LiteralArgumentBuilder<CommandSourceStack> constructBaseCommand(Commands.CommandSelection selection, CommandBuildContext context) {
-        LiteralArgumentBuilder<CommandSourceStack> root = super.constructBaseCommand(selection, context);
-
-        root.then(CommandVersion.make(this));
-
-        return root;
-    }
-
-    /**
-     * Save a mod value.
-     *
-     * @param key   The key.
-     * @param value The value.
-     * @param <T>   The value type.
-     */
-    public <T> void putGenericReference(EnumReferenceKey<T> key, T value) {
-        genericReference.put(key, value);
+    public <V> void putGenericReference(EnumReferenceKey<V> key, V value) {
+        getGenericReference().put(key, value);
     }
 
     private void populateDefaultGenericReferences() {
@@ -226,164 +153,41 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
         genericReference.put(REFKEY_INFOBOOK_REWARDS, true);
     }
 
-    /**
-     * Get the value for a generic reference key.
-     * The default keys can be found in {@link ModBaseNeoForge}.
-     *
-     * @param key The key of a value.
-     * @param <T> The type of value.
-     * @return The value for the given key.
-     */
     @SuppressWarnings("unchecked")
-    public <T> T getReferenceValue(EnumReferenceKey<T> key) {
-        if (!genericReference.containsKey(key))
+    public <V> V getReferenceValue(EnumReferenceKey<V> key) {
+        if (!getGenericReference().containsKey(key)) {
             throw new IllegalArgumentException("Could not find " + key + " as generic reference item.");
-        return (T) genericReference.get(key);
-    }
-
-    /**
-     * Called on the Forge setup lifecycle event.
-     *
-     * @param event The setup event.
-     */
-    protected void setup(FMLCommonSetupEvent event) {
-        log(Level.TRACE, "setup()");
-
-        // Iterate over all configs again
-        getConfigHandler().loadSetup();
-
-        // Register proxy things
-        ICommonProxy proxy = getProxy();
-        if (proxy != null) {
-            proxy.registerEventHooks();
-            proxy.registerPackets(getPacketHandler());
-            proxy.registerTickHandlers();
         }
         return (V) getGenericReference().get(key);
     }
 
-    /**
-     * Called on the Forge client setup lifecycle event.
-     *
-     * @param event The setup event.
-     */
-    protected void setupClient(FMLClientSetupEvent event) {
-        // Register proxy things
-        ICommonProxy proxy = getProxy();
-        if (proxy != null) {
-            proxy.registerRenderers();
+    protected void onServerStarted(MinecraftServer server) {
+        for (WorldStorage.Access<?> worldStorage : getWorldStorages()) {
+            worldStorage.onStartedEvent(server);
         }
     }
 
-    protected void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
-        ICommonProxy proxy = getProxy();
-        if (proxy != null) {
-            proxy.registerKeyBindings(getKeyRegistry(), event);
+    protected void onServerStopping(MinecraftServer server) {
+        for (WorldStorage.Access<?> worldStorage : getWorldStorages()) {
+            worldStorage.onStoppingEvent(server);
         }
     }
 
-    /**
-     * Load things after Forge registries have been created.
-     *
-     * @param event The Forge registry creation event.
-     */
-    private void afterRegistriesCreated(NewRegistryEvent event) {
-        getConfigHandler().loadRegistriesCreated();
-    }
-
-    /**
-     * Load things before Forge registries are being filled.
-     *
-     * @param event The Forge registry filling event.
-     */
-    private void beforeRegistriedFilled(RegisterEvent event) {
-        if (event.getRegistryKey().equals(BuiltInRegistries.ATTRIBUTE.key())) {
-            // We only need to call this once, and the ATTRIBUTE event is emitted first.
-            getConfigHandler().loadRegistriesFilled();
-        }
-    }
-
-    protected void registerGameTests(RegisterGameTestsEvent event) {
-        if (!GameTestLoaderHelpers.areGameTestsEnabled(getModId())) {
-            return;
-        }
-        try {
-            Field field = RegisterGameTestsEvent.class.getDeclaredField("environmentsRegistry");
-            field.setAccessible(true);
-            Registry<TestEnvironmentDefinition<?>> testEnvironmentRegistry = (Registry<TestEnvironmentDefinition<?>>) field.get(event);
-            GameTestLoaderHelpers.registerCommonTests(getModId(), getGameTestClasses(), event::registerTest, testEnvironmentRegistry);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Register the things that are related to when the server is starting.
-     *
-     * @param event The Forge server starting event.
-     */
-    protected void onServerStarting(ServerStartingEvent event) {
-
-    }
-
-    protected void onRegisterCommands(RegisterCommandsEvent event) {
-        event.getDispatcher().register(constructBaseCommand(event.getCommandSelection(), event.getBuildContext()));
-    }
-
-    /**
-     * Register the things that are related to server starting.
-     *
-     * @param event The Forge server started event.
-     */
-    protected void onServerStarted(ServerStartedEvent event) {
-        for (WorldStorage.Access<?> worldStorage : worldStorages) {
-            worldStorage.onStartedEvent(event);
-        }
-    }
-
-    /**
-     * Register the things that are related to server stopping, like persistent storage.
-     *
-     * @param event The Forge server stopping event.
-     */
-    protected void onServerStopping(ServerStoppingEvent event) {
-        for (WorldStorage.Access<?> worldStorage : worldStorages) {
-            worldStorage.onStoppingEvent(event);
-        }
-    }
-
-    /**
-     * Register a new world storage type.
-     * Make sure to call this at least before the event
-     * {@link net.neoforged.neoforge.event.server.ServerStartedEvent} is called.
-     *
-     * @param worldStorage The world storage to register.
-     */
     public void registerWorldStorage(WorldStorage.Access<?> worldStorage) {
-        worldStorages.add(worldStorage);
+        getWorldStorages().add(worldStorage);
     }
 
-    /**
-     * Get the mod by id.
-     *
-     * @param modId The mod id.
-     * @return The mod instance or null.
-     */
     @Nullable
-    public static ModBaseNeoForge get(String modId) {
-        return (ModBaseNeoForge) ModBaseCommon.getCommon(modId);
-    }
-
-    public static Map<String, ModBaseNeoForge<?>> getMods() {
-        return (Map) ModBaseCommon.getCommonMods();
+    public static ModBaseNeoForge<?> get(String modId) {
+        return ModBaseCommon.getCommon(modId) instanceof ModBaseNeoForge<?> mod ? mod : null;
     }
 
     /**
      * Unique references to values that can be registered inside a mod.
-     *
-     * @param <T> The type of value.
+     * @param <V> The type of value.
      */
-    public static class EnumReferenceKey<T> {
+    @Data
+    public static class EnumReferenceKey<V> {
 
         private final String key;
         private final Class<V> type;
@@ -397,45 +201,6 @@ public abstract class ModBaseNeoForge<T extends ModBaseNeoForge<T>> extends ModB
             return new EnumReferenceKey<>(key, type);
         }
 
-        public String getKey() {
-            return this.key;
-        }
-
-        public Class<T> getType() {
-            return this.type;
-        }
-
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof ModBaseNeoForge.EnumReferenceKey)) return false;
-            final EnumReferenceKey<?> other = (EnumReferenceKey<?>) o;
-            if (!other.canEqual((Object) this)) return false;
-            final Object this$key = this.getKey();
-            final Object other$key = other.getKey();
-            if (this$key == null ? other$key != null : !this$key.equals(other$key)) return false;
-            final Object this$type = this.getType();
-            final Object other$type = other.getType();
-            if (this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
-            return true;
-        }
-
-        protected boolean canEqual(final Object other) {
-            return other instanceof ModBaseNeoForge.EnumReferenceKey;
-        }
-
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final Object $key = this.getKey();
-            result = result * PRIME + ($key == null ? 43 : $key.hashCode());
-            final Object $type = this.getType();
-            result = result * PRIME + ($type == null ? 43 : $type.hashCode());
-            return result;
-        }
-
-        public String toString() {
-            return "ModBaseNeoForge.EnumReferenceKey(key=" + this.getKey() + ", type=" + this.getType() + ")";
-        }
     }
 
 }

@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 
 /**
@@ -38,7 +38,7 @@ public interface IRegistryExportable {
         try {
             componentsString = componentsToString(ServerLifecycleHooks.getCurrentServer().registryAccess(), itemStack.getComponentsPatch());
         } catch (IllegalStateException e) {
-            CyclopsCoreNeoForge.clog(e.getMessage());
+            EvilCraft.clog(e.getMessage());
         }
         if(!"{}".equals(componentsString)) {
             object.addProperty("components", componentsString);
@@ -56,7 +56,7 @@ public interface IRegistryExportable {
         try {
             componentsString = componentsToString(ServerLifecycleHooks.getCurrentServer().registryAccess(), fluidStack.getComponentsPatch());
         } catch (IllegalStateException e) {
-            CyclopsCoreNeoForge.clog(e.getMessage());
+            EvilCraft.clog(e.getMessage());
         }
         if(!"{}".equals(componentsString)) {
             object.addProperty("components", componentsString);

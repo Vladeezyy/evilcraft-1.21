@@ -6,7 +6,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.Reference;
 import org.cyclops.cyclopscore.network.PacketCodec;
 
@@ -36,7 +36,7 @@ public class RequestPlayerNbtPacket extends PacketCodec<RequestPlayerNbtPacket> 
 
     @Override
     public void actionServer(Level level, ServerPlayer player) {
-        CyclopsCoreNeoForge._instance.getPacketHandler().sendToPlayer(new SendPlayerNbtPacket(player), player);
+        EvilCraft._instance.getPacketHandler().sendToPlayer(new SendPlayerNbtPacket(player), player);
     }
 
 }

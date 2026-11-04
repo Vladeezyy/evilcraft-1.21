@@ -3,11 +3,11 @@ package org.cyclops.evilcraft.fabric.cyclopscore.metadata;
 
 
 import net.minecraft.world.item.crafting.RecipeType;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 
 public class RegistryExportables {
 
-    public static IRegistryExportableRegistry REGISTRY = CyclopsCoreNeoForge._instance.getRegistryManager()
+    public static IRegistryExportableRegistry REGISTRY = EvilCraft._instance.getRegistryManager()
             .getRegistry(IRegistryExportableRegistry.class);
 
     public static void load() {

@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
 import net.minecraft.world.level.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.Reference;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.network.CodecField;
@@ -63,10 +63,10 @@ public class RequestRecipeDisplayPacket extends PacketCodec<RequestRecipeDisplay
                 ResourceKey.create(Registries.RECIPE, Identifier.parse(this.recipe))
         );
         if (recipeDisplays.isEmpty()) {
-            CyclopsCoreNeoForge.clog(org.apache.logging.log4j.Level.ERROR, "Received an invalid recipe request for recipe type " + recipeType.toString() + " with recipe id " + recipe + " from " + player.getName());
+            EvilCraft._instance.getLoggerHelper().log(org.apache.logging.log4j.Level.ERROR, "Received an invalid recipe request for recipe type " + recipeType.toString() + " with recipe id " + recipe + " from " + player.getName());
             return;
         }
-        CyclopsCoreNeoForge._instance.getPacketHandler().sendToPlayer(
+        EvilCraft._instance.getPacketHandler().sendToPlayer(
                 new SendRecipeDisplayPacket(recipeType, recipe, recipeDisplays.getFirst()), player);
     }
 

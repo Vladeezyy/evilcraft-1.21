@@ -6,8 +6,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
@@ -53,20 +51,20 @@ public abstract class WorldStorage<T extends WorldStorage> extends SavedData {
         /**
          * When a server is started.
          *
-         * @param event The received event.
+         * @param server The server.
          */
-        public void onStartedEvent(ServerStartedEvent event) {
-            T data = get(event.getServer());
+        public void onStartedEvent(MinecraftServer server) {
+            T data = get(server);
             data.afterLoad();
         }
 
         /**
          * When a server is stopping.
          *
-         * @param event The received event.
+         * @param server The server.
          */
-        public void onStoppingEvent(ServerStoppingEvent event) {
-            T data = get(event.getServer());
+        public void onStoppingEvent(MinecraftServer server) {
+            T data = get(server);
             data.beforeSave();
         }
     }

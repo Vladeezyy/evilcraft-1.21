@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.fabricmc.api.EnvType;
 import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.RequestPlayerAdvancementUnlockedPacket;
 
 import java.util.Set;
@@ -36,7 +36,7 @@ public class AdvancementHelpers {
     }
 
     public static void requestAdvancementUnlockInfo(Identifier advancementId) {
-        CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
+        EvilCraft._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
     }
 
     public static AdvancementHolder getAdvancement(Dist dist, Identifier resourceLocation) {

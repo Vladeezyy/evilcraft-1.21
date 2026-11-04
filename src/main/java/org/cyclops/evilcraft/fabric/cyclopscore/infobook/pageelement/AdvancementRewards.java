@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.Reference;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.EntityHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.AdvancementRewardsObtainPacket;
@@ -58,7 +58,7 @@ public class AdvancementRewards {
         if (!isObtained(player)) {
             // If client-side, send packet to server, otherwise, obtain the rewards server-side
             if (player.level().isClientSide()) {
-                CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new AdvancementRewardsObtainPacket(id));
+                EvilCraft._instance.getPacketHandler().sendToServer(new AdvancementRewardsObtainPacket(id));
             } else {
                 for (IReward reward : getRewards()) {
                     reward.obtain(player);

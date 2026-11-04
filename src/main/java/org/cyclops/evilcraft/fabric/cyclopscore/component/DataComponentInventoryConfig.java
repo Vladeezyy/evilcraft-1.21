@@ -3,7 +3,6 @@ package org.cyclops.evilcraft.fabric.cyclopscore.component;
 import org.cyclops.evilcraft.EvilCraft;
 
 
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
 import org.cyclops.cyclopscore.config.extendedconfig.DataComponentConfigCommon;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
@@ -13,7 +12,7 @@ import org.cyclops.cyclopscore.inventory.SimpleInventory;
  */
 public class DataComponentInventoryConfig extends DataComponentConfigCommon<SimpleInventory, ModBaseNeoForge<?>> {
     public DataComponentInventoryConfig() {
-        super(CyclopsCoreNeoForge._instance, "inventory", builder -> builder
+        super(EvilCraft._instance, "inventory", builder -> builder
                 .persistent(SimpleInventory.CODEC)
                 .networkSynchronized(SimpleInventory.STREAM_CODEC));
     }

@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
 import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBookRegistry;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.AdvancementRewards;
 import org.cyclops.evilcraft.fabric.cyclopscore.network.packet.RequestRecipeDisplayPacket;
@@ -43,7 +43,7 @@ public class RecipeHelpers {
         Pair<RecipeType<?>, Identifier> key = Pair.of(recipeType, recipe);
         if (!CLIENT_RECIPE_DISPLAYS.containsKey(key) && !CLIENT_RECIPE_DISPLAYS_REQUESTING.contains(key)) {
             CLIENT_RECIPE_DISPLAYS_REQUESTING.add(key);
-            CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new RequestRecipeDisplayPacket(recipeType, recipe));
+            EvilCraft._instance.getPacketHandler().sendToServer(new RequestRecipeDisplayPacket(recipeType, recipe));
         }
     }
 
@@ -51,7 +51,7 @@ public class RecipeHelpers {
         Pair<RecipeType<?>, String> key = Pair.of(recipeType, recipeRegex);
         if (!CLIENT_RECIPE_DISPLAYS_REGEX_REQUESTING.contains(key)) {
             CLIENT_RECIPE_DISPLAYS_REGEX_REQUESTING.add(key);
-            CyclopsCoreNeoForge._instance.getPacketHandler().sendToServer(new RequestRecipeDisplaysRegexPacket(recipeType, recipeRegex));
+            EvilCraft._instance.getPacketHandler().sendToServer(new RequestRecipeDisplaysRegexPacket(recipeType, recipeRegex));
         }
     }
 

@@ -5,7 +5,9 @@ up for 26.x and stops at `compileJava`.
 
 ## How this branch was made
 - `vendor/26.1.2` (local branch): upstream CyclopsMC/EvilCraft `master-26-lts` @ 94d5b596 (1.2.109) on top of the
-  1.21.1 import da1ca17, same file set.
+  1.21.1 import da1ca17, same file set. Upstream's `.gitignore` has a `config` rule, so the import lost
+  `core/config/*` (5 sources); restored from upstream in step 2. Importing 26.2 and 26.3: compare with
+  `git diff --name-status vendor/<version> upstream/<branch> -- src` (texture lines there are only file mode changes).
 - `gen/121`, `gen/2612` (local): both upstream trees after the mechanical port scripts
   (`tools/port/ccshim.py` with CyclopsCore 5eb184ec12^ / master-26-lts, `normalize.py`, `data_fabric.py`).
   `ccshim.py` was fixed for Windows paths (os.sep).
@@ -34,8 +36,31 @@ up for 26.x and stops at `compileJava`.
    a Minecraft jar without classes. Syntax errors are gone; `compileJava` reports **2,319 errors in 338 files**
    (2026-11-04), about 30% of them in `fabric/cyclopscore` (685), which step 2 mostly removes. Count them again after
    each step, the number can grow as classes start to resolve.
-2. EvilCraft extends ModBaseFabric (instead of the ModBaseVersionable shim); re-check the 1.21.1 fixes
-   (registration order, setup after registries, Cyclops Core entrypoint order, NBT types) against CC 26 Fabric.
+2. Done (compiles at this level, **nothing checked at runtime**): `ModBaseNeoForge` keeps upstream's name (45 files use
+   it, smaller merges of 26.2 and 26.3) and extends ModBaseFabric. `compileJava` reports **1,853 errors in 274 files**
+   (2026-11-04), 365 of them in `fabric/cyclopscore`. The base class, proxies, config and action classes have none left.
+   The 1.21.1 fixes against CC 26 Fabric (from its source):
+   - Setup after registries: still needed, `onInitialize` calls `loadSetup` first. Now in `config/ConfigHandler`.
+   - Registration order: still needed, configs register in add order. Now in `config/ConfigHandler`, with block items
+     queued until the item rank instead of the old `BlockActionFabric`. `ARMOR_MATERIAL` is no longer a registry.
+   - Cyclops Core entrypoint order: still needed. `constructCyclopsCore`, the `onInitialize` guard and
+     `CyclopsCoreFabricMixin` stay.
+   - NBT types: still needed, `NBTClassTypesFabric` now uses CC's common `NBTClassType`.
+   - `keyShift` on `CLIENT_STARTED`: still needed.
+   - Data components `fluid_content` and `inventory` stay `evilcraft:*`, the same ids as the 1.21.1 port. CC Fabric only
+     registers capacity and energy storage.
+   Moved to step 3:
+   - 23 `getModEventBus()` calls (`*Config`, `*ConfigClient`, `BroomPartRegistry`, `DamageIndicatedItemFluidContainer`):
+     the method is gone, each needs a Fabric hook. `ClientProxy` already dropped `onModelBakingCompleted`, its field was
+     unused.
+   - `SavedDataType` in `GlobalCounters` and `WorldStorageSharedTank`: upstream's 3-argument constructor is NeoForge's,
+     vanilla needs a `DataFixTypes` too and passes it to `SavedDataStorage.readTagFromDisk`. Check that path before
+     choosing a value, data must survive a reload.
+   - `getGameTestClasses` in `EvilCraft` points to classes in `src/gametest`, which `main` cannot see: do the GameTest
+     move described above.
+   - Model loaders and the dark tank render layer (removed from `ClientProxy`) go with the model rewrite.
+   - IMC is gone: other mods call `EntityVengeanceSpirit.addToBlacklistIMC` directly.
+   Not checked: key category registration (`getMainKeyCategory`), block items order, setup order, packets in game.
 3. Transfer API shim, then compile and fix errors (`tools/port/errs.sh`), with the saved conflict notes.
 4. fabric.mod.json, the access widener entries (the header is done; entries are still from 1.21.1), mixins checked with
    javap.

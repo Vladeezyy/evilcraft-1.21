@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.cyclops.evilcraft.fabric.cyclopscore.CyclopsCoreNeoForge;
+import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.cyclopscore.Reference;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.AdvancementRewards;
 import org.cyclops.cyclopscore.network.CodecField;
@@ -52,7 +52,7 @@ public class AdvancementRewardsObtainPacket extends PacketCodec<AdvancementRewar
         if (advancementRewards != null) {
             advancementRewards.obtain(player);
         } else {
-            CyclopsCoreNeoForge.clog(org.apache.logging.log4j.Level.WARN, String.format("Received an invalid advancement reward id '%s' from %s.", advancementRewardsId, player.getDisplayName().getString()));
+            EvilCraft._instance.getLoggerHelper().log(org.apache.logging.log4j.Level.WARN, String.format("Received an invalid advancement reward id '%s' from %s.", advancementRewardsId, player.getDisplayName().getString()));
         }
     }
 

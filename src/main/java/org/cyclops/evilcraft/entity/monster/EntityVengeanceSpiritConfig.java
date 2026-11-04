@@ -68,14 +68,7 @@ public class EntityVengeanceSpiritConfig extends EntityConfigCommon<IModBase, En
     @Override
     public void onRegistered() {
         super.onRegistered();
-        EvilCraft._instance.getImcHandler().registerAction(Reference.IMC_BLACKLIST_VENGEANCESPIRIT, message -> {
-            Object value = message.messageSupplier().get();
-            if (value instanceof String) {
-                EntityVengeanceSpirit.addToBlacklistIMC((String) value);
-                return true;
-            }
-            return false;
-        });
+        // No IMC on Fabric: other mods call EntityVengeanceSpirit.addToBlacklistIMC directly
         NeoForge.EVENT_BUS.register(EntityVengeanceSpirit.class);
     }
 
