@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 
-import org.cyclops.evilcraft.fabric.event.RecipesUpdatedEvent;
 
 
 import com.google.common.collect.Maps;
