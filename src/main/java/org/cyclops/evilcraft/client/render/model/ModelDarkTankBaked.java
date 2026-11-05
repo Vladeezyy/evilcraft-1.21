@@ -26,11 +26,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.model.data.ModelData;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingChildDynamicItemAndBlockModel;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -80,7 +78,7 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
             combinedList.addAll(getFluidQuads(fluidStack, capacity, flowing));
         }
         List<BlockStateModelPart> baseParts = new ArrayList<>();
-        baseModel.collectParts(level, BlockPos.ZERO, blockState, rand, baseParts);
+        baseModel.collectParts(rand, baseParts);
         for (BlockStateModelPart blockModelPart : baseParts) {
             combinedList.addAll(blockModelPart.getQuads(null));
         }
@@ -136,7 +134,7 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
         List<BakedQuad> quads = Lists.newArrayList();
         for(Direction side : Direction.values()) {
             TextureAtlasSprite texture = getFluidIcon(fluidStack, flowing, side);
-            int color = IModHelpers.get().getRenderHelpers().getFluidBakedQuadColor(fluidStack);
+            int color = IModHelpersNeoForge.get().getRenderHelpers().getFluidBakedQuadColor(fluidStack);
             if(side == Direction.UP) {
                 addBakedQuadRotated(quads, 0.13F, 0.87F, 0.13F, 0.87F, height, texture, side, ROTATION_FIX[side.ordinal()], true, color, ROTATION_UV);
             } else if(side == Direction.DOWN) {

@@ -36,14 +36,6 @@ public class RenderBlockEntityColossalBloodChest extends RenderBlockEntityChestB
     }
 
     @Override
-    public AABB getRenderBoundingBox(BlockEntityColossalBloodChest blockEntity) {
-        return new AABB(
-                Vec3.atLowerCornerOf(blockEntity.getBlockPos().subtract(new Vec3i(3, 3, 3))),
-                Vec3.atLowerCornerOf(blockEntity.getBlockPos().offset(3, 6, 3))
-        );
-    }
-
-    @Override
     public RenderState createRenderState() {
         return new RenderState();
     }

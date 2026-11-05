@@ -10,7 +10,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 

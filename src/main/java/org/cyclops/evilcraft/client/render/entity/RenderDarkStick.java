@@ -37,8 +37,6 @@ public class RenderDarkStick extends EntityRenderer<EntityItemDarkStick, RenderS
 
         state.ageInTicks = (float)entity.getAge() + partialTick;
         state.bobOffset = entity.bobOffs;
-        state.shouldBob = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(entity.getItem()).shouldBobAsEntity(entity.getItem());
-        state.shouldSpread = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(entity.getItem()).shouldSpreadAsEntity(entity.getItem());
         state.extractItemGroupRenderState(entity, entity.getItem(), this.itemModelResolver);
         state.valid = entity.isValid();
         state.angle = entity.getAngle();

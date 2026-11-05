@@ -8,25 +8,23 @@ import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.quad.BakedColors;
-import net.neoforged.neoforge.client.model.quad.BakedNormals;
-import net.neoforged.neoforge.model.data.ModelData;
+import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * A model that can be used as a basis for flexible baked models.
@@ -205,7 +203,7 @@ public abstract class DynamicBaseModel implements BlockStateModel {
         Vector3f v3 = rotate(new Vector3f(x2 - .5f, y - .5f, z2 - .5f), side).add(.5f, .5f, .5f);
         Vector3f v4 = rotate(new Vector3f(x2 - .5f, y - .5f, z1 - .5f), side).add(.5f, .5f, .5f);
         // See QuadBakingVertexConsumer for examples on how BakedQuad is constructed
-        quads.add(new BakedQuad(
+        BakedQuad quad = new BakedQuad(
                 v1,
                 v2,
                 v3,
@@ -215,10 +213,9 @@ public abstract class DynamicBaseModel implements BlockStateModel {
                 UVPair.pack(texture.getU(uvs[(2 + rotation) % 4][0]), texture.getV(uvs[(2 + rotation) % 4][1])),
                 UVPair.pack(texture.getU(uvs[(3 + rotation) % 4][0]), texture.getV(uvs[(3 + rotation) % 4][1])),
                 side,
-                new BakedQuad.MaterialInfo(texture, ChunkSectionLayer.CUTOUT, RenderTypes.entityCutout(texture.atlasLocation()), -1, false, 0, true),
-                BakedNormals.UNSPECIFIED,
-                isColored ? BakedColors.of(shadeColor) : BakedColors.DEFAULT
-        ));
+                new BakedQuad.MaterialInfo(texture, ChunkSectionLayer.CUTOUT, RenderTypes.entityCutout(texture.atlasLocation()), -1, false, 0)
+        );
+        quads.add(isColored ? ColoredQuads.withColor(quad, shadeColor) : quad);
     }
 
     public abstract List<BakedQuad> handleBlockState(BlockAndTintGetter level, BlockPos pos,
@@ -226,21 +223,15 @@ public abstract class DynamicBaseModel implements BlockStateModel {
                                                      RandomSource rand, ModelData extraData,
                                                      ChunkSectionLayer renderType);
 
+    /**
+     * Blocks on Fabric. Each quad knows its layer, and is emitted once: NeoForge's upstream code repeats all quads for
+     * each side and layer.
+     */
     @Override
-    public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
-        ModelData extraData = getModelData(level, pos, state, level.getModelData(pos));
-        for (ChunkSectionLayer renderType : getRenderTypes(state, random, extraData)) {
-            for (Direction side : Direction.values()) {
-                QuadCollection.Builder quadCollectionBuilder = new QuadCollection.Builder();
-                for (BakedQuad blockStateQuad : handleBlockState(level, pos, state, side, random, extraData, renderType)) {
-                    quadCollectionBuilder = quadCollectionBuilder.addCulledFace(side, blockStateQuad);
-                }
-                parts.add(new SimpleModelWrapper(
-                        quadCollectionBuilder.build(),
-                        usesBlockLight(),
-                        particleMaterial(level, pos, state)
-                ));
-            }
+    public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, Predicate<Direction> cullTest) {
+        ModelData extraData = getModelData(level, pos, state, ModelData.EMPTY);
+        for (BakedQuad quad : handleBlockState(level, pos, state, null, random, extraData, null)) {
+            ColoredQuads.emit(emitter, quad);
         }
     }
 

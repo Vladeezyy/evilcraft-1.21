@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
  * @author rubensworks
  */
 public class RenderStateBroom extends EntityRenderState {
+    public float partialTick;
     public float yRotO;
     public float xRotO;
     public float yRot;

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.model.data.ModelData;
 
 import javax.annotation.Nullable;
 

@@ -33,7 +33,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.model.data.ModelProperty;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;

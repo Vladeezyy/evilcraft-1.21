@@ -38,8 +38,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.SubscribeEvent;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
-import net.neoforged.neoforge.model.data.ModelProperty;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;

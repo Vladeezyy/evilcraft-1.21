@@ -7,7 +7,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.api.degradation.IDegradable;
 import org.cyclops.evilcraft.core.config.extendedconfig.DegradationEffectConfig;

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.client.render.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 
 
 import com.mojang.serialization.MapCodec;
@@ -29,11 +30,7 @@ public record ItemDynamicItemAndBlockModel(DynamicItemAndBlockModel resolvedMode
     @Override
     public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed) {
         List<BakedQuad> quads = resolvedModel.handleItemState(stack, level, owner);
-        QuadCollection.Builder quadBuilder = new QuadCollection.Builder();
-        for (BakedQuad quad : quads) {
-            quadBuilder.addUnculledFace(quad);
-        }
-        new CuboidItemModelWrapper(List.of(), quadBuilder.build(), modelRenderProperties, new Matrix4f())
+        ColoredQuads.itemModel(quads, modelRenderProperties)
                 .update(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
     }
 

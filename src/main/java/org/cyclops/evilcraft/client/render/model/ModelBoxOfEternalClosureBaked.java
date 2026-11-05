@@ -28,8 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
-import net.neoforged.neoforge.model.data.ModelData;
+import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingDynamicItemAndBlockModel;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -82,19 +81,19 @@ public class ModelBoxOfEternalClosureBaked extends DelegatingDynamicItemAndBlock
         List<BakedQuad> quads = Lists.newLinkedList();
 
         List<BlockStateModelPart> boxParts = new ArrayList<>();
-        boxModel.collectParts(level, BlockPos.ZERO, blockState, rand, boxParts);
+        boxModel.collectParts(rand, boxParts);
         for (BlockStateModelPart blockModelPart : boxParts) {
             quads.addAll(blockModelPart.getQuads(null));
         }
         if (isOpen) {
             List<BlockStateModelPart> lidRotParts = new ArrayList<>();
-            boxLidRotatedModel.collectParts(level, BlockPos.ZERO, blockState, rand, lidRotParts);
+            boxLidRotatedModel.collectParts(rand, lidRotParts);
             for (BlockStateModelPart blockModelPart : lidRotParts) {
                 quads.addAll(blockModelPart.getQuads(null));
             }
         } else {
             List<BlockStateModelPart> lidParts = new ArrayList<>();
-            boxLidModel.collectParts(level, BlockPos.ZERO, blockState, rand, lidParts);
+            boxLidModel.collectParts(rand, lidParts);
             for (BlockStateModelPart blockModelPart : lidParts) {
                 quads.addAll(blockModelPart.getQuads(null));
             }

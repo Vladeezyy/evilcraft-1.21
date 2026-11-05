@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.blockentity;
 
+import org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -90,9 +92,9 @@ public class RenderBlockEntityDarkTank implements BlockEntityRenderer<BlockEntit
     @Override
     public void submit(RenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         FluidStack fluid = renderState.fluid;
-        IModHelpers.get().getRenderHelpers().renderFluidContext(fluid, poseStack, () -> {
+        IModHelpersNeoForge.get().getRenderHelpers().renderFluidContext(fluid, poseStack, () -> {
             float height = (float) (renderState.fillRatio * 0.99F);
-            int brightness = Math.max(renderState.lightCoords, fluid.getFluid().getFluidType().getLightLevel(fluid));
+            int brightness = Math.max(renderState.lightCoords, FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
             renderFluidSides(height, renderState.fluid, renderState.enabled, brightness, poseStack, submitNodeCollector);
         });
     }
@@ -100,7 +102,7 @@ public class RenderBlockEntityDarkTank implements BlockEntityRenderer<BlockEntit
     public static void renderFluidSides(float height, FluidStack fluid, boolean flowing, int brightness, PoseStack matrixStackIn, SubmitNodeCollector submitNodeCollector) {
         int l2 = brightness >> 0x10 & 0xFFFF;
         int i3 = brightness & 0xFFFF;
-        Triple<Float, Float, Float> colorParts = IModHelpers.get().getRenderHelpers().getFluidVertexBufferColor(fluid);
+        Triple<Float, Float, Float> colorParts = IModHelpersNeoForge.get().getRenderHelpers().getFluidVertexBufferColor(fluid);
         float r = colorParts.getLeft();
         float g = colorParts.getMiddle();
         float b = colorParts.getRight();

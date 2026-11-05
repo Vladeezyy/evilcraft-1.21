@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.model;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
+import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 import org.cyclops.evilcraft.fabric.client.model.ModelData;
 
 import com.google.common.collect.Lists;
@@ -30,15 +32,11 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
-import net.neoforged.neoforge.client.model.quad.BakedColors;
-import net.neoforged.neoforge.client.model.quad.BakedNormals;
+import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.model.data.ModelData;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingDynamicItemAndBlockModel;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -119,7 +117,7 @@ public class ModelEntangledChaliceBaked extends DelegatingDynamicItemAndBlockMod
 
         // Base chalice model
         List<BlockStateModelPart> chalceParts = new ArrayList<>();
-        chaliceModel.collectParts(level, BlockPos.ZERO, blockState, rand, chalceParts);
+        chaliceModel.collectParts(rand, chalceParts);
         for (BlockStateModelPart blockModelPart : chalceParts) {
             quads.addAll(blockModelPart.getQuads(null));
         }
@@ -127,10 +125,10 @@ public class ModelEntangledChaliceBaked extends DelegatingDynamicItemAndBlockMod
         // Colored gems
         int color = getColorSeed(this.id);
         List<BlockStateModelPart> gemParts = new ArrayList<>();
-        gemsModel.collectParts(level, BlockPos.ZERO, blockState, rand, gemParts);
+        gemsModel.collectParts(rand, gemParts);
         for (BlockStateModelPart blockModelPart : gemParts) {
             for (BakedQuad quad : blockModelPart.getQuads(null)) {
-                quads.add(new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo(), BakedNormals.UNSPECIFIED, BakedColors.of(color)));
+                quads.add(ColoredQuads.withColor(new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo()), color));
             }
         }
 
@@ -191,8 +189,8 @@ public class ModelEntangledChaliceBaked extends DelegatingDynamicItemAndBlockMod
     protected List<BakedQuad> getFluidQuads(FluidStack fluidStack, int capacity) {
         float height = Math.min(0.95F, ((float) fluidStack.getAmount() / (float) capacity)) * 0.1875F + 0.8125F;
         List<BakedQuad> quads = Lists.newArrayList();
-        TextureAtlasSprite texture = IModHelpers.get().getRenderHelpers().getFluidIcon(fluidStack, Direction.UP);
-        int color = IModHelpers.get().getRenderHelpers().getFluidBakedQuadColor(fluidStack);
+        TextureAtlasSprite texture = IModHelpersNeoForge.get().getRenderHelpers().getFluidIcon(fluidStack, Direction.UP);
+        int color = IModHelpersNeoForge.get().getRenderHelpers().getFluidBakedQuadColor(fluidStack);
         addBakedQuadRotated(quads, 0.1875F, 0.8125F, 0.1875F, 0.8125F, height, texture, Direction.UP, ROTATION_FIX[Direction.UP.ordinal()], true, color, ROTATION_UV);
         return quads;
     }

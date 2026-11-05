@@ -49,8 +49,8 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
     }
 
     @Override
-    public AABB getRenderBoundingBox(BlockEntityBoxOfEternalClosure blockEntity) {
-        return AABB.INFINITE;
+    public boolean shouldRenderOffScreen() {
+        return true;
     }
 
     @Override

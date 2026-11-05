@@ -1,65 +1,65 @@
 {
   "variants": {
     "axis_x=true,facing=south": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand",
       "x": 90
     },
     "axis_x=true,facing=west": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand",
       "y": 90,
       "x": 90
     },
     "axis_x=true,facing=north": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand",
       "x": 270
     },
     "axis_x=true,facing=east": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand",
       "y": 90,
       "x": 270
     },
     "axis_x=true,facing=up": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand",
       "x": 180
     },
     "axis_x=true,facing=down": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand"
     },
     "axis_x=false,facing=south": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated",
       "x": 90
     },
     "axis_x=false,facing=west": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated",
       "y": 90,
       "x": 90
     },
     "axis_x=false,facing=north": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated",
       "x": 270
     },
     "axis_x=false,facing=east": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated",
       "y": 90,
       "x": 270
     },
     "axis_x=false,facing=up": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated",
       "x": 180
     },
     "axis_x=false,facing=down": {
-      "type": "evilcraft:display_stand",
+      "fabric:type": "evilcraft:display_stand",
       "base": "evilcraft:block/display_stand_rotated"
     }
   }

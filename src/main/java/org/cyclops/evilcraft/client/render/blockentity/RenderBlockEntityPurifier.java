@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.blockentity;
 
+import org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -30,7 +32,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Triple;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.blockentity.BlockEntityPurifier;
@@ -100,14 +101,14 @@ public class RenderBlockEntityPurifier implements BlockEntityRenderer<BlockEntit
 
         // Render fluid
         FluidStack fluid = renderState.fluid;
-        IModHelpers.get().getRenderHelpers().renderFluidContext(fluid, poseStack, () -> {
+        IModHelpersNeoForge.get().getRenderHelpers().renderFluidContext(fluid, poseStack, () -> {
             float height = (float) ((fluid.getAmount() * 0.7D) / renderState.capacity + 0.23D + 0.01D);
-            int brightness = Math.max(renderState.lightCoords, fluid.getFluid().getFluidType().getLightLevel(fluid));
+            int brightness = Math.max(renderState.lightCoords, FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
             int l2 = brightness >> 0x10 & 0xFFFF;
             int i3 = brightness & 0xFFFF;
 
-            TextureAtlasSprite icon = IModHelpers.get().getRenderHelpers().getFluidIcon(fluid, Direction.UP);
-            Triple<Float, Float, Float> color = IModHelpers.get().getBaseHelpers().intToRGB(IModHelpers.get().getRenderHelpers().getFluidBakedQuadColor(fluid));
+            TextureAtlasSprite icon = IModHelpersNeoForge.get().getRenderHelpers().getFluidIcon(fluid, Direction.UP);
+            Triple<Float, Float, Float> color = IModHelpers.get().getBaseHelpers().intToRGB(IModHelpersNeoForge.get().getRenderHelpers().getFluidBakedQuadColor(fluid));
 
             submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.text(icon.atlasLocation()), (pose, vb1) -> {
                 vb1.addVertex(pose, 0.0625F, height, 0.0625F).setColor(color.getLeft(), color.getMiddle(), color.getRight(), 1).setUv(icon.getU0(), icon.getV1()).setUv2(l2, i3);

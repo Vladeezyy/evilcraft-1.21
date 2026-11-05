@@ -25,7 +25,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityPurifier;
 import org.cyclops.evilcraft.core.block.IBlockTank;

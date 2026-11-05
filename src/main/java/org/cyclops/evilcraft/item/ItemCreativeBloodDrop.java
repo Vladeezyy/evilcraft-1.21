@@ -25,7 +25,6 @@ import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodStain;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;

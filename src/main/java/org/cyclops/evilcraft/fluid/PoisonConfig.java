@@ -4,7 +4,6 @@ import org.cyclops.evilcraft.fabric.fluids.SoundActions;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Rarity;
-import org.cyclops.evilcraft.fabric.fluids.SoundActions;
 import org.cyclops.evilcraft.fabric.cyclopscore.config.extendedconfig.FluidConfigNeoForge;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;

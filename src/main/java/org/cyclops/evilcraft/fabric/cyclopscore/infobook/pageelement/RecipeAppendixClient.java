@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.infobook.*;
 
 import java.util.List;

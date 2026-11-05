@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.evilcraft.fabric.event.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;

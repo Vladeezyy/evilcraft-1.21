@@ -32,7 +32,6 @@ import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 import org.cyclops.evilcraft.entity.item.EntityItemUndespawnable;

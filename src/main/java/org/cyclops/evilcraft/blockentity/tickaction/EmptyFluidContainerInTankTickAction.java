@@ -11,7 +11,6 @@ import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.IFluidHelpersNeoForge;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTickingTankInventory;
 import org.cyclops.evilcraft.core.blockentity.tickaction.ITickAction;

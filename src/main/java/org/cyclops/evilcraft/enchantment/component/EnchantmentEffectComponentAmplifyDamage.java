@@ -7,7 +7,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.EnchantmentHelpers;
 import org.cyclops.evilcraft.RegistryEntries;

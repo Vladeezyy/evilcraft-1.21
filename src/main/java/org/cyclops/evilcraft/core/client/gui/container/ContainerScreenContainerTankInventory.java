@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.client.gui.container;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -126,7 +127,7 @@ public abstract class ContainerScreenContainerTankInventory<C extends ContainerI
     protected void drawTank(GuiGraphicsExtractor guiGraphics, int xOffset, int yOffset, Fluid fluid, int level) {
         if(fluid != null) {
             FluidStack stack = new FluidStack(fluid, 1);
-            TextureAtlasSprite icon = IModHelpers.get().getRenderHelpers().getFluidIcon(stack, Direction.UP);
+            TextureAtlasSprite icon = IModHelpersNeoForge.get().getRenderHelpers().getFluidIcon(stack, Direction.UP);
 
             int verticalOffset = 0;
 

@@ -11,7 +11,6 @@ import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**

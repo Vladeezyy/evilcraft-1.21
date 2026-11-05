@@ -30,8 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
-import net.neoforged.neoforge.model.data.ModelData;
+import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DynamicItemAndBlockModel;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -131,7 +130,7 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
         boolean useAmbientOcclusion = resolvedModel.getTopAmbientOcclusion();
         Material.Baked particleMatBaked = baker.materials().resolveSlot(textureSlotsOverride, "particle", resolvedModel);
         QuadCollection quadcollection = resolvedModel.getTopGeometry()
-                .bake(textureSlotsOverride, baker, modelState, resolvedModel, resolvedModel.getTopAdditionalProperties());
+                .bake(textureSlotsOverride, baker, modelState, resolvedModel);
 
         return new SimpleModelWrapper(quadcollection, useAmbientOcclusion, particleMatBaked);
     }

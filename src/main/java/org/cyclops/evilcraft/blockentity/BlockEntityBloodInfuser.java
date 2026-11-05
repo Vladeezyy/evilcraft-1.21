@@ -31,7 +31,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.cyclops.cyclopscore.datastructure.SingleCache;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;

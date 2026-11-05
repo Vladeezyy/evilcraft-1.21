@@ -8,8 +8,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import com.google.common.collect.ImmutableSet;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;

@@ -1,55 +1,55 @@
 package org.cyclops.evilcraft.block;
 
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.state.BlockState;
-import org.apache.commons.lang3.tuple.Pair;
-import org.cyclops.cyclopscore.client.model.IDynamicModelElementCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.client.render.model.ItemDynamicItemAndBlockModel;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
-import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.client.render.model.ModelDarkTankBaked;
-
-import javax.annotation.Nullable;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import org.cyclops.evilcraft.fabric.cyclopscore.client.render.model.ItemDynamicItemAndBlockModel;
+import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
+import org.jetbrains.annotations.Nullable;
 
 /**
+ * Cyclops Core's dynamic model elements are only applied on NeoForge. The item shows its fluid through a dynamic model;
+ * the block keeps its plain baked model, as {@link org.cyclops.evilcraft.client.render.blockentity.RenderBlockEntityDarkTank}
+ * draws the fluid in the world.
  * @author rubensworks
  */
 public class BlockDarkTankConfigClient extends BlockClientConfig<ModBaseNeoForge<?>> {
     public BlockDarkTankConfigClient(BlockConfigCommon<ModBaseNeoForge<?>> blockConfig) {
         super(blockConfig);
+        ModelLoadingPlugin.register(context -> context.modifyItemModelAfterBake().register((model, modelContext) -> {
+            Identifier tank = BuiltInRegistries.BLOCK.getKey(RegistryEntries.BLOCK_DARK_TANK.get());
+            return tank.equals(modelContext.itemId()) ? new ItemModelDarkTank() : model;
+        }));
     }
 
-    @Override
-    @Nullable
-    public IDynamicModelElementCommon getDynamicModelElement() {
-        return new DynamicModel();
-    }
+    /**
+     * Resolved at the first use: block models may not be baked yet when this item model is.
+     */
+    private static final class ItemModelDarkTank implements ItemModel {
 
-    public static class DynamicModel implements IDynamicModelElementCommon {
-
-        private ModelDarkTankBaked model;
+        private ItemDynamicItemAndBlockModel model;
 
         @Override
-        public BlockStateModel createDynamicBlockModel(Consumer<Pair<BlockState, BlockStateModel>> modelConsumer, Function<BlockState, BlockStateModel> modelRetriever) {
-            BlockState blockState = RegistryEntries.BLOCK_DARK_TANK.get().defaultBlockState();
-            model = new ModelDarkTankBaked(modelRetriever.apply(blockState));
-            modelConsumer.accept(Pair.of(blockState, model));
-            return model;
-        }
-
-        @Override
-        public ItemModel createDynamicItemModel(Consumer<Pair<Identifier, ItemModel>> modelConsumer, Function<Identifier, ItemModel> modelRetriever) {
-            ItemDynamicItemAndBlockModel itemModel = new ItemDynamicItemAndBlockModel(model, model.getModelRenderProperties());
-            Identifier registryName = BuiltInRegistries.BLOCK.getKey(RegistryEntries.BLOCK_DARK_TANK.get());
-            modelConsumer.accept(Pair.of(registryName, itemModel));
-            return itemModel;
+        public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext,
+                           @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed) {
+            if (model == null) {
+                ModelDarkTankBaked baked = new ModelDarkTankBaked(Minecraft.getInstance().getModelManager().getBlockStateModelSet()
+                        .get(RegistryEntries.BLOCK_DARK_TANK.get().defaultBlockState()));
+                model = new ItemDynamicItemAndBlockModel(baked, baked.getModelRenderProperties());
+            }
+            model.update(renderState, stack, itemModelResolver, displayContext, level, owner, seed);
         }
     }
 }

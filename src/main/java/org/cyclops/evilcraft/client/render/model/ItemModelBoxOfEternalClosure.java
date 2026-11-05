@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.client.render.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 import com.mojang.math.Quadrant;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -31,11 +32,7 @@ public record ItemModelBoxOfEternalClosure(ModelBoxOfEternalClosureBaked model, 
     @Override
     public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner entity, int seed) {
         List<BakedQuad> quads = model.handleItemState(stack, level, entity);
-        QuadCollection.Builder quadBuilder = new QuadCollection.Builder();
-        for (BakedQuad quad : quads) {
-            quadBuilder.addUnculledFace(quad);
-        }
-        new CuboidItemModelWrapper(List.of(), quadBuilder.build(), modelRenderProperties, new Matrix4f())
+        ColoredQuads.itemModel(quads, modelRenderProperties)
                 .update(renderState, stack, itemModelResolver, displayContext, level, entity, seed);
     }
 

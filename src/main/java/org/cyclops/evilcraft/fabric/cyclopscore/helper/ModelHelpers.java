@@ -21,8 +21,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.neoforged.neoforge.model.data.ModelData;
-import net.neoforged.neoforge.model.data.ModelProperty;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -204,7 +202,7 @@ public final class ModelHelpers {
                     new Vector3f(itemTransform.translation()),
                     eulerToQuaternion(itemTransform.rotation()),
                     new Vector3f(itemTransform.scale()),
-                    eulerToQuaternion(itemTransform.rightRotation())
+                    new Quaternionf()
             );
             map.put(key, new ModelState() {
                 @Override

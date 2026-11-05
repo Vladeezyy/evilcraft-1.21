@@ -17,7 +17,6 @@ import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockDarkTank;
 import org.cyclops.evilcraft.item.ItemBloodExtractor;

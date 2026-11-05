@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "type": "evilcraft:entangled_chalice",
+      "fabric:type": "evilcraft:entangled_chalice",
       "chalice": "evilcraft:block/chalice",
       "gems": "evilcraft:block/gems"
     }

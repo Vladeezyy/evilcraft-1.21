@@ -33,6 +33,7 @@ public class RenderBroom extends EntityRenderer<EntityBroom, RenderStateBroom> {
     @Override
     public void extractRenderState(EntityBroom entity, RenderStateBroom reusedState, float partialTick) {
         super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.partialTick = partialTick;
 
         reusedState.yRotO = entity.yRotO;
         reusedState.xRotO = entity.xRotO;

@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;

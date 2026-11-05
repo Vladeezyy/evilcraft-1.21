@@ -25,7 +25,6 @@ import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.item.ItemBlockNBT;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.block.BlockDarkTankConfig;

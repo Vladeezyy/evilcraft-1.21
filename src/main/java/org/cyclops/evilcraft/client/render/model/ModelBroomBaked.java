@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.client.render.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 import org.cyclops.evilcraft.fabric.client.model.ModelData;
 
 import com.google.common.collect.ImmutableMap;
@@ -23,9 +24,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.quad.BakedColors;
-import net.neoforged.neoforge.client.model.quad.BakedNormals;
-import net.neoforged.neoforge.model.data.ModelData;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DynamicItemAndBlockModel;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -167,7 +165,7 @@ public class ModelBroomBaked extends DynamicItemAndBlockModel {
     private Collection<? extends BakedQuad> offsetAndColor(List<BakedQuad> quads, float offset, int color) {
         List<BakedQuad> offsetQuads = Lists.newArrayListWithExpectedSize(quads.size());
         for (BakedQuad quad : quads) {
-            offsetQuads.add(new BakedQuad(offsetVec(quad.position0(), offset), offsetVec(quad.position1(), offset), offsetVec(quad.position2(), offset), offsetVec(quad.position3(), offset), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo(), BakedNormals.UNSPECIFIED, BakedColors.of(color)));
+            offsetQuads.add(ColoredQuads.withColor(new BakedQuad(offsetVec(quad.position0(), offset), offsetVec(quad.position1(), offset), offsetVec(quad.position2(), offset), offsetVec(quad.position3(), offset), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo()), color));
         }
 
         return offsetQuads;

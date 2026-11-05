@@ -2,37 +2,29 @@ package org.cyclops.evilcraft.fabric.event;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.world.level.ItemLike;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.world.level.block.Block;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Registers item and block color handlers once all registries are filled.
+ * The part of NeoForge's event of this name that the mod uses. Item colors are in the item model files since 1.21.4.
  */
 @Environment(EnvType.CLIENT)
-public class RegisterColorHandlersEvent {
+public final class RegisterColorHandlersEvent {
 
-    public static class Item {
-        public static void addListener(Consumer<Item> listener) {
-            ModLifecycle.afterRegistries(() -> listener.accept(new Item()));
-        }
-
-        public void register(ItemColor color, ItemLike... items) {
-            ColorProviderRegistry.ITEM.register(color, items);
-        }
+    private RegisterColorHandlersEvent() {
     }
 
-    public static class Block {
-        public static void addListener(Consumer<Block> listener) {
-            ModLifecycle.afterRegistries(() -> listener.accept(new Block()));
+    public static final class BlockTintSources {
+        public static void addListener(Consumer<BlockTintSources> listener) {
+            ModLifecycle.afterRegistries(() -> listener.accept(new BlockTintSources()));
         }
 
-        public void register(BlockColor color, net.minecraft.world.level.block.Block... blocks) {
-            ColorProviderRegistry.BLOCK.register(color, blocks);
+        public void register(List<BlockTintSource> tints, Block... blocks) {
+            BlockColorRegistry.register(tints, blocks);
         }
     }
 }

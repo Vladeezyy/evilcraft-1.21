@@ -16,7 +16,6 @@ import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.inventory.PlayerExtendedInventoryIterator;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.Reference;

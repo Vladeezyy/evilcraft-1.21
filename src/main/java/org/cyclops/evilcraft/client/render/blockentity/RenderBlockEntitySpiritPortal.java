@@ -35,7 +35,7 @@ public class RenderBlockEntitySpiritPortal implements BlockEntityRenderer<BlockE
     }
 
     @Override
-    public boolean shouldRenderOffScreen(BlockEntitySpiritPortal blockEntity) {
+    public boolean shouldRenderOffScreen() {
         // The rendering is larger than the block
         return true;
     }

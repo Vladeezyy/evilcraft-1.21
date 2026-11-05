@@ -28,7 +28,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.apache.commons.lang3.mutable.MutableDouble;

@@ -148,7 +148,6 @@ public class RenderVengeanceSpirit extends EntityRenderer<EntityVengeanceSpirit,
         avatarRenderState.nameTag = renderState.nameTag;
         avatarRenderState.nameTagAttachment = renderState.nameTagAttachment;
         avatarRenderState.leashStates = renderState.leashStates;
-        avatarRenderState.partialTick = renderState.partialTick;
         avatarRenderState.bodyRot = renderState.bodyRot;
         avatarRenderState.yRot = renderState.yRot;
         avatarRenderState.xRot = renderState.xRot;
@@ -164,6 +163,7 @@ public class RenderVengeanceSpirit extends EntityRenderer<EntityVengeanceSpirit,
     @Override
     public void extractRenderState(EntityVengeanceSpirit entity, RenderStateVengeanceSpirit renderState, float partialTick) {
         super.extractRenderState(entity, renderState, partialTick);
+        renderState.partialTick = partialTick;
 
         renderState.spirit = entity;
         renderState.bodyRot = entity.yBodyRot;

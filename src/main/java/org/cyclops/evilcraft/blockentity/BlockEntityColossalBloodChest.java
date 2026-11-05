@@ -30,7 +30,6 @@ import org.cyclops.cyclopscore.block.multi.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.DirectionHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.InventorySlotMasked;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;

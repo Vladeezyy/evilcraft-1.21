@@ -1,7 +1,7 @@
 # Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
 
 Status (2026-11-05): **does not build yet.** Upstream 26.1.2 is merged into the Fabric port, the Gradle build is set
-up for 26.x and stops at `compileJava` with **532 errors in 166 files**. Nothing has run in the game on this branch.
+up for 26.x and stops at `compileJava` with **349 errors in 123 files**. Nothing has run in the game on this branch.
 
 ## How this branch was made
 - `vendor/26.1.2` (local branch): upstream CyclopsMC/EvilCraft `master-26-lts` @ 94d5b596 (1.2.109) on top of the
@@ -62,7 +62,7 @@ up for 26.x and stops at `compileJava` with **532 errors in 166 files**. Nothing
    - IMC is gone: other mods call `EntityVengeanceSpirit.addToBlacklistIMC` directly.
    Not checked: key category registration (`getMainKeyCategory`), block items order, setup order, packets in game.
 3. In progress (2026-11-05, on the Mac: `JAVA_HOME=~/.gradle/jdks/eclipse_adoptium-25-aarch64-os_x.2/jdk-25.0.4.1+1/Contents/Home`).
-   **1,853 -> 532 errors.** Everything below compiles only; **none of it has run yet**.
+   **1,853 -> 349 errors.** Everything below compiles only; **none of it has run yet**.
    - Done: `fabric/transfer`, the names of NeoForge's transfer API written anew over Fabric's Transfer API (not copied:
      NeoForge is LGPL-2.1-only). Transactions wrap Fabric's, so they nest with other mods' transactions; `SnapshotJournal`
      is its own (Fabric's SnapshotParticipant does not pass the original state to the final commit, `onRootCommit` needs
@@ -71,15 +71,27 @@ up for 26.x and stops at `compileJava` with **532 errors in 166 files**. Nothing
    - Done: `fabric/capabilities` with the names `Capabilities.Fluid/Item.BLOCK/ITEM` (fallbacks to `FluidStorage`/`ItemStorage`;
      the mod's handlers are exposed to them), `IModHelpersNeoForge` (fluid helpers in mB, capability helpers),
      `FluidStackTemplate`, bus registrations -> static `addListener` of `fabric/event`.
+   - Done: models and renderers, no errors left in `client/render`. `DynamicBaseModel` is `emitQuads` (each quad once; upstream
+     repeats all quads for each side and layer). `fabric/client/model/ColoredQuads`: vanilla's BakedQuad has no color, so an opaque
+     ARGB color goes in `MaterialInfo.tintIndex` (values below -1); vertex colors for blocks, `Constant` tints for items. Upstream's
+     colors are ABGR, `withColor` converts. The `Register*` model events fill vanilla's id mappers (AW). Blockstates use
+     `fabric:type`. Dark tank: Cyclops Core only calls `getDynamicModelElement` on NeoForge, so `BlockDarkTankConfigClient`
+     replaces the item model with a plugin and leaves the block's baked model alone. Deleted, unused since 26.1: `IGeometry*`,
+     `ModelLoaders`, `UnbakedGeometryHelper`, `ModelRenderTypes`, `IClientFluidTypeExtensions`.
    - Scripts for the 26.2 and 26.3 merges, run in this order: `tools/port/rewrite_transfer.py`, `rewrite_cc_shim.py`,
-     `rewrite_events.py`, `autoimport.py`; `errsummary.sh` compiles and summarizes (edit its paths for another machine).
+     `rewrite_events.py`, `autoimport.py`, `rewrite_models.py`; `errsummary.sh` compiles and summarizes (edit its paths for another machine).
    - The saved conflict notes are on the Windows machine (`D:/mods/_ref/ec-notes`), and so are `vendor/*`, `gen/*`. Not needed
      to continue: our side of any conflict is `git show main:<path>`.
-   - Left, biggest first (`errsummary.sh`): models (`client/render`, `fabric/client`: ModelData, BakedColors/BakedNormals,
-     CustomUnbakedBlockStateModel, the Register* model events), JEI (`evilcraftcompat`), remaining events (`NeoForge.EVENT_BUS.post`,
-     `@SubscribeEvent`, `RegisterEvent`, `TagsUpdatedEvent`, `ServerStartedEvent`, `DefaultDataComponentsBoundEvent`,
-     `BreakBlockEvent`), `method does not override` (NeoForge item and block extensions), the GameTest move of step 2.
-   - To check in game first: `ItemAccess.forStack` (mutates the stack directly and restores it on abort, also components
+   - Left, biggest first (`errsummary.sh`): JEI (`evilcraftcompat`, 66), the rest of `fabric/cyclopscore` (55), `EvilCraft.java` (19),
+     remaining events (`NeoForge.EVENT_BUS.post`, `@SubscribeEvent`, `RegisterEvent`, `TagsUpdatedEvent`, `ServerStartedEvent`,
+     `DefaultDataComponentsBoundEvent`, `BreakBlockEvent`), `method does not override` (NeoForge item and block extensions),
+     the GameTest move of step 2.
+   - To check in game first, models: display stand, entangled chalice and box of eternal closure as blocks and items (a model
+     that fails to load shows nothing in the compiler); colors of fluids and gems (ABGR conversion); the dark tank item; cutout
+     and translucent blocks (17 model files have NeoForge's `render_type`, which vanilla ignores: the layer now comes from the
+     sprite). Quads that vanilla keeps per cull face: upstream's `getQuads(null)` skips them, a JSON face with `cullface` would be
+     missing. Performance: item models rebuild their quads each frame as upstream does; measure before caching.
+   - To check in game first, transfer: `ItemAccess.forStack` (mutates the stack directly and restores it on abort, also components
      through `PatchedDataComponentMap.restorePatch`), hoppers on `ResourceHandlerStorage`, buckets through the
      `FluidStorage.ITEM` fallback, `FluidStacksResourceHandler` saving (`stacks` key; 1.21.1 port worlds wrote `Fluid`).
 4. fabric.mod.json, the access widener entries (the header is done; entries are still from 1.21.1), mixins checked with

@@ -1,7 +1,14 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.helper;
 
 import org.cyclops.evilcraft.fabric.cyclopscore.datastructure.DimPos;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.material.Fluid;
+import org.apache.commons.lang3.tuple.Triple;
+import org.cyclops.cyclopscore.helper.IModHelpersFabric;
+import org.cyclops.cyclopscore.helper.IRenderHelpersFabric;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.capabilities.BlockCapability;
@@ -39,6 +46,13 @@ public final class IModHelpersNeoForge {
 
     public CapabilityHelpers getCapabilityHelpers() {
         return capabilityHelpers;
+    }
+
+    /**
+     * Only for the fluid methods; the others are on {@code IModHelpers.get().getRenderHelpers()}. Client only.
+     */
+    public RenderHelpers getRenderHelpers() {
+        return RenderHelpers.INSTANCE;
     }
 
     public static final class FluidHelpers {
@@ -113,6 +127,36 @@ public final class IModHelpersNeoForge {
 
         public <T, C> Optional<T> getCapability(Level level, BlockPos pos, @Nullable C context, BlockCapability<T, C> capability) {
             return Optional.ofNullable(capability.getCapability(level, pos, context));
+        }
+    }
+
+    public static final class RenderHelpers {
+
+        private static final RenderHelpers INSTANCE = new RenderHelpers();
+
+        public TextureAtlasSprite getFluidIcon(Fluid fluid, Direction side) {
+            return IModHelpersFabric.get().getRenderHelpers().getFluidIcon(fluid, side);
+        }
+
+        public TextureAtlasSprite getFluidIcon(FluidStack fluid, Direction side) {
+            return IModHelpersFabric.get().getRenderHelpers().getFluidIcon(fluid.toVariant(), side);
+        }
+
+        public void renderFluidContext(FluidStack fluid, PoseStack poseStack, IRenderHelpersFabric.IFluidContextRender render) {
+            if (!fluid.isEmpty()) {
+                IModHelpersFabric.get().getRenderHelpers().renderFluidContext(fluid.toVariant(), poseStack, render);
+            }
+        }
+
+        public Triple<Float, Float, Float> getFluidVertexBufferColor(FluidStack fluid) {
+            return IModHelpersFabric.get().getRenderHelpers().getFluidVertexBufferColor(fluid.toVariant());
+        }
+
+        /**
+         * @return The color in ABGR, see {@link org.cyclops.evilcraft.fabric.client.model.ColoredQuads#withColor}.
+         */
+        public int getFluidBakedQuadColor(FluidStack fluid) {
+            return IModHelpersFabric.get().getRenderHelpers().getFluidBakedQuadColor(fluid.toVariant());
         }
     }
 }

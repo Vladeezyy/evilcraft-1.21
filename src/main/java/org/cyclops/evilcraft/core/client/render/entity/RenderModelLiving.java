@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Mob;
-import org.cyclops.cyclopscore.config.extendedconfig.ExtendedConfigCommon;
 import org.cyclops.evilcraft.Reference;
 
 /**

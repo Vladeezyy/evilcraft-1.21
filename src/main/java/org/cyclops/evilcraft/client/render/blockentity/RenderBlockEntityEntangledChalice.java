@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.blockentity;
 
+import org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -40,20 +42,20 @@ public class RenderBlockEntityEntangledChalice implements BlockEntityRenderer<Bl
         BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPosition, breakProgress);
         renderState.fluid = blockEntity.getTank().getFluid();
         renderState.capacity = blockEntity.getTank().getCapacity();
-        renderState.color = IModHelpers.get().getRenderHelpers().getFluidVertexBufferColor(renderState.fluid);
+        renderState.color = IModHelpersNeoForge.get().getRenderHelpers().getFluidVertexBufferColor(renderState.fluid);
     }
 
     @Override
     public void submit(RenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         if(!renderState.fluid.isEmpty()) {
             FluidStack fluid = renderState.fluid;
-            IModHelpers.get().getRenderHelpers().renderFluidContext(renderState.fluid, poseStack, () -> {
+            IModHelpersNeoForge.get().getRenderHelpers().renderFluidContext(renderState.fluid, poseStack, () -> {
                 float height = Math.min(0.95F, ((float) fluid.getAmount() / (float) renderState.capacity)) * 0.1875F + 0.8125F;
-                int brightness = Math.max(renderState.lightCoords, fluid.getFluid().getFluidType().getLightLevel(fluid));
+                int brightness = Math.max(renderState.lightCoords, FluidHelpersFabricExtra.getLightLevel(fluid.getFluid()));
                 int l2 = brightness >> 0x10 & 0xFFFF;
                 int i3 = brightness & 0xFFFF;
 
-                TextureAtlasSprite icon = IModHelpers.get().getRenderHelpers().getFluidIcon(fluid, Direction.UP);
+                TextureAtlasSprite icon = IModHelpersNeoForge.get().getRenderHelpers().getFluidIcon(fluid, Direction.UP);
                 Triple<Float, Float, Float> color = renderState.color;
 
                 submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.text(icon.atlasLocation()), (pose, vb) -> {
