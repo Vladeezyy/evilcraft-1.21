@@ -4,39 +4,28 @@ import com.mojang.datafixers.Products;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
-import java.util.function.Predicate;
+import java.util.Optional;
 
 /**
- * A loot modifier that only applies when all of its loot conditions pass.
+ * A loot modifier that only applies when its loot condition passes.
  */
 public abstract class LootModifier implements IGlobalLootModifier {
 
-    public static final Codec<LootItemCondition[]> LOOT_CONDITIONS_CODEC = LootItemCondition.DIRECT_CODEC.listOf()
-            .xmap(list -> list.toArray(LootItemCondition[]::new), java.util.List::of);
-
-    protected final LootItemCondition[] conditions;
+    protected final Optional<Holder<LootItemCondition>> condition;
     private final int priority;
-    private final Predicate<LootContext> combinedConditions;
 
-    protected LootModifier(LootItemCondition[] conditions, int priority) {
-        this.conditions = conditions;
+    protected LootModifier(Optional<Holder<LootItemCondition>> condition, int priority) {
+        this.condition = condition;
         this.priority = priority;
-        this.combinedConditions = context -> {
-            for (LootItemCondition condition : conditions) {
-                if (!condition.test(context)) {
-                    return false;
-                }
-            }
-            return true;
-        };
     }
 
-    protected static <T extends LootModifier> Products.P2<RecordCodecBuilder.Mu<T>, LootItemCondition[], Integer> codecStart(RecordCodecBuilder.Instance<T> instance) {
-        return instance.group(LOOT_CONDITIONS_CODEC.fieldOf("conditions").forGetter(lm -> lm.conditions),
+    protected static <T extends LootModifier> Products.P2<RecordCodecBuilder.Mu<T>, Optional<Holder<LootItemCondition>>, Integer> codecStart(RecordCodecBuilder.Instance<T> instance) {
+        return instance.group(LootItemCondition.CODEC.optionalFieldOf("condition").forGetter(lm -> ((LootModifier) lm).condition),
                 Codec.INT.optionalFieldOf("priority", 1000).forGetter(lm -> ((LootModifier) lm).priority));
     }
 
@@ -47,7 +36,7 @@ public abstract class LootModifier implements IGlobalLootModifier {
 
     @Override
     public final ObjectArrayList<ItemStack> apply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        return combinedConditions.test(context) ? doApply(generatedLoot, context) : generatedLoot;
+        return condition.isEmpty() || condition.get().value().test(context) ? doApply(generatedLoot, context) : generatedLoot;
     }
 
     protected abstract ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context);

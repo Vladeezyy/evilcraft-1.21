@@ -1,4 +1,16 @@
-# Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 -> 26.2 (WIP)
+# Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 -> 26.2 -> 26.3 (WIP)
+
+Status of this branch, 26.3 (2026-11-05): **works on server and client in automatic tests; nobody has played it, no release.**
+- Built on mc/26.2. `master-26` contains all of the LTS branch, so `merge_upstream.py` merges from the head of `master-26.2` to `master-26`. Mod version stays 1.2.109 (upstream's `mod_version` on that branch says 1.2.98).
+- GameTests 106/106, client scene 30 checks OK, production server and client OK, no recipe or loot parse errors. Resources equal upstream's except the rewritten data; the `.nbt` files are byte-identical. Not checked in game: the werewolf mansion in a village (26.3 reads templates with other keys, upstream's files are unchanged).
+- Stress: MSPT 3.80 -> 4.64 (+0.83, 22%; one run). FPS 69 -> 69 says nothing: looks capped, as on 26.2. **Find what caps FPS on 26.2+ and measure again; a JFR share of the server thread is also still to do.**
+- **Open:** in 1 of 2 scene runs the near part of the stage was missing and white for at least 8 ticks (`scene_blocks_after`, `scene_items_dynamic`). Only smooth stone is in that part. Looks like a late section rebuild, cause unknown.
+- Stripping and composting: `AxeItem` and Fabric's registries are gone. `fabric/extensions/StrippableBlocks` is a `UseBlockCallback`; the sapling gets the `compostable` component through `DefaultItemComponentEvents`. The fuels are upstream's `cooking_fuel` component.
+- Loot modifiers: `condition` as on NeoForge 26.3. Upstream's data still has `conditions` with the old key, which that codec ignores, so upstream may add this loot every time; here the files are rewritten to `condition` with `type`, so the chances hold.
+- JEI: `RecipeMap` cannot be made from synchronized recipes any more, `JeiCompatLoaderClient.RECIPES` is used directly.
+- Mixin: `ServerPlayer.drop(ItemStack, boolean, Prediction)`. Scenes: `mc.getWindow().setWindowed`, GLFW is gone.
+
+Below: 26.2, then 26.1.2.
 
 Status of this branch, 26.2 (2026-11-05): **works on server and client in automatic tests; nobody has played it, no release.**
 - Built on mc/26.1.2 (1.2.109). Upstream's `master-26.2` is older than the LTS branch (1.2.98, last commit 2026-09-11, 36 LTS commits behind), so only its

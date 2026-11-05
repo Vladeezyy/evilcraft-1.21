@@ -73,7 +73,8 @@ public class RecipeDeadBush extends CustomRecipe {
     @Override
     public List<RecipeDisplay> display() {
         return List.of(new ShapelessCraftingRecipeDisplay(
-                List.of(new SlotDisplay.TagSlotDisplay(ItemTags.SAPLINGS), new SlotDisplay.TagSlotDisplay(ConventionalItemTags.SHEAR_TOOLS)),
+                List.of(new SlotDisplay.TagSlotDisplay(BuiltInRegistries.ITEM.getOrThrow(ItemTags.SAPLINGS)),
+                        new SlotDisplay.TagSlotDisplay(BuiltInRegistries.ITEM.getOrThrow(ConventionalItemTags.SHEAR_TOOLS))),
                 new SlotDisplay.ItemSlotDisplay(Items.DEAD_BUSH),
                 new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
         ));

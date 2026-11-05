@@ -3,10 +3,15 @@ package org.cyclops.evilcraft.block;
 import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
@@ -36,9 +41,10 @@ public class BlockBloodWaxedCoalConfig extends BlockConfigCommon<IModBase> {
                         return 5;
                     }
                 },
-                getDefaultItemConstructor(EvilCraft._instance)
+                getDefaultItemConstructor(EvilCraft._instance, properties -> properties
+                        .component(DataComponents.COOKING_FUEL, new CookingFuel(new ResolvableInt.Constant(32000),
+                                ResolvableFloat.fromKey(ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER))))
         );
-        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getItemInstance(), 32000)));
     }
 
 }

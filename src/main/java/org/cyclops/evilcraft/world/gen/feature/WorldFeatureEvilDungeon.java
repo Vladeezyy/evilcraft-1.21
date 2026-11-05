@@ -2,6 +2,7 @@ package org.cyclops.evilcraft.world.gen.feature;
 
 import net.minecraft.world.entity.EntityTypes;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.RandomizableContainer;
@@ -10,9 +11,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.MonsterRoomFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -23,7 +23,9 @@ import org.cyclops.evilcraft.RegistryEntries;
  * @author rubensworks
  *
  */
-public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
+public class WorldFeatureEvilDungeon implements Feature {
+
+    public static final MapCodec<WorldFeatureEvilDungeon> CODEC = MapCodec.unit(WorldFeatureEvilDungeon::new);
 
     // The mobs of vanilla's monster rooms
     private static final net.minecraft.world.entity.EntityType<?>[] MONSTER_ROOM_MOBS = new net.minecraft.world.entity.EntityType<?>[]{
@@ -37,15 +39,13 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
     private static final int CHESTS = 2;
     private static final int CHESTS_RAND = 2;
 
-    public WorldFeatureEvilDungeon(Codec<NoneFeatureConfiguration> config) {
-        super(config);
+    @Override
+    public MapCodec<WorldFeatureEvilDungeon> codec() {
+        return CODEC;
     }
 
     @Override
-    public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-        WorldGenLevel world = context.level();
-        BlockPos blockPos = context.origin();
-        RandomSource random = context.random();
+    public boolean place(WorldGenLevel world, ChunkGenerator chunkGenerator, RandomSource random, BlockPos blockPos) {
 
         int height = 3;
         int radiusX = random.nextInt(RADIUS_X_RAND) + RADIUS_X;
@@ -145,7 +145,7 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
                     BlockEntity tile = world.getBlockEntity(loopPos);
 
                     if (tile instanceof SpawnerBlockEntity) {
-                        ((SpawnerBlockEntity) tile).getSpawner().setEntityId(net.minecraft.util.Util.getRandom(MONSTER_ROOM_MOBS, random), null, random, loopPos);
+                        ((SpawnerBlockEntity) tile).setEntityId(net.minecraft.util.Util.getRandom(MONSTER_ROOM_MOBS, random), random);
                     } else {
                         System.err.println("Failed to fetch mob spawner entity at (" + xs + ", " + y + ", " + zs + ")");
                     }

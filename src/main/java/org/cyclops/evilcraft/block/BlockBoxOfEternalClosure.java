@@ -20,7 +20,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -52,7 +51,6 @@ import java.util.function.Supplier;
  */
 public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockRarityProvider, IDynamicLightBlock {
 
-    public static final MapCodec<BlockBoxOfEternalClosure> CODEC = simpleCodec(BlockBoxOfEternalClosure::new);
 
     public static final String FORGOTTEN_PLAYER = "Forgotten Player";
     private static final int LIGHT_LEVEL = 6;
@@ -71,10 +69,6 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
                 .setValue(FACING, Direction.NORTH));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

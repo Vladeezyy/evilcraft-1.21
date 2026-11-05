@@ -14,7 +14,6 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -40,7 +39,6 @@ import javax.annotation.Nullable;
  */
 public class BlockSpiritFurnace extends BlockWithEntityGuiTank implements CubeDetector.IDetectionListener {
 
-    public static final MapCodec<BlockSpiritFurnace> CODEC = simpleCodec(BlockSpiritFurnace::new);
 
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
@@ -51,10 +49,6 @@ public class BlockSpiritFurnace extends BlockWithEntityGuiTank implements CubeDe
                 .setValue(ACTIVE, false));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

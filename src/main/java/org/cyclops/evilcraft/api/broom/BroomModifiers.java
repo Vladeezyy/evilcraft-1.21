@@ -16,6 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -263,7 +264,7 @@ public class BroomModifiers {
                                                     block.playerWillDestroy(world, pos, blockState, player);
                                                     if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
                                                         block.destroy(world, pos, blockState);
-                                                        block.playerDestroy(world, player, pos, blockState, world.getBlockEntity(pos), ItemStack.EMPTY);
+                                                        block.playerDestroy((ServerLevel) world, playerMp, pos, blockState, world.getBlockEntity(pos), ItemStack.EMPTY);
                                                     }
 
                                                     // Send block change packet to the client

@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -30,7 +29,6 @@ import javax.annotation.Nullable;
  */
 public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui implements IDynamicLightBlock {
 
-    public static final MapCodec<BlockSanguinaryEnvironmentalAccumulator> CODEC = simpleCodec(BlockSanguinaryEnvironmentalAccumulator::new);
 
     public static final BooleanProperty ON = BooleanProperty.create("on");
 
@@ -41,10 +39,6 @@ public class BlockSanguinaryEnvironmentalAccumulator extends BlockWithEntityGui 
                 .setValue(ON, false));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

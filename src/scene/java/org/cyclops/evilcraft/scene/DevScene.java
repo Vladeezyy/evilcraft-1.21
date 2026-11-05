@@ -56,7 +56,6 @@ import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,7 +186,7 @@ public final class DevScene {
                 return;
             }
             opened = true;
-            GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
+            mc.getWindow().setWindowed(1600, 900);
             if (mc.getLevelSource().levelExists(WORLD)) {
                 mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.gui.setScreen(new TitleScreen()));
             } else {

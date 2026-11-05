@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -38,7 +37,6 @@ import javax.annotation.Nullable;
  */
 public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynamicLightBlock {
 
-    public static final MapCodec<BlockBloodChest> CODEC = simpleCodec(BlockBloodChest::new);
 
     public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class, Direction.Plane.HORIZONTAL);
     public static final BooleanProperty ON = BooleanProperty.create("on");
@@ -51,10 +49,6 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynami
                 .setValue(ON, false));
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

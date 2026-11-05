@@ -16,7 +16,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,7 +38,6 @@ import java.util.Random;
  */
 public class BlockBloodStain extends BlockWithEntity {
 
-    public static final MapCodec<BlockBloodStain> CODEC = simpleCodec(BlockBloodStain::new);
 
     private static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
 
@@ -48,10 +46,6 @@ public class BlockBloodStain extends BlockWithEntity {
         LivingDeathEvent.addListener(this::bloodStainedBlockEvent);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {

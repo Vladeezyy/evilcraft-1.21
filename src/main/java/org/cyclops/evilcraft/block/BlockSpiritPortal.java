@@ -7,7 +7,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,7 +31,6 @@ import javax.annotation.Nullable;
  */
 public class BlockSpiritPortal extends BlockWithEntity {
 
-    public static final MapCodec<BlockSpiritPortal> CODEC = simpleCodec(BlockSpiritPortal::new);
 
     public static final VoxelShape SHAPE = Block.box(0.4F * 16F, 0.4F * 16F, 0.4F * 16F, 0.6F * 16F, 0.6F * 16F, 0.6F * 16F);
 
@@ -41,10 +39,6 @@ public class BlockSpiritPortal extends BlockWithEntity {
         LivingDeathEvent.addListener(this::palingDeath);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

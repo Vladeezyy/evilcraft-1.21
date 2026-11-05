@@ -49,7 +49,7 @@ public final class ColoredQuads {
         BakedQuad.MaterialInfo info = quad.materialInfo();
         return new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(),
                 quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(),
-                new BakedQuad.MaterialInfo(info.sprite(), info.layer(), info.itemRenderType(), tint, info.shade(), info.lightEmission()));
+                new BakedQuad.MaterialInfo(info.sprite(), info.layer(), info.itemRenderType(), info.itemGlintRenderType(), info.itemGlintSpecialRenderType(), tint, info.shadeDirectionOverride(), info.lightEmission()));
     }
 
     private static boolean isColor(int tint) {

@@ -1,12 +1,13 @@
 {
   "type": "cyclopscore:inject_item",
-  "conditions": [
-    {
-      "condition": "random_chance",
-      "chance": 0.35
-    }
-  ],
-  "item": { "id": "evilcraft:condensed_blood", "Count": 1 },
+  "condition": {
+    "type": "minecraft:random_chance",
+    "chance": 0.35
+  },
+  "item": {
+    "id": "evilcraft:condensed_blood",
+    "Count": 1
+  },
   "maxStackSize": 32,
   "loot_tables": [
     "minecraft:chests/spawn_bonus_chest",

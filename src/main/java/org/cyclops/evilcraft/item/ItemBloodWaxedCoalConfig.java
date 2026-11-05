@@ -2,6 +2,11 @@ package org.cyclops.evilcraft.item;
 
 import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
@@ -17,9 +22,9 @@ public class ItemBloodWaxedCoalConfig extends ItemConfigCommon<IModBase> {
         super(
                 EvilCraft._instance,
             "blood_waxed_coal",
-                (eConfig, properties) -> new Item(properties)
+                (eConfig, properties) -> new Item(properties.component(DataComponents.COOKING_FUEL, new CookingFuel(new ResolvableInt.Constant(3200),
+                        ResolvableFloat.fromKey(ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER))))
         );
-        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getInstance(), 3200)));
     }
 
 

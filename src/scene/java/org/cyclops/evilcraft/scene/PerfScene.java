@@ -33,7 +33,6 @@ import org.cyclops.evilcraft.blockentity.BlockEntityBloodChest;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.blockentity.BlockEntityDarkTank;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
@@ -100,7 +99,7 @@ public final class PerfScene {
         }
         if (!opened) {
             opened = true;
-            GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
+            mc.getWindow().setWindowed(1600, 900);
             // Uncapped frames, or the FPS of both windows is the display's refresh rate
             mc.options.enableVsync().set(false);
             mc.options.framerateLimit().set(260);

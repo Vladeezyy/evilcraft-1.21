@@ -35,17 +35,20 @@ public class ItemBlockNBT extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level world, @Nullable Player player, ItemStack itemStack, BlockState blockState) {
-        if (super.updateCustomBlockEntityTag(pos, world, player, itemStack, blockState)) {
-            return true;
+    protected boolean placeBlock(net.minecraft.world.item.context.BlockPlaceContext context, net.minecraft.world.level.block.state.BlockState placementState) {
+        if (!super.placeBlock(context, placementState)) {
+            return false;
         }
 
-        BlockEntity tile = world.getBlockEntity(pos);
-        if (tile != null) {
-            return itemStackDataToTile(itemStack.copy().split(1), tile);
+        Level world = context.getLevel();
+        if (!world.isClientSide()) {
+            BlockEntity tile = world.getBlockEntity(context.getClickedPos());
+            if (tile != null) {
+                itemStackDataToTile(context.getItemInHand().copy().split(1), tile);
+            }
         }
 
-        return false;
+        return true;
     }
 
     /**

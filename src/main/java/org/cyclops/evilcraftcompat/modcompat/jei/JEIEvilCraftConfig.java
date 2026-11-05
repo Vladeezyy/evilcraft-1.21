@@ -90,9 +90,8 @@ public class JEIEvilCraftConfig implements IModPlugin {
 
     protected <I extends RecipeInput, T extends Recipe<I>> void addRecipes(IRecipeRegistration registry, IRecipeHolderType<T> recipeTypeJei, RecipeType<T> recipeType) {
         // Null until the server has synchronized its recipes
-        net.minecraft.world.item.crafting.RecipeMap recipes = IModHelpers.get().getMinecraftClientHelpers().getRecipes();
-        if (recipes != null) {
-            registry.addRecipes(recipeTypeJei, Lists.newArrayList(recipes.byType(recipeType)));
+        if (JeiCompatLoaderClient.RECIPES != null) {
+            registry.addRecipes(recipeTypeJei, Lists.newArrayList(JeiCompatLoaderClient.RECIPES.getAllOfType(recipeType)));
         }
     }
 

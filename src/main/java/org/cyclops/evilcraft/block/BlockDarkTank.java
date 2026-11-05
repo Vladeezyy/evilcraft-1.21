@@ -17,7 +17,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -51,7 +50,6 @@ import java.util.Locale;
  */
 public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynamicLightBlock {
 
-    public static final MapCodec<BlockDarkTank> CODEC = simpleCodec(BlockDarkTank::new);
 
     // Model Properties
     public static final ModelProperty<FluidStack> TANK_FLUID = new ModelProperty<>();
@@ -63,10 +61,6 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynam
         super(properties, BlockEntityDarkTank::new);
     }
 
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     @Nullable

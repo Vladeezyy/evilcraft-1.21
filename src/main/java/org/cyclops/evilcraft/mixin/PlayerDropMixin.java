@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.server.level.ServerPlayer.class)
 public abstract class PlayerDropMixin {
-    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("HEAD"), cancellable = true)
-    private void evilcraft$droppedByPlayer(ItemStack stack, boolean dropAround, boolean includeThrowerName, CallbackInfoReturnable<ItemEntity> cir) {
+    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZLnet/minecraft/util/Prediction;)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("HEAD"), cancellable = true)
+    private void evilcraft$droppedByPlayer(ItemStack stack, boolean dropAround, net.minecraft.util.Prediction prediction, CallbackInfoReturnable<ItemEntity> cir) {
         if (stack.getItem() instanceof IItemDroppedByPlayer item && !item.onDroppedByPlayer(stack, (Player) (Object) this)) {
             cir.setReturnValue(null);
         }

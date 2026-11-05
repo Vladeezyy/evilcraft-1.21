@@ -34,7 +34,7 @@ public class LootModifierInjectItem extends LootModifier {
     private final List<String> lootTables;
     private final int maxStackSize;
 
-    public LootModifierInjectItem(LootItemCondition[] conditionsIn, int priority, ItemStackTemplate itemStack, List<String> lootTables, int maxStackSize) {
+    public LootModifierInjectItem(java.util.Optional<net.minecraft.core.Holder<LootItemCondition>> conditionsIn, int priority, ItemStackTemplate itemStack, List<String> lootTables, int maxStackSize) {
         super(conditionsIn, priority);
         this.itemStack = itemStack;
         this.lootTables = lootTables;

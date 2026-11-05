@@ -11,6 +11,7 @@ import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.cyclopscore.inventory.SimpleInventory;
 import org.cyclops.cyclopscore.persist.nbt.NBTPersist;
 import org.cyclops.evilcraft.EvilCraft;

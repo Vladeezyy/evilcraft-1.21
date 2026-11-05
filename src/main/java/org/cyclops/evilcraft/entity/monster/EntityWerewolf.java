@@ -29,6 +29,7 @@ import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import org.cyclops.evilcraft.fabric.event.EntityTickEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
