@@ -169,7 +169,7 @@ public class BlockEntangledChalice extends BlockWithEntity implements IInformati
 
     public void fillItemCategory(NonNullList<ItemStack> list) {
         ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(this));
-        ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
+        ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) itemAccess.getCapability(Capabilities.Fluid.ITEM);
         try (var tx = Transaction.openRoot()) {
             fluidHandler.setTankID("creative", tx);
             tx.commit();

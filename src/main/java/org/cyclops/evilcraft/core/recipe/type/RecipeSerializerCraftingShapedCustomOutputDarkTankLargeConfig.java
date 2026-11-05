@@ -18,7 +18,7 @@ public class RecipeSerializerCraftingShapedCustomOutputDarkTankLargeConfig exten
     public RecipeSerializerCraftingShapedCustomOutputDarkTankLargeConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_dark_tank_large",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DARK_TANK, DataComponentPatch.builder()
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DARK_TANK.get(), DataComponentPatch.builder()
                         .set(org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries.COMPONENT_CAPACITY.get(), BlockEntityDarkTank.BASE_CAPACITY * 9)
                         .build())).getRecipeSerializer());
     }

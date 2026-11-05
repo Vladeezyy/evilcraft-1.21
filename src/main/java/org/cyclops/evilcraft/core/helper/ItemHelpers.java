@@ -102,7 +102,7 @@ public class ItemHelpers {
         if (toFillItem.getItem() == Items.BUCKET) {
             maxFill = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
         }
-        ResourceHandler<FluidResource> toFillHandler = Capabilities.Fluid.ITEM.getCapability(toFill, null);
+        ResourceHandler<FluidResource> toFillHandler = toFill.getCapability(Capabilities.Fluid.ITEM);
         if(toFillHandler != null && toFillItem != toDrainItem
                 && player.getUseItemRemainingTicks() == 0) {
             FluidStack moved = IModHelpersNeoForge.get().getFluidHelpers().move(toDrain, toFillHandler, Math.min(maxFill, tickFluid.getAmount()), null, false, false);

@@ -49,7 +49,7 @@ public abstract class SnapshotJournal<T> implements CloseCallback {
             revertToSnapshot(snapshot);
         } else if (depth > 0) {
             // A state of the parent is older, so that one stays
-            if (snapshots.size() < depth) {
+            while (snapshots.size() < depth) {
                 snapshots.add(NONE);
             }
             if (snapshots.get(depth - 1) == NONE) {

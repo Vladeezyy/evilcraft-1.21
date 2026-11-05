@@ -139,14 +139,12 @@ public class WorldSharedTankCache {
             tick = 0;
         }
     }
-
-    @SubscribeEvent
-    public void onLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    public void onLoggedIn(ServerPlayer player) {
         if(!IModHelpers.get().getMinecraftHelpers().isClientSide()) {
             try {
                 for(Map.Entry<String, FluidStack> entry: EvilCraft.sharedTanks.get().getEntries()) {
                     EvilCraft._instance.getPacketHandler().sendToPlayer(
-                            new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), (ServerPlayer) event.getEntity());
+                            new UpdateWorldSharedTankClientCachePacket(removeMapID(entry.getKey()), entry.getValue()), player);
                 }
             } catch (UnsupportedOperationException e) {
                 // Can occur for players without a channel for this packet, such as during game testing

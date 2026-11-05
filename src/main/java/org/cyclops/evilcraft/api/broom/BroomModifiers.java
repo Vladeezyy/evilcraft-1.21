@@ -34,11 +34,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.*;
 import org.cyclops.evilcraft.core.broom.BroomParts;
@@ -262,11 +257,11 @@ public class BroomModifiers {
                                             // Destroy the block
                                             if (!broom.level().isClientSide()) {
                                                 ServerPlayer playerMp = (ServerPlayer) player;
-                                                BreakBlockEvent breakEvent = CommonHooks.fireBlockBreak(world, playerMp.gameMode.getGameModeForPlayer(), (ServerPlayer) player, pos, blockState);
+                                                BlockEvent.BreakEvent breakEvent = CommonHooks.fireBlockBreak(world, playerMp.gameMode.getGameModeForPlayer(), (ServerPlayer) player, pos, blockState);
                                                 if (!breakEvent.isCanceled()) {
                                                     // Block breaking sequence
                                                     block.playerWillDestroy(world, pos, blockState, player);
-                                                    if(block.onDestroyedByPlayer(blockState, world, pos, player, broom.getBroomStack(), true, fluidState)) {
+                                                    if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
                                                         block.destroy(world, pos, blockState);
                                                         block.playerDestroy(world, player, pos, blockState, world.getBlockEntity(pos), ItemStack.EMPTY);
                                                     }
@@ -277,7 +272,7 @@ public class BroomModifiers {
                                             } else if (Minecraft.getInstance().hitResult.getType() == HitResult.Type.BLOCK) {
                                                 // Play sound and client-side block breaking sequence
                                                 world.globalLevelEvent(2001, pos, Block.getId(blockState));
-                                                if(block.onDestroyedByPlayer(blockState, world, pos, player, broom.getBroomStack(), true, fluidState)) {
+                                                if(world.setBlock(pos, fluidState.createLegacyBlock(), world.isClientSide() ? 11 : 3)) {
                                                     block.destroy(world, pos, blockState);
                                                 }
 

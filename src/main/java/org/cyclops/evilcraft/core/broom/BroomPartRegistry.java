@@ -13,9 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.registries.RegisterEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.Reference;
@@ -44,9 +41,10 @@ public class BroomPartRegistry implements IBroomPartRegistry {
     private Map<IBroomPart, Identifier> partModels;
 
     public BroomPartRegistry() {
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, this::beforeItemsRegistered);
-        ItemTooltipEvent.addListener(this::onTooltipEvent);
         partModels = Maps.newHashMap();
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
+            ItemTooltipEvent.addListener(this::onTooltipEvent);
+        }
     }
 
     @Override
@@ -207,16 +205,11 @@ public class BroomPartRegistry implements IBroomPartRegistry {
         }
     }
 
-    public void beforeItemsRegistered(RegisterEvent event) {
-        // The block registry even is called before the items event
-        if (event.getRegistryKey().equals(Registries.ITEM)) {
-            parts.clear();
-            partItems.clear();
-            partsByType.clear();
-            baseModifiers.clear();
-            if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
-                partModels.clear();
-            }
-        }
+    public void beforeItemsRegistered() {
+        parts.clear();
+        partItems.clear();
+        partsByType.clear();
+        baseModifiers.clear();
+        partModels.clear();
     }
 }

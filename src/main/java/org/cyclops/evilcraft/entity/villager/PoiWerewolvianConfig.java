@@ -38,12 +38,22 @@ public class PoiWerewolvianConfig extends PoiConfigCommon<EvilCraft> {
     @Override
     public void onRegistered() {
         super.onRegistered();
-        IStructureHelpersNeoForge sh = getMod().getModHelpers().getStructureHelpers();
-        for (String biome : new String[]{"plains", "snowy", "savanna", "desert", "taiga"}) {
-            sh.addToStructureTemplatePool(
-                    Identifier.withDefaultNamespace("village/" + biome + "/houses"),
-                    Identifier.fromNamespaceAndPath(getMod().getModId(), "village/werewolvian_mansion")
-            );
-        }
+        // Fabric: the POI type in the registry alone is not found by its blocks, so villagers never took the
+        // werewolf profession (NeoForge adds the block states of registered POI types itself)
+        net.minecraft.core.Holder<PoiType> poi = net.minecraft.core.registries.BuiltInRegistries.POINT_OF_INTEREST_TYPE.getOrThrow(RegistryEntries.POI_WEREWOLVIAN.getKey());
+        net.minecraft.world.entity.ai.village.poi.PoiTypes.registerBlockStates(poi, poi.value().matchingStates());
+        org.cyclops.cyclopscore.helper.IStructureHelpers sh = getMod().getModHelpers().getStructureHelpers();
+        // When the server data (and its structure template pools) is loaded
+        net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+            if (!client) {
+                for (String biome : new String[]{"plains", "snowy", "savanna", "desert", "taiga"}) {
+                    sh.addToStructureTemplatePool(
+                            Identifier.withDefaultNamespace("village/" + biome + "/houses"),
+                            Identifier.fromNamespaceAndPath(getMod().getModId(), "village/werewolvian_mansion"),
+                            registries
+                    );
+                }
+            }
+        });
     }
 }

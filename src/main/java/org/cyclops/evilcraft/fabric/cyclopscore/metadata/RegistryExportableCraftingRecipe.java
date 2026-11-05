@@ -28,7 +28,7 @@ public class RegistryExportableCraftingRecipe extends RegistryExportableRecipeAb
         JsonArray arrayInputs = new JsonArray();
         for (Ingredient input : inputs) {
             JsonArray arrayInputAlternatives = new JsonArray();
-            for (Holder<Item> inputAlternative : input.getValues()) {
+            for (Holder<Item> inputAlternative : input.items().toList()) {
                 arrayInputAlternatives.add(IRegistryExportable.serializeItemStack(new ItemStack(inputAlternative.value())));
             }
             arrayInputs.add(arrayInputAlternatives);

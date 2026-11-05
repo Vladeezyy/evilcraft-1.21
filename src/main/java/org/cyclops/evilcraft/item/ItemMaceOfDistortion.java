@@ -47,7 +47,7 @@ public class ItemMaceOfDistortion extends ItemMace {
     private static final int POWER_LEVELS = 5;
 
     public ItemMaceOfDistortion(Item.Properties properties) {
-        super(properties, CONTAINER_SIZE, HIT_USAGE, MAXIMUM_CHARGE, POWER_LEVELS, MELEE_DAMAGE);
+        super(properties, CONTAINER_SIZE, HIT_USAGE, MAXIMUM_CHARGE, POWER_LEVELS, MELEE_DAMAGE, (float) ItemMaceOfDistortionConfig.attackSpeed);
     }
 
     @SuppressWarnings("unchecked")

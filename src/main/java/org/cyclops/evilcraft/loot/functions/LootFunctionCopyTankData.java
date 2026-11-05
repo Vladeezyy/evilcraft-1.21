@@ -36,7 +36,7 @@ public class LootFunctionCopyTankData extends LootItemConditionalFunction {
         if (lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY) instanceof BlockEntityTankInventory tile) {
             SingleUseTank fluidHandlerTile = tile.getTank();
             ItemAccess itemAccess = ItemAccess.forStack(itemStack);
-            return Optional.ofNullable(Capabilities.Fluid.ITEM.getCapability(itemAccess, null))
+            return Optional.ofNullable(itemAccess.getCapability(Capabilities.Fluid.ITEM))
                     .map(fluidHandlerItem -> {
                         try (var tx = Transaction.openRoot()) {
                             if (fluidHandlerItem instanceof IFluidHandlerCapacity) {

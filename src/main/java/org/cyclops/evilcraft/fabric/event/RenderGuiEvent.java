@@ -2,7 +2,9 @@ package org.cyclops.evilcraft.fabric.event;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.minecraft.resources.Identifier;
+import org.cyclops.evilcraft.Reference;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
@@ -38,8 +40,11 @@ public class RenderGuiEvent {
             super(guiGraphics, partialTick);
         }
 
+        private static int nextId = 0;
+
         public static void addListener(Consumer<Post> listener) {
-            HudRenderCallback.EVENT.register((guiGraphics, deltaTracker) -> listener.accept(new Post(guiGraphics, deltaTracker)));
+            HudElementRegistry.addLast(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "overlay" + (nextId++)),
+                    (guiGraphics, deltaTracker) -> listener.accept(new Post(guiGraphics, deltaTracker)));
         }
     }
 }

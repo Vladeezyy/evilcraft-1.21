@@ -51,7 +51,7 @@ public class BlockEntityTankInventory extends CyclopsBlockEntity {
         }
 
         public void registerTankInventoryCapabilitiesItem() {
-            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK, (blockEntity, direction) -> new WorldlyContainerWrapper(blockEntity.getInventory(), direction));
+            add(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK, (blockEntity, direction) -> WorldlyContainerWrapper.of(blockEntity.getInventory(), direction));
         }
 
         public void registerTankInventoryCapabilitiesFluid() {

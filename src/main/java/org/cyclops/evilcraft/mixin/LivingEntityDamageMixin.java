@@ -20,14 +20,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LivingEntityDamageMixin {
 
     @ModifyExpressionValue(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F", ordinal = 0))
-    private float evilcraft$damagePre(float damage, DamageSource source, float amount, @Share("evilcraft$damage") LocalFloatRef shared) {
+    private float evilcraft$damagePre(float damage, net.minecraft.server.level.ServerLevel level, DamageSource source, float amount, @Share("evilcraft$damage") LocalFloatRef shared) {
         float newDamage = LivingDamageEvent.firePre((LivingEntity) (Object) this, source, damage);
         shared.set(newDamage);
         return newDamage;
     }
 
     @Inject(method = "actuallyHurt", at = @At("TAIL"))
-    private void evilcraft$damagePost(DamageSource source, float amount, CallbackInfo ci, @Share("evilcraft$damage") LocalFloatRef shared) {
+    private void evilcraft$damagePost(net.minecraft.server.level.ServerLevel level, DamageSource source, float amount, CallbackInfo ci, @Share("evilcraft$damage") LocalFloatRef shared) {
         LivingDamageEvent.firePost((LivingEntity) (Object) this, source, amount, shared.get());
     }
 }

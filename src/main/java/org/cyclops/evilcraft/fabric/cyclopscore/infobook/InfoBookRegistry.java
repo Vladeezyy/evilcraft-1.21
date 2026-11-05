@@ -1,17 +1,17 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
-import org.cyclops.evilcraft.fabric.event.RecipesUpdatedEvent;
-import net.minecraft.server.MinecraftServer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.server.MinecraftServer;
+import org.cyclops.cyclopscore.helper.IModHelpers;
+
+import org.cyclops.evilcraft.fabric.event.RecipesUpdatedEvent;
 
 
 import com.google.common.collect.Maps;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import org.apache.logging.log4j.Level;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.RecipeHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.AdvancementRewards;
@@ -29,8 +29,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class InfoBookRegistry implements IInfoBookRegistry {
 
     static {
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, InfoBookRegistry::onClientTagsLoadedStatic);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, InfoBookRegistry::onServerStartedStatic);
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+            if (client) {
+                onClientTagsLoadedStatic();
+            }
+        });
+        ServerLifecycleEvents.SERVER_STARTED.register(InfoBookRegistry::onServerStartedStatic);
     }
 
     private final Map<IInfoBook, String> bookPaths = Maps.newIdentityHashMap();
@@ -38,8 +42,10 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     private final Queue<SectionInjection> sectionInjections = new LinkedBlockingQueue<>(); // Thread-safe queue
 
     public InfoBookRegistry() {
-        NeoForge.EVENT_BUS.addListener(this::onPlayerLoggedIn);
-        NeoForge.EVENT_BUS.addListener(this::onServerStarted);
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
+            registerClient();
+        }
+        ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
     }
 
     @Override
@@ -62,23 +68,28 @@ public class InfoBookRegistry implements IInfoBookRegistry {
     // Reset achievement rewards to avoid remembering stuff across different servers and client worlds.
     // We have this in static methods to make sure that this is called only once per server start,
     // to avoid it being called for every infobook registry.
-    public static void onClientTagsLoadedStatic(TagsUpdatedEvent event) {
+    public static void onClientTagsLoadedStatic() {
         AdvancementRewards.reset();
     }
-    public static void onServerStartedStatic(ServerStartedEvent event) {
-        if (event.getServer().isDedicatedServer()) {
+    public static void onServerStartedStatic(MinecraftServer server) {
+        if (server.isDedicatedServer()) {
             // Only call this on dedicated servers, as the RecipesUpdatedEvent won't be emitted there
             AdvancementRewards.reset();
         }
     }
 
-    public void onPlayerLoggedIn(ClientPlayerNetworkEvent.LoggingIn event) {
+    @Environment(EnvType.CLIENT)
+    private void registerClient() {
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> onPlayerLoggedIn());
+    }
+
+    public void onPlayerLoggedIn() {
         RecipeHelpers.reset();
         initializeAllBooks(false);
     }
 
-    public void onServerStarted(ServerStartedEvent event) {
-        if (event.getServer().isDedicatedServer()) {
+    public void onServerStarted(MinecraftServer server) {
+        if (server.isDedicatedServer()) {
             initializeAllBooks(false);
         }
     }

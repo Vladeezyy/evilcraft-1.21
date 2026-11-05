@@ -14,8 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.item.ItemBloodPearlOfTeleportation;
 import org.cyclops.evilcraft.item.ItemBloodPearlOfTeleportationConfig;
@@ -47,9 +45,8 @@ public class EntityBloodPearl extends ThrowableProjectile implements ItemSupplie
             if (this.getOwner() != null && this.getOwner() instanceof ServerPlayer) {
                 ServerPlayer entityplayermp = (ServerPlayer)this.getOwner();
 
-                if (entityplayermp.connection.getConnection().isConnected() && entityplayermp.level() == this.level()) {
-                    EntityTeleportEvent event = new EntityTeleportEvent(entityplayermp, (net.minecraft.server.level.ServerLevel) entityplayermp.level(), this.getX(), this.getY(), this.getZ());
-                    if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
+                if (entityplayermp.connection.isAcceptingMessages() && entityplayermp.level() == this.level()) {
+                    {
                         if (this.getOwner().isPassenger()) {
                             this.getOwner().stopRiding();
                         }

@@ -177,35 +177,9 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
                     org.cyclops.evilcraft.fabric.capabilities.Capabilities.Item.BLOCK,
                     (blockEntity, direction) -> {
                         if (direction == Direction.UP || direction == Direction.DOWN) {
-                            return VanillaContainerWrapper.of(new InventorySlotMasked(
-                                    blockEntity.getInventory(),
-                                    SLOTS_DROP
-                            ) {
-                                @Override
-                                public void onTransfer(int slot, int amountChange, TransactionContext transaction) {
-                                    super.onTransfer(slot, amountChange, transaction);
-                                    if (amountChange != 0) {
-                                        new SnapshotJournal<Void>() {
-
-                                            @Override
-                                            protected Void createSnapshot() {
-                                                return null;
-                                            }
-
-                                            @Override
-                                            protected void revertToSnapshot(Void o) {
-
-                                            }
-
-                                            @Override
-                                            protected void onRootCommit(Void originalState) {
-                                                super.onRootCommit(originalState);
-                                                blockEntity.resetWork(false);
-                                            }
-                                        }.updateSnapshots(transaction);
-                                    }
-                                }
-                            });
+                            return new org.cyclops.evilcraft.fabric.transfer.NotifyingResourceHandler<>(
+                                    VanillaContainerWrapper.of(new InventorySlotMasked(blockEntity.getInventory(), SLOTS_DROP)),
+                                    () -> blockEntity.resetWork(false));
                         }
                         return VanillaContainerWrapper.of(new InventorySlotMasked(blockEntity.getInventory(), SLOT_BOX, SLOT_CONTAINER));
                     }

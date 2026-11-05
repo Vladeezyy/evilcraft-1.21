@@ -48,7 +48,9 @@ public class WorldStorageSharedTank extends WorldStorage<WorldStorageSharedTank>
                     () -> new WorldStorageSharedTank(Maps.newHashMap()),
                     RecordCodecBuilder.<WorldStorageSharedTank>create(instance -> instance.group(
                             Codec.dispatchedMap(Codec.STRING, (key) -> FluidStack.OPTIONAL_CODEC).fieldOf("tank_cache").forGetter(data -> data.tankCache)
-                    ).apply(instance, tankCache -> new WorldStorageSharedTank(Maps.newHashMap(tankCache))))
+                    ).apply(instance, tankCache -> new WorldStorageSharedTank(Maps.newHashMap(tankCache)))),
+                    // Vanilla needs a type to fix on load; this one has no rules for the fields of the mod
+                    net.minecraft.util.datafix.DataFixTypes.SAVED_DATA_COMMAND_STORAGE
             ), mod);
         }
     }

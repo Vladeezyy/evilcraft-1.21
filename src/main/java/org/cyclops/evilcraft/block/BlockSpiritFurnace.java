@@ -105,7 +105,10 @@ public class BlockSpiritFurnace extends BlockWithEntityGuiTank implements CubeDe
     }
 
     @Override
-    public void onBlockExploded(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, java.util.function.BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        if (state.isAir() || explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK) {
+            return;
+        }
         if(world.getBlockState(pos).getValue(ACTIVE)) triggerDetector(world, pos, false);
         super.onExplosionHit(state, world, pos, explosion, dropConsumer);
     }

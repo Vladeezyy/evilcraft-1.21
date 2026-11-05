@@ -53,8 +53,7 @@ public class ContainerScreenExaltedCrafter extends ContainerScreenExtended<Conta
     }
 
     protected boolean handleKeyCode(KeyEvent evt) {
-        InputConstants.Key inputCode = InputConstants.getKey(evt);
-        if (Keys.EXALTEDCRAFTING.isActiveAndMatches(inputCode)) {
+        if (Keys.EXALTEDCRAFTING.matches(evt)) {
             if (IModHelpers.get().getMinecraftClientHelpers().isShifted()) {
                 this.buttonBalance.onPress(evt);
             } else {

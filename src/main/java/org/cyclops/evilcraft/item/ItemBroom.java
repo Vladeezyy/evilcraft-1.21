@@ -17,7 +17,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -47,7 +46,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     public ItemBroom(Item.Properties properties) {
         super(properties, 10 * IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
         if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
-            ComputeFovModifierEvent.addListener(this::onFovEvent);
+            ComputeFovModifierEvent.LISTENERS.register(this::onFovEvent);
         }
     }
 

@@ -9,7 +9,6 @@ import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.IFluidHelpersNeoForge;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.blockentity.BlockEntityBloodInfuser;
 import org.cyclops.evilcraft.blockentity.tickaction.EmptyFluidContainerInTankTickAction;
@@ -86,7 +85,7 @@ public class FluidContainerItemTickAction extends BloodInfuserTickAction{
         if (itemStackHandler == null) {
             return ItemStack.EMPTY;
         }
-        IFluidHelpersNeoForge fh = IModHelpersNeoForge.get().getFluidHelpers();
+        IModHelpersNeoForge.FluidHelpers fh = IModHelpersNeoForge.get().getFluidHelpers();
         FluidStack moved = fh.move(tile.getTank(), itemStackHandler, MB_PER_TICK, null, false, true);
         if (moved.isEmpty()) {
             fh.move(tile.getTank(), itemStackHandler, MB_PER_TICK, null, false, true);

@@ -3,8 +3,10 @@ package org.cyclops.evilcraftcompat.modcompat.jei.spiritfurnace;
 import com.google.common.collect.Lists;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -16,16 +18,13 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.fabric.api.entity.FakePlayer;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.ServerLifecycleHooks;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSpiritFurnaceConfig;
 import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpirit;
 import org.cyclops.evilcraftcompat.modcompat.jei.spiritreanimator.SpiritReanimatorRecipeJEI;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Recipe wrapper for Spirit Furnace recipes
@@ -58,7 +57,7 @@ public class SpiritFurnaceRecipeJEI {
     public static List<ItemStack> getMobDrops(EntityType<?> entityType, Entity entity, ServerLevel level) {
         List<ItemStack> items = Lists.newArrayList();
 
-        FakePlayer killerEntity = FakePlayer.get(level);
+        net.fabricmc.fabric.api.entity.FakePlayer killerEntity = net.fabricmc.fabric.api.entity.FakePlayer.get(level);
         LootParams.Builder lootParamsBuilder = (new LootParams.Builder(level))
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
                 .withParameter(LootContextParams.ORIGIN, Vec3.ZERO)
@@ -67,14 +66,20 @@ public class SpiritFurnaceRecipeJEI {
                 .withParameter(LootContextParams.DAMAGE_SOURCE, killerEntity.damageSources().generic())
                 .withParameter(LootContextParams.LAST_DAMAGE_PLAYER, killerEntity);
         LootParams params = lootParamsBuilder.create(LootContextParamSets.ENTITY);
-        LootContext context = new LootContext.Builder(params).create(Optional.ofNullable(entityType.getDefaultLootTable().location()));
+        LootContext context = new LootContext.Builder(params).create(entityType.getDefaultLootTable().map(ResourceKey::identifier));
 
-        LootTable lootTable = ServerLifecycleHooks.getCurrentServer().reloadableRegistries().getLootTable(entityType.getDefaultLootTable());
-        for (LootPool pool : lootTable.pools) {
-            for (LootPoolEntryContainer entryContainer : pool.entries) {
-                entryContainer.expand(context, entry -> entry.createItemStack(items::add, context));
+        entityType.getDefaultLootTable().ifPresent(lootTableKey -> {
+            LootTable lootTable = org.cyclops.evilcraft.fabric.ServerLifecycleHooks.getCurrentServer().reloadableRegistries().getLootTable(lootTableKey);
+            for (LootPool pool : lootTable.pools) {
+                for (LootPoolEntryContainer entryContainer : pool.entries) {
+                    entryContainer.expand(context, entry -> entry.createItemStack(item -> {
+                        if (!item.isEmpty()) {
+                            items.add(item);
+                        }
+                    }, context));
+                }
             }
-        }
+        });
         return items;
     }
 
@@ -129,15 +134,15 @@ public class SpiritFurnaceRecipeJEI {
     }
 
     public static List<SpiritFurnaceRecipeJEI> generateServerRecipes() {
-        ServerLevel level = ServerLifecycleHooks.getCurrentServer().overworld();
+        ServerLevel level = org.cyclops.evilcraft.fabric.ServerLifecycleHooks.getCurrentServer().overworld();
         List<SpiritFurnaceRecipeJEI> recipes = Lists.newArrayList();
         for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
             try {
-                Entity entity = entityType.create(level);
+                Entity entity = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE);
                 if (entity instanceof LivingEntity livingEntity && EntityVengeanceSpirit.canSustain(livingEntity)) {
                     recipes.add(SpiritFurnaceRecipeJEI.create(entityType, livingEntity, level));
                 }
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 // Ignore errors during entity creation
             }
         }

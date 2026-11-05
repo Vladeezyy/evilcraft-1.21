@@ -23,7 +23,7 @@ public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extend
     public RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_display_stand",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DISPLAY_STAND), (inventory, staticOutput) -> {
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DISPLAY_STAND.get()), (inventory, staticOutput) -> {
                     Wrapper<ItemStack> plankWoodStack = new Wrapper<>(ItemStack.EMPTY);
                     for (int i = 0; i < inventory.size(); i++) {
                         int finalI = i;

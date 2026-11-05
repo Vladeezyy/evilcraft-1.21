@@ -39,8 +39,8 @@ public class AdvancementHelpers {
         EvilCraft._instance.getPacketHandler().sendToServer(new RequestPlayerAdvancementUnlockedPacket(advancementId.toString()));
     }
 
-    public static AdvancementHolder getAdvancement(Dist dist, Identifier resourceLocation) {
-        if (dist.isClient()) {
+    public static AdvancementHolder getAdvancement(net.fabricmc.api.EnvType side, Identifier resourceLocation) {
+        if (side == net.fabricmc.api.EnvType.CLIENT) {
             return getAdvancementManagerClient().get(resourceLocation);
         }
         return getAdvancementManagerServer().get(resourceLocation);

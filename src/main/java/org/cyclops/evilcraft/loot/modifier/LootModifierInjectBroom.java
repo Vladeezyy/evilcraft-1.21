@@ -52,7 +52,7 @@ public class LootModifierInjectBroom extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        if (getLootTables().contains(context.getQueriedLootTableId().toString())) {
+        if (getLootTables().contains(org.cyclops.evilcraft.fabric.loot.GlobalLootModifiers.getQueriedLootTableId(context).toString())) {
             ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(RegistryEntries.ITEM_BROOM));
 
             // Fill with blood

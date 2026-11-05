@@ -15,6 +15,7 @@ import org.cyclops.evilcraft.fabric.transfer.FluidStacksResourceHandler;
  */
 public class InventoryFluid implements IInventoryFluid {
 
+    private final NonNullList<ItemStack> itemStacks;
     private final ResourceHandler<FluidResource> fluidHandler;
 
     public InventoryFluid(NonNullList<ItemStack> itemStacks, NonNullList<FluidStack> fluidStacks) {

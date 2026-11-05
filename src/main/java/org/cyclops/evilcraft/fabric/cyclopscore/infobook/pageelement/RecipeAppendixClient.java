@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.cyclopscore.infobook.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.*;
 
 import java.util.List;
 
@@ -106,7 +106,7 @@ public abstract class RecipeAppendixClient<S extends RecipeAppendix<?>> extends 
         if(renderOverlays) gui.drawOuterBorder(guiGraphics, x, y, RecipeAppendix.SLOT_SIZE, RecipeAppendix.SLOT_SIZE, 1, 1, 1, 0.2f);
 
         if (!fluidStack.isEmpty()) {
-            IModHelpers.get().getGuiHelpers().renderFluidSlot(guiGraphics, fluidStack, x, y);
+            org.cyclops.cyclopscore.helper.IModHelpersFabric.get().getGuiHelpers().renderFluidSlot(guiGraphics, fluidStack.toVariant(), fluidStack.getAmount() * 81L, x, y);
 
             if (button != null && renderOverlays) button.update(x, y, fluidStack, gui);
         }
@@ -124,7 +124,7 @@ public abstract class RecipeAppendixClient<S extends RecipeAppendix<?>> extends 
         if(mx >= x && my >= y && mx <= x + RecipeAppendix.SLOT_SIZE && my <= y + RecipeAppendix.SLOT_SIZE && !fluidStack.isEmpty() ) {
             List<FormattedCharSequence> lines = Lists.newArrayList();
             lines.add(fluidStack.getHoverName().copy()
-                    .withColor(TextColor.fromLegacyFormat(fluidStack.getFluid().getFluidType().getRarity(fluidStack).color()).getValue())
+                    .withColor(TextColor.fromLegacyFormat(org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getRarity(fluidStack.getFluid()).color()).getValue())
                     .getVisualOrderText());
             lines.add(FormattedCharSequence.forward(
                     fluidStack.getAmount() + " mB",
@@ -236,7 +236,7 @@ public abstract class RecipeAppendixClient<S extends RecipeAppendix<?>> extends 
 
         @Override
         protected String getTranslationKey(FluidStack element) {
-            return element.getFluidType().getDescriptionId(element);
+            return org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getDescriptionId(element.getFluid());
         }
 
         @Override

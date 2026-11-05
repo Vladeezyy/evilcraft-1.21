@@ -1,7 +1,10 @@
 # Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
 
-Status (2026-11-05): **does not build yet.** Upstream 26.1.2 is merged into the Fabric port, the Gradle build is set
-up for 26.x and stops at `compileJava` with **349 errors in 123 files**. Nothing has run in the game on this branch.
+Status (2026-11-05): **the mod builds, the server side works, the client has never run.**
+- `compileJava` and `jar`: OK. All 106 GameTests of the original pass (`tools/gametest.sh`), no recipe parse errors.
+- Production server: starts (`SERVER_ONLY=1 tools/prodtest.sh`).
+- **Not done:** no client run yet, so models, renderers, GUIs and JEI are untested. `src/scene` does not compile (118 errors,
+  still on the 1.21.1 API): it is the next step, as it is how the client gets tested. No stress test yet. No release.
 
 ## How this branch was made
 - `vendor/26.1.2` (local branch): upstream CyclopsMC/EvilCraft `master-26-lts` @ 94d5b596 (1.2.109) on top of the
@@ -79,13 +82,11 @@ up for 26.x and stops at `compileJava` with **349 errors in 123 files**. Nothing
      replaces the item model with a plugin and leaves the block's baked model alone. Deleted, unused since 26.1: `IGeometry*`,
      `ModelLoaders`, `UnbakedGeometryHelper`, `ModelRenderTypes`, `IClientFluidTypeExtensions`.
    - Scripts for the 26.2 and 26.3 merges, run in this order: `tools/port/rewrite_transfer.py`, `rewrite_cc_shim.py`,
-     `rewrite_events.py`, `autoimport.py`, `rewrite_models.py`; `errsummary.sh` compiles and summarizes (edit its paths for another machine).
+     `rewrite_events.py`, `autoimport.py`, `rewrite_models.py`, `rewrite_misc.py`, then `data_fabric.py` on the resources; `errsummary.sh` compiles and summarizes (edit its paths for another machine).
    - The saved conflict notes are on the Windows machine (`D:/mods/_ref/ec-notes`), and so are `vendor/*`, `gen/*`. Not needed
      to continue: our side of any conflict is `git show main:<path>`.
-   - Left, biggest first (`errsummary.sh`): JEI (`evilcraftcompat`, 66), the rest of `fabric/cyclopscore` (55), `EvilCraft.java` (19),
-     remaining events (`NeoForge.EVENT_BUS.post`, `@SubscribeEvent`, `RegisterEvent`, `TagsUpdatedEvent`, `ServerStartedEvent`,
-     `DefaultDataComponentsBoundEvent`, `BreakBlockEvent`), `method does not override` (NeoForge item and block extensions),
-     the GameTest move of step 2.
+   - Done at the end of step 3: compile errors 349 -> 0. JEI is upstream's 26.x (`EvilCraft-Compat@master-26-lts`) with the Fabric
+     parts of 1.21.1 back (`JeiFluids`, `JeiCompatLoader*`); upstream's GameTests in `src/main` replace `src/gametest`.
    - To check in game first, models: display stand, entangled chalice and box of eternal closure as blocks and items (a model
      that fails to load shows nothing in the compiler); colors of fluids and gems (ABGR conversion); the dark tank item; cutout
      and translucent blocks (17 model files have NeoForge's `render_type`, which vanilla ignores: the layer now comes from the
@@ -94,9 +95,15 @@ up for 26.x and stops at `compileJava` with **349 errors in 123 files**. Nothing
    - To check in game first, transfer: `ItemAccess.forStack` (mutates the stack directly and restores it on abort, also components
      through `PatchedDataComponentMap.restorePatch`), hoppers on `ResourceHandlerStorage`, buckets through the
      `FluidStorage.ITEM` fallback, `FluidStacksResourceHandler` saving (`stacks` key; 1.21.1 port worlds wrote `Fluid`).
-4. fabric.mod.json, the access widener entries (the header is done; entries are still from 1.21.1), mixins checked with
-   javap.
-5. Tests: GameTests, scene, production server, stress; then 26.2 (`master-26.2`) and 26.3 (`master-26`).
+4. Done: fabric.mod.json and mixins on Java 25, access widener entries checked against the jar, mixins fixed by running.
+5. Tests. Done: GameTests 106/106, production server.
+   - Next: port `src/scene` (118 errors), then scene, production client, stress with FPS and MSPT against vanilla.
+   - Warnings to look at: `The broom modifier evilcraft:witherer (hungerer, kamikaze, withershield) has no valid items` in the
+     info book; `duplicate API provider` for the chalice and creative blood drop (`DamageIndicatedItemFluidContainer` and their
+     configs both register; Fabric keeps the first, the config's, which is the right one).
+   - Dropped from NeoForge, to check: `setNoCombineRepair` of the burning gem stone (anvil), `shouldDisplayFluidOverlay` (water next
+     to chest walls), teleport event of the blood pearl.
+   - Then 26.2 (`master-26.2`) and 26.3 (`master-26`).
 6. 1.21.11: upstream has no such branch. The closest is `master-1.21.10` (1.2.62), older than our 1.2.99 and 1.2.109. Plan:
    backport from the finished 26.1.2 (the API is close; `fabric/transfer` carries over) with obfuscated Loom + Parchment,
    Java 21, against Cyclops Core `1.21.11-1.25.5-964` (Modrinth `g86bbBfU`, Fabric, 2026-03-28), which is older than

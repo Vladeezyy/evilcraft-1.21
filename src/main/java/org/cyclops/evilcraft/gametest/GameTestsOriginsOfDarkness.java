@@ -14,8 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -58,7 +57,7 @@ public class GameTestsOriginsOfDarkness {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(InteractionHand.MAIN_HAND,
                 new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse("evilcraft:darkened_apple"))));
-        NeoForge.EVENT_BUS.post(new PlayerInteractEvent.EntityInteract(player, InteractionHand.MAIN_HAND, pig));
+        net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker().interact(player, player.level(), InteractionHand.MAIN_HAND, pig, null);
 
         // The spirit portal is placed at a shuffled random position within 1 block of the pig's
         // death position (pig.blockPosition() + (0,1,0) = POS.above().above()).

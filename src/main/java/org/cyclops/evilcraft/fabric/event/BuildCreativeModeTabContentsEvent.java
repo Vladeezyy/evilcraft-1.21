@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.fabric.event;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -14,15 +14,15 @@ import java.util.function.Consumer;
 public class BuildCreativeModeTabContentsEvent {
 
     private final CreativeModeTab tab;
-    private final FabricItemGroupEntries entries;
+    private final FabricCreativeModeTabOutput entries;
 
-    public BuildCreativeModeTabContentsEvent(CreativeModeTab tab, FabricItemGroupEntries entries) {
+    public BuildCreativeModeTabContentsEvent(CreativeModeTab tab, FabricCreativeModeTabOutput entries) {
         this.tab = tab;
         this.entries = entries;
     }
 
     public static void addListener(Consumer<BuildCreativeModeTabContentsEvent> listener) {
-        ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> listener.accept(new BuildCreativeModeTabContentsEvent(tab, entries)));
+        CreativeModeTabEvents.MODIFY_OUTPUT_ALL.register((tab, entries) -> listener.accept(new BuildCreativeModeTabContentsEvent(tab, entries)));
     }
 
     public CreativeModeTab getTab() {

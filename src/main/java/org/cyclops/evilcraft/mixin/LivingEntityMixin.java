@@ -21,10 +21,10 @@ public abstract class LivingEntityMixin {
     }
 
     @ModifyVariable(method = "causeFallDamage", at = @At("HEAD"), argsOnly = true, ordinal = 0)
-    private float evilcraft$fall(float fallDistance, float fallDistanceArg, float damageMultiplier, DamageSource source) {
+    private double evilcraft$fall(double fallDistance, double fallDistanceArg, float damageMultiplier, DamageSource source) {
         if (LivingFallEvent.LISTENERS.isEmpty()) {
             return fallDistance;
         }
-        return LivingFallEvent.LISTENERS.post(new LivingFallEvent((LivingEntity) (Object) this, fallDistance, damageMultiplier)).getDistance();
+        return LivingFallEvent.LISTENERS.post(new LivingFallEvent((LivingEntity) (Object) this, (float) fallDistance, damageMultiplier)).getDistance();
     }
 }

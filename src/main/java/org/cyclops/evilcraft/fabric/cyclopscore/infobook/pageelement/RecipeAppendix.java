@@ -9,7 +9,7 @@ import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
-import org.cyclops.cyclopscore.infobook.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.*;
 
 import javax.annotation.Nullable;
 import java.util.Map;

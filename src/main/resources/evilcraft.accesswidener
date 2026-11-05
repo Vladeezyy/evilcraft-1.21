@@ -8,13 +8,11 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageHeight I
 # Entities (from EvilCraft's access transformer)
 accessible method net/minecraft/world/entity/Entity canRide (Lnet/minecraft/world/entity/Entity;)Z
-accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime I
 accessible method net/minecraft/world/entity/LivingEntity getDeathSound ()Lnet/minecraft/sounds/SoundEvent;
 accessible method net/minecraft/world/entity/Mob getAmbientSound ()Lnet/minecraft/sounds/SoundEvent;
 accessible field net/minecraft/world/effect/MobEffectInstance duration I
 mutable field net/minecraft/world/effect/MobEffectInstance duration I
 accessible method net/minecraft/world/entity/LivingEntity onEffectUpdated (Lnet/minecraft/world/effect/MobEffectInstance;ZLnet/minecraft/world/entity/Entity;)V
-accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayer Lnet/minecraft/world/entity/player/Player;
 # Particles
 accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 accessible class net/minecraft/client/particle/ParticleResources$SpriteParticleRegistration
@@ -26,7 +24,6 @@ accessible field net/minecraft/world/inventory/MenuType constructor Lnet/minecra
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible field net/minecraft/world/inventory/InventoryMenu TEXTURE_EMPTY_SLOTS Ljava/util/Map;
 # Dynamic models
-accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init> ()V
 # Key mappings (info book key binding appendix)
 accessible field net/minecraft/client/KeyMapping ALL Ljava/util/Map;
 # Slots that move (container scrolling) and hover checks of container screens
@@ -40,7 +37,6 @@ accessible field net/minecraft/world/level/chunk/ChunkAccess sections [Lnet/mine
 accessible method net/minecraft/server/level/ChunkMap getLightEngine ()Lnet/minecraft/server/level/ThreadedLevelLightEngine;
 # Broom flight (from EvilCraft's access transformer)
 accessible field net/minecraft/server/network/ServerGamePacketListenerImpl aboveGroundVehicleTickCount I
-accessible method net/minecraft/client/resources/model/SimpleBakedModel$Builder <init> (ZZZLnet/minecraft/client/renderer/block/model/ItemTransforms;Lnet/minecraft/client/renderer/block/model/ItemOverrides;)V
 extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 accessible field net/minecraft/world/level/block/LiquidBlock fluid Lnet/minecraft/world/level/material/FlowingFluid;
 # EvilCraft-Compat (JEI Spirit Furnace recipes): mob drops from the loot table entries
@@ -55,3 +51,7 @@ accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> 
 accessible method net/minecraft/client/renderer/item/CuboidItemModelWrapper <init> (Ljava/util/List;Lnet/minecraft/client/resources/model/geometry/QuadCollection;Lnet/minecraft/client/renderer/item/ModelRenderProperties;Lorg/joml/Matrix4fc;)V
 accessible field net/minecraft/client/renderer/item/ItemModels ID_MAPPER Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
 accessible field net/minecraft/client/renderer/special/SpecialModelRenderers ID_MAPPER Lnet/minecraft/util/ExtraCodecs$LateBoundIdMapper;
+accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerMemoryTime I
+accessible field net/minecraft/world/item/crafting/RecipeManager recipes Lnet/minecraft/world/item/crafting/RecipeMap;
+accessible method net/minecraft/world/entity/npc/villager/Villager readAdditionalSaveData (Lnet/minecraft/world/level/storage/ValueInput;)V
+accessible method net/minecraft/world/entity/npc/villager/Villager addAdditionalSaveData (Lnet/minecraft/world/level/storage/ValueOutput;)V

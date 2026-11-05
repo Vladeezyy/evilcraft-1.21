@@ -3,7 +3,6 @@ package org.cyclops.evilcraft.fabric.extensions;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,11 +28,11 @@ public final class ItemExtensions {
             if (player.isSecondaryUseActive() && item.doesSneakBypassUse(stack, level, hitResult.getBlockPos(), player)) {
                 // Vanilla skips the block when sneaking with an item, use it anyway
                 BlockState state = level.getBlockState(hitResult.getBlockPos());
-                ItemInteractionResult itemResult = state.useItemOn(stack, level, player, hand, hitResult);
+                InteractionResult itemResult = state.useItemOn(stack, level, player, hand, hitResult);
                 if (itemResult.consumesAction()) {
-                    return itemResult.result();
+                    return itemResult;
                 }
-                if (itemResult == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+                if (itemResult instanceof InteractionResult.TryEmptyHandInteraction) {
                     InteractionResult blockResult = state.useWithoutItem(level, player, hitResult);
                     if (blockResult.consumesAction()) {
                         return blockResult;

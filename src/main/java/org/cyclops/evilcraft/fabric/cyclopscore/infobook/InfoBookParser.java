@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.util.Strings;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.RecipeHelpers;
-import org.cyclops.cyclopscore.infobook.condition.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 import org.w3c.dom.Document;

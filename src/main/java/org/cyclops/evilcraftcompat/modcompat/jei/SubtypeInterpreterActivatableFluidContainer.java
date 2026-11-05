@@ -1,23 +1,20 @@
 package org.cyclops.evilcraftcompat.modcompat.jei;
 
-import mezz.jei.api.ingredients.subtypes.IIngredientSubtypeInterpreter;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.ingredients.subtypes.UidContext;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
-import org.cyclops.evilcraft.core.helper.ItemHelpers;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author rubensworks
  */
-public class SubtypeInterpreterActivatableFluidContainer implements IIngredientSubtypeInterpreter<ItemStack> {
+public class SubtypeInterpreterActivatableFluidContainer implements ISubtypeInterpreter<ItemStack> {
 
     @Override
-    public String apply(@Nonnull ItemStack itemStack, UidContext context) {
-        FluidStack fluidStack = FluidUtil.getFluidContained(itemStack).orElse(FluidStack.EMPTY);
-        return (ItemHelpers.isActivated(itemStack) ? "true" : "false") + "::" + (!fluidStack.isEmpty() ? BuiltInRegistries.FLUID.getKey(fluidStack.getFluid()) : "none");
+    public @Nullable Object getSubtypeData(ItemStack itemStack, UidContext context) {
+        FluidStack fluidStack = FluidUtil.getFirstStackContained(itemStack);
+        return fluidStack.getFluid();
     }
 }

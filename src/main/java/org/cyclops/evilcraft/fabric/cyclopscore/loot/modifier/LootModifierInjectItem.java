@@ -55,7 +55,7 @@ public class LootModifierInjectItem extends LootModifier {
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        if (getLootTables().contains(context.getQueriedLootTableId().toString())) {
+        if (getLootTables().contains(org.cyclops.evilcraft.fabric.loot.GlobalLootModifiers.getQueriedLootTableId(context).toString())) {
             ItemStack stack = getItemStack().create();
             stack.setCount(context.getRandom().nextInt(1, getMaxStackSize() + 1));
             generatedLoot.add(stack);

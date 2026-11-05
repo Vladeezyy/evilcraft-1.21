@@ -52,8 +52,8 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     private final float meleeDamage;
 
     public ItemMace(Properties builder, int containerSize, int hitUsage, int maximumCharge,
-                    int powerLevels, float meleeDamage) {
-        super(builder, containerSize);
+                    int powerLevels, float meleeDamage, float attackSpeed) {
+        super(builder.attributes(createAttributes(meleeDamage, attackSpeed)), containerSize);
         this.hitUsage = hitUsage;
         this.maximumCharge = maximumCharge;
         this.powerLevels = powerLevels;
@@ -258,17 +258,16 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
                 SoundSource.NEUTRAL, 0.5F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));
     }
 
-    @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers() {
+    private static ItemAttributeModifiers createAttributes(float meleeDamage, float attackSpeed) {
         return new ItemAttributeModifiers(Lists.newArrayList(
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_DAMAGE,
-                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_damage"), this.meleeDamage, AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_damage"), meleeDamage, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND
                 ),
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_SPEED,
-                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_attack_speed"), getAttackSpeed(), AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "add_mace_attack_speed"), attackSpeed, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND
                 )
         ));

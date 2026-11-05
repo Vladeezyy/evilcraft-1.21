@@ -1,15 +1,12 @@
 package org.cyclops.evilcraft.block;
 
 import org.cyclops.evilcraft.fabric.event.ModLifecycle;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.EvilCraft;
@@ -41,7 +38,7 @@ public class BlockBloodWaxedCoalConfig extends BlockConfigCommon<IModBase> {
                 },
                 getDefaultItemConstructor(EvilCraft._instance)
         );
-        ModLifecycle.afterRegistries(() -> FuelRegistry.INSTANCE.add(this.getItemInstance(), 32000));
+        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getItemInstance(), 32000)));
     }
 
 }

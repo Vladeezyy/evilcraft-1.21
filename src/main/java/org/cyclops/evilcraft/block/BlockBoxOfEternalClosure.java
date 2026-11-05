@@ -201,7 +201,7 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
         return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityBoxOfEternalClosure.class)
-                .map(tile -> tile.getLidAngle() > 0 ? LIGHT_LEVEL : super.getLightEmission(state, world, pos))
+                .map(tile -> tile.getLidAngle() > 0 ? LIGHT_LEVEL : state.getLightEmission())
                 .orElse(0);
     }
 

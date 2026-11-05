@@ -24,7 +24,7 @@ public class RecipeSerializerCraftingShapedCustomOutputEntangledChaliceCopyConfi
                     ItemAccess newStack = ItemAccess.forStack(staticOutput.copy());
                     String tankID = ((ItemEntangledChalice.FluidHandler) Capabilities.Fluid.ITEM.getCapability(inventory.getItem(4), ItemAccess.forStack(inventory.getItem(4)))).getTankID();
                     try (var tx = Transaction.openRoot()) {
-                        ((ItemEntangledChalice.FluidHandler) Capabilities.Fluid.ITEM.getCapability(newStack, null)).setTankID(tankID, tx);
+                        ((ItemEntangledChalice.FluidHandler) newStack.getCapability(Capabilities.Fluid.ITEM)).setTankID(tankID, tx);
                         tx.commit();
                     }
                     return newStack.getResource().toStack(2);

@@ -26,7 +26,7 @@ public class DeferredHolder<R, T extends R> extends DeferredHolderCommon<R, T> i
     }
 
     public Identifier getId() {
-        return key.location();
+        return key.identifier();
     }
 
     public ResourceKey<R> getKey() {

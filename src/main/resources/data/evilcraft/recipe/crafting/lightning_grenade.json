@@ -8,8 +8,8 @@
   "key": {
     "P": "#c:ender_pearls",
     "C": {
-      "neoforge:ingredient_type": "neoforge:components",
-      "items": "evilcraft:weather_container",
+      "fabric:type": "fabric:components",
+      "base": "evilcraft:weather_container",
       "components": {
         "evilcraft:weather_container_type": "LIGHTNING"
       }

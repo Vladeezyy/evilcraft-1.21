@@ -7,9 +7,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -133,8 +133,8 @@ public class GameTestsBloodInfuser {
             helper.assertTrue(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE).isEmpty(), Component.literal("Infuse slot is not empty"));
             helper.assertFalse(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT).isEmpty(), Component.literal("Result is not available"));
             helper.assertTrue(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT).getItem() == RegistryEntries.ITEM_DARK_TANK.get(), Component.literal("Result item is wrong"));
-            helper.assertValueEqual(16000, Capabilities.Fluid.ITEM.getCapability(ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT)), null).getAmountAsInt(0), Component.literal("Container content amount"));
-            helper.assertValueEqual(RegistryEntries.FLUID_BLOOD.value(), Capabilities.Fluid.ITEM.getCapability(ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT)), null).getResource(0).getFluid(), Component.literal("Container content fluid"));
+            helper.assertValueEqual(16000, ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT)).getCapability(Capabilities.Fluid.ITEM).getAmountAsInt(0), Component.literal("Container content amount"));
+            helper.assertValueEqual(RegistryEntries.FLUID_BLOOD.value(), ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT)).getCapability(Capabilities.Fluid.ITEM).getResource(0).getFluid(), Component.literal("Container content fluid"));
             helper.assertTrue(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT).getCount() == 1, Component.literal("Result item count is wrong"));
             helper.assertValueEqual(0, infuser.getTank().getFluidAmount(), Component.literal("Blood infuser tank contents"));
         });
@@ -222,7 +222,7 @@ public class GameTestsBloodInfuser {
         helper.succeedWhen(() -> {
             BlockEntityBloodInfuser infuser = getInfuser(helper);
             helper.assertFalse(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_CONTAINER).isEmpty(), Component.literal("Container was incorrectly destroyed"));
-            helper.assertValueEqual(Capabilities.Fluid.ITEM.getCapability(ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_CONTAINER)), null).getAmountAsInt(0), 0, Component.literal("Container contents"));
+            helper.assertValueEqual(ItemAccess.forStack(infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_CONTAINER)).getCapability(Capabilities.Fluid.ITEM).getAmountAsInt(0), 0, Component.literal("Container contents"));
             helper.assertValueEqual(5000, infuser.getTank().getFluidAmount(), Component.literal("Blood infuser tank contents"));
         });
     }

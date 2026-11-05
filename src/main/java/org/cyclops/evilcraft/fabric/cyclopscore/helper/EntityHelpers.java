@@ -86,7 +86,7 @@ public class EntityHelpers {
      * @return If the entity was spawned.
      */
     public static boolean spawnEntity(ServerLevelAccessor world, Mob entityLiving, EntitySpawnReason spawnReason) {
-        EventHooks.finalizeMobSpawn(entityLiving, world, world.getCurrentDifficultyAt(entityLiving.blockPosition()), spawnReason, null);
+        entityLiving.finalizeSpawn(world, world.getCurrentDifficultyAt(entityLiving.blockPosition()), spawnReason, null);
         world.addFreshEntity(entityLiving);
         return true;
     }
@@ -126,13 +126,7 @@ public class EntityHelpers {
      * @return The player's persisted NBT tag.
      */
     public static CompoundTag getPersistedPlayerNbt(Player player) {
-        CompoundTag tag = player.getPersistentData();
-        CompoundTag persistedTag = tag.getCompound(Player.PERSISTED_NBT_TAG).orElse(null);
-        if (persistedTag == null) {
-            persistedTag = new CompoundTag();
-            tag.put(Player.PERSISTED_NBT_TAG, persistedTag);
-        }
-        return persistedTag;
+        return org.cyclops.evilcraft.fabric.PersistentData.getPersisted(player);
     }
 
 }

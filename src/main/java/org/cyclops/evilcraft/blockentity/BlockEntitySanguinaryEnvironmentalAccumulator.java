@@ -149,7 +149,7 @@ public class BlockEntitySanguinaryEnvironmentalAccumulator extends BlockEntityWo
                     public Optional<RecipeEnvironmentalAccumulator> getNewValue(Triple<ItemStack, FluidStack, WeatherType> key) {
                         Inventory recipeInput = new Inventory(1, 64, BlockEntitySanguinaryEnvironmentalAccumulator.this);
                         recipeInput.setItem(0, key.getLeft());;
-                        return IModHelpers.get().getCraftingHelpers().findRecipe(getRegistry(), recipeInput, getLevel()).map(RecipeHolder::value);
+                        return IModHelpers.get().getCraftingHelpers().findRecipe(getRegistry(), recipeInput.asRecipeInput(), getLevel()).map(RecipeHolder::value);
                     }
 
                     @Override

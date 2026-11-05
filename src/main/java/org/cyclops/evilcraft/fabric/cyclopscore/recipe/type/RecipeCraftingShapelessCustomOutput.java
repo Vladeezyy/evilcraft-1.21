@@ -71,7 +71,7 @@ public class RecipeCraftingShapelessCustomOutput extends ShapelessRecipe {
                     p_311734_ -> p_311734_.group(
                                     Codec.STRING.optionalFieldOf("group", "").forGetter(p_301127_ -> p_301127_.group()),
                                     CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(p_301133_ -> p_301133_.category()),
-                                    Codec.lazyInitialized(() -> Ingredient.CODEC.listOf(1, ShapedRecipePattern.getMaxHeight() * ShapedRecipePattern.getMaxWidth())).fieldOf("ingredients").forGetter((p_360071_) -> p_360071_.placementInfo().ingredients())
+                                    Codec.lazyInitialized(() -> Ingredient.CODEC.listOf(1, 9)).fieldOf("ingredients").forGetter((p_360071_) -> p_360071_.placementInfo().ingredients())
                             )
                             .apply(p_311734_, (group, category, ingredients) -> new RecipeCraftingShapelessCustomOutput(this, group, category, this.outputProvider.get(), ingredients))
             );

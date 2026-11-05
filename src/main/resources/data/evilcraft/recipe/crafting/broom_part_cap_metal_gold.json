@@ -3,8 +3,8 @@
   "ingredients": [
     "#c:ingots/gold",
     {
-      "neoforge:ingredient_type": "neoforge:components",
-      "items": "evilcraft:broom_part",
+      "fabric:type": "fabric:components",
+      "base": "evilcraft:broom_part",
       "components": {
         "evilcraft:broom_parts": [
           "evilcraft:cap_bare"

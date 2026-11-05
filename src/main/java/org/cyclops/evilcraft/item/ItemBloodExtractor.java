@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.HitResult;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
@@ -121,7 +120,7 @@ public class ItemBloodExtractor extends ItemBloodContainer {
             Pair<Integer, ItemStack> itemStackLocation = it.nextIndexed();
             ItemStack itemStack = itemStackLocation.getRight();
             if(!itemStack.isEmpty() && itemStack.getItem() instanceof ItemBloodExtractor) {
-                ResourceHandler<FluidResource> fluidHandler = new Capabilities.Fluid.ITEM.getCapability(ItemAccessItemLocation(player, new ItemLocation(InventoryLocationPlayer.getInstance(), itemStackLocation.getLeft())), null);
+                ResourceHandler<FluidResource> fluidHandler = new ItemAccessItemLocation(player, new ItemLocation(InventoryLocationPlayer.getInstance(), itemStackLocation.getLeft())).getCapability(Capabilities.Fluid.ITEM);
                 try (var tx = Transaction.openRoot()) {
                     toFill -= fluidHandler.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), toFill, tx);
                     tx.commit();

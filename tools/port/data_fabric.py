@@ -9,11 +9,10 @@ import json, os, sys
 TAGS = {'c:slimeballs': 'c:slime_balls'}
 
 def base_of(items):
-    if isinstance(items, list):
-        return [base_of(i) for i in items] if len(items) > 1 else base_of(items[0])
-    if items.startswith('#'):
-        return {'tag': items[1:]}
-    return {'item': items}
+    # Since 1.21.2 a plain ingredient is the item id itself (or a list of ids, or "#tag")
+    if isinstance(items, list) and len(items) == 1:
+        return items[0]
+    return items
 
 def condition(c):
     t = c.get('type')
@@ -34,7 +33,7 @@ def condition(c):
 
 def walk(o):
     if isinstance(o, dict):
-        if o.get('type') == 'neoforge:components':
+        if 'neoforge:components' in (o.get('type'), o.get('neoforge:ingredient_type')):
             n = {'fabric:type': 'fabric:components', 'base': base_of(o['items']), 'components': o['components']}
             return n
         out = {}

@@ -8,8 +8,8 @@
   "key": {
     "C": "evilcraft:dark_gem_crushed",
     "P": {
-      "neoforge:ingredient_type": "neoforge:components",
-      "items": "minecraft:potion",
+      "fabric:type": "fabric:components",
+      "base": "minecraft:potion",
       "components": {
         "minecraft:potion_contents": {
           "potion": "minecraft:weakness"

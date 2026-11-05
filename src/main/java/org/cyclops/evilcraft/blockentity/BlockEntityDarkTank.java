@@ -66,7 +66,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
 
     @Nullable
     protected boolean fill(ItemAccess itemAccess) {
-        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
+        ResourceHandler<FluidResource> container = itemAccess.getCapability(Capabilities.Fluid.ITEM);
         return !IModHelpersNeoForge.get().getFluidHelpers().move(getTank(), container, Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()), null, false, false).isEmpty();
     }
 
@@ -96,7 +96,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
                         if(!blockEntity.getTank().isEmpty() && entity instanceof ItemEntity) {
                             ItemEntity item = (ItemEntity) entity;
                             ItemAccess itemAccess = ItemAccess.forStack(item.getItem());
-                            if (org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemAccess, null) != null &&
+                            if (itemAccess.getCapability(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM) != null &&
                                     item.getItem().getCount() == 1) {
                                 if(blockEntity.fill(itemAccess)) {
                                     item.setItem(itemAccess.getResource().toStack(itemAccess.getAmount()));
@@ -109,7 +109,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
                                 ItemLocation itemLocation = it.nextIndexed();
                                 ItemAccess itemAccess = new ItemAccessItemLocation(player, itemLocation);
                                 if(itemAccess.getAmount() > 0
-                                        && org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemAccess, null) != null) {
+                                        && itemAccess.getCapability(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM) != null) {
                                     blockEntity.fill(itemAccess);
                                 }
                             }

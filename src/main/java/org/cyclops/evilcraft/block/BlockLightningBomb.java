@@ -75,7 +75,10 @@ public class BlockLightningBomb extends Block {
     }
 
     @Override
-    public void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, java.util.function.BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        if (state.isAir() || explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK) {
+            return;
+        }
         if (!level.isClientSide()) {
             EntityLightningBombPrimed entityprimed = new EntityLightningBombPrimed(level,
                     (double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F),

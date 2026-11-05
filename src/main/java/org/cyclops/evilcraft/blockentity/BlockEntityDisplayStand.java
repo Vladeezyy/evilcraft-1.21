@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  * @author rubensworks
  *
  */
-public class BlockEntityDisplayStand extends CyclopsBlockEntity {
+public class BlockEntityDisplayStand extends CyclopsBlockEntity implements org.cyclops.evilcraft.fabric.extensions.IBlockEntityUpdateListener {
 
     @NBTPersist
     private ItemStack displayStandType;
@@ -106,11 +106,6 @@ public class BlockEntityDisplayStand extends CyclopsBlockEntity {
     }
 
     @Override
-    public void onDataPacket(Connection net, ValueInput valueInput) {
-        super.onDataPacket(net, valueInput);
-        onUpdateReceived();
-    }
-
     public void onUpdateReceived() {
         IModHelpers.get().getBlockHelpers().markForUpdate(level, worldPosition);
     }

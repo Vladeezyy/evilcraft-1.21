@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
-import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 

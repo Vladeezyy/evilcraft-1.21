@@ -14,6 +14,9 @@ public class EvilCraftCompat {
 
     public static void load() {
         JeiCompatLoader.initialize();
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            JeiCompatLoaderClient.initializeRecipes();
+        }
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && FabricLoader.getInstance().isModLoaded(Reference.MOD_JEI)) {
             JeiCompatLoaderClient.initialize();
         }

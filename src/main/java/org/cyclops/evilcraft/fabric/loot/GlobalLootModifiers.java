@@ -150,8 +150,8 @@ public final class GlobalLootModifiers {
         });
         modifiers = parsed;
         Map<LootTable, Identifier> ids = new IdentityHashMap<>();
-        server.reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE).entrySet()
-                .forEach(entry -> ids.put(entry.getValue(), entry.getKey().location()));
+        server.reloadableRegistries().lookup().lookupOrThrow(Registries.LOOT_TABLE).listElements()
+                .forEach(entry -> ids.put(entry.value(), entry.key().identifier()));
         lootTableIds = ids;
     }
 

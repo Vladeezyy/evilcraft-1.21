@@ -19,10 +19,12 @@ public abstract class LootModifier implements IGlobalLootModifier {
             .xmap(list -> list.toArray(LootItemCondition[]::new), java.util.List::of);
 
     protected final LootItemCondition[] conditions;
+    private final int priority;
     private final Predicate<LootContext> combinedConditions;
 
-    protected LootModifier(LootItemCondition[] conditions) {
+    protected LootModifier(LootItemCondition[] conditions, int priority) {
         this.conditions = conditions;
+        this.priority = priority;
         this.combinedConditions = context -> {
             for (LootItemCondition condition : conditions) {
                 if (!condition.test(context)) {
@@ -33,8 +35,9 @@ public abstract class LootModifier implements IGlobalLootModifier {
         };
     }
 
-    protected static <T extends LootModifier> Products.P1<RecordCodecBuilder.Mu<T>, LootItemCondition[]> codecStart(RecordCodecBuilder.Instance<T> instance) {
-        return instance.group(LOOT_CONDITIONS_CODEC.fieldOf("conditions").forGetter(lm -> lm.conditions));
+    protected static <T extends LootModifier> Products.P2<RecordCodecBuilder.Mu<T>, LootItemCondition[], Integer> codecStart(RecordCodecBuilder.Instance<T> instance) {
+        return instance.group(LOOT_CONDITIONS_CODEC.fieldOf("conditions").forGetter(lm -> lm.conditions),
+                Codec.INT.optionalFieldOf("priority", 1000).forGetter(lm -> ((LootModifier) lm).priority));
     }
 
     @Override

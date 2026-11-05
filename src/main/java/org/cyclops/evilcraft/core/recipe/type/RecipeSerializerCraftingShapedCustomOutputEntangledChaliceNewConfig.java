@@ -24,7 +24,7 @@ public class RecipeSerializerCraftingShapedCustomOutputEntangledChaliceNewConfig
                 "crafting_shaped_custom_output_entangled_chalice_new",
                 eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_ENTANGLED_CHALICE.get(), 2), (inventory, staticOutput) -> {
                     ItemAccess newStack = ItemAccess.forStack(new ItemStack(RegistryEntries.ITEM_ENTANGLED_CHALICE));
-                    ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) Capabilities.Fluid.ITEM.getCapability(newStack, null);
+                    ItemEntangledChalice.FluidHandler fluidHandler = (ItemEntangledChalice.FluidHandler) newStack.getCapability(Capabilities.Fluid.ITEM);
                     if (!IModHelpers.get().getMinecraftHelpers().isClientSideThread()) {
                         try (var tx = Transaction.openRoot()) {
                             fluidHandler.setNextTankID(tx);

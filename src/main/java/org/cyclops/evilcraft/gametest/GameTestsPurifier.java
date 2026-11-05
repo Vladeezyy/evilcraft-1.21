@@ -19,7 +19,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.cyclopscore.gametest.GameTest;
-import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockPurifierConfig;
@@ -36,7 +36,7 @@ public class GameTestsPurifier {
     private static ItemStack createEnchantedSword(HolderLookup.Provider holders, String enchantmentId, int level) {
         ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
         ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
-        enchantments.set(holders.holderOrThrow(ResourceKey.create(Registries.ENCHANTMENT, Identifier.parse(enchantmentId))), level);
+        enchantments.set(holders.getOrThrow(ResourceKey.create(Registries.ENCHANTMENT, Identifier.parse(enchantmentId))), level);
         EnchantmentHelper.setEnchantments(sword, enchantments.toImmutable());
         return sword;
     }
@@ -52,7 +52,7 @@ public class GameTestsPurifier {
         purifier.getInventory().setItem(BlockEntityPurifier.SLOT_ADDITIONAL, new ItemStack(RegistryEntries.ITEM_BLOOK.get()));
 
         // Fill tank with max blood
-        purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
+        purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
 
         helper.succeedWhen(() -> {
             ItemEnchantments enchantments = purifier.getInventory().getItem(BlockEntityPurifier.SLOT_PURIFY).get(DataComponents.ENCHANTMENTS);
@@ -71,7 +71,7 @@ public class GameTestsPurifier {
         purifier.getInventory().setItem(BlockEntityPurifier.SLOT_PURIFY, createEnchantedSword(holders, "minecraft:vanishing_curse", 1));
 
         // Fill tank with 1 bucket of blood (curse removal only needs > 0)
-        purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume()));
+        purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume()));
 
         helper.succeedWhen(() -> {
             ItemEnchantments enchantments = purifier.getInventory().getItem(BlockEntityPurifier.SLOT_PURIFY).get(DataComponents.ENCHANTMENTS);
@@ -95,14 +95,14 @@ public class GameTestsPurifier {
         BlockEntityPurifier disenchantPurifier = helper.getBlockEntity(POS, BlockEntityPurifier.class);
         disenchantPurifier.getInventory().setItem(BlockEntityPurifier.SLOT_PURIFY, createEnchantedSword(holders, "minecraft:sharpness", 1));
         disenchantPurifier.getInventory().setItem(BlockEntityPurifier.SLOT_ADDITIONAL, new ItemStack(RegistryEntries.ITEM_BLOOK.get()));
-        disenchantPurifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
+        disenchantPurifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
 
         // Curse removal scenario: sword with vanishing curse at an adjacent position
         BlockPos pos2 = POS.offset(3, 0, 0);
         helper.setBlock(pos2, RegistryEntries.BLOCK_PURIFIER.get());
         BlockEntityPurifier cursePurifier = helper.getBlockEntity(pos2, BlockEntityPurifier.class);
         cursePurifier.getInventory().setItem(BlockEntityPurifier.SLOT_PURIFY, createEnchantedSword(holders, "minecraft:vanishing_curse", 1));
-        cursePurifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume()));
+        cursePurifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume()));
 
         // After enough ticks for the purifiers to have acted (if not blacklisted), verify nothing was removed
         helper.runAfterDelay(150, () -> {
@@ -135,7 +135,7 @@ public class GameTestsPurifier {
             helper.setBlock(pos, RegistryEntries.BLOCK_PURIFIER.get());
             BlockEntityPurifier purifier = helper.getBlockEntity(pos, BlockEntityPurifier.class);
             purifier.getInventory().setItem(BlockEntityPurifier.SLOT_PURIFY, new ItemStack(entry.getKey()));
-            purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
+            purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
             purifierPositions.put(pos, entry.getKey());
             offset += 2;
         }
@@ -165,7 +165,7 @@ public class GameTestsPurifier {
             helper.setBlock(pos, RegistryEntries.BLOCK_PURIFIER.get());
             BlockEntityPurifier purifier = helper.getBlockEntity(pos, BlockEntityPurifier.class);
             purifier.getInventory().setItem(BlockEntityPurifier.SLOT_PURIFY, new ItemStack(head));
-            purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
+            purifier.getTank().setFluid(new FluidStack(RegistryEntries.FLUID_BLOOD, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS));
             purifierPositions.put(pos, head);
             offset += 2;
         }

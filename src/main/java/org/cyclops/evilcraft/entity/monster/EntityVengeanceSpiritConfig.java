@@ -6,7 +6,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.neoforged.neoforge.common.NeoForge;
 import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
@@ -69,7 +68,7 @@ public class EntityVengeanceSpiritConfig extends EntityConfigCommon<IModBase, En
     public void onRegistered() {
         super.onRegistered();
         // No IMC on Fabric: other mods call EntityVengeanceSpirit.addToBlacklistIMC directly
-        NeoForge.EVENT_BUS.register(EntityVengeanceSpirit.class);
+        org.cyclops.evilcraft.fabric.event.LivingDeathEvent.addListener(EntityVengeanceSpirit::vengeanceEvent);
     }
 
     public void onEntityAttributeCreationEvent(EntityAttributeCreationEvent event) {

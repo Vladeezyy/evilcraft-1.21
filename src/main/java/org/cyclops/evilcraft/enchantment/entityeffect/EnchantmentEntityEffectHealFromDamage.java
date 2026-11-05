@@ -41,7 +41,7 @@ public record EnchantmentEntityEffectHealFromDamage(
     @Override
     public void apply(ServerLevel level, int enchantmentLevel, EnchantedItemInUse enchantedItemInUse, Entity entity, Vec3 vec) {
         if (lastDamageEvent != null && lastDamageEvent.getSource().getEntity() == entity) {
-            float damage = lastDamageEvent.getHealthDamage();
+            float damage = lastDamageEvent.getNewDamage();
             enchantedItemInUse.owner().heal(this.damageMultiplier.calculate(enchantmentLevel) * damage);
             lastDamageEvent = null;
         }

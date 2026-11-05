@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import com.google.common.collect.Lists;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -64,7 +65,7 @@ public class RecipeDeadBush extends CustomRecipe {
     @Override
     public PlacementInfo placementInfo() {
         if (this.placementInfo == null) {
-            this.placementInfo = PlacementInfo.create(Lists.newArrayList(Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(ItemTags.SAPLINGS)), Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(Tags.Items.TOOLS_SHEAR))));
+            this.placementInfo = PlacementInfo.create(Lists.newArrayList(Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(ItemTags.SAPLINGS)), Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(ConventionalItemTags.SHEAR_TOOLS))));
         }
         return this.placementInfo;
     }
@@ -72,7 +73,7 @@ public class RecipeDeadBush extends CustomRecipe {
     @Override
     public List<RecipeDisplay> display() {
         return List.of(new ShapelessCraftingRecipeDisplay(
-                List.of(new SlotDisplay.TagSlotDisplay(ItemTags.SAPLINGS), new SlotDisplay.TagSlotDisplay(Tags.Items.TOOLS_SHEAR)),
+                List.of(new SlotDisplay.TagSlotDisplay(ItemTags.SAPLINGS), new SlotDisplay.TagSlotDisplay(ConventionalItemTags.SHEAR_TOOLS)),
                 new SlotDisplay.ItemSlotDisplay(Items.DEAD_BUSH),
                 new SlotDisplay.ItemSlotDisplay(Items.CRAFTING_TABLE)
         ));

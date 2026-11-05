@@ -41,7 +41,6 @@ public class ItemSpectralGlasses extends Item {
         super(properties.humanoidArmor(MATERIAL, ArmorType.HELMET));
     }
 
-    @Override
     public EquipmentSlot getEquipmentSlot(ItemStack stack) {
         return EquipmentSlot.HEAD;
     }

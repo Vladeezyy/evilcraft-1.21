@@ -6,8 +6,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.SoundType;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.DefaultDataComponentsBoundEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -37,18 +35,18 @@ public class BlockBoxOfEternalClosureConfig extends BlockConfigCommon<ModBaseNeo
                         .sound(SoundType.METAL)),
                 (eConfig, block) -> new ItemBlockBoxOfEternalClosure(block, eConfig.createDefaultItemProperties())
         );
-        NeoForge.EVENT_BUS.addListener(this::onDefaultDataComponentsBound);
+        org.cyclops.evilcraft.fabric.event.ModLifecycle.afterRegistries(this::onDefaultDataComponentsBound);
     }
 
-    private void onDefaultDataComponentsBound(DefaultDataComponentsBoundEvent event) {
-        if (event.shouldUpdateStaticData()) {
+    private void onDefaultDataComponentsBound() {
+        {
             // Initialize the filled box template with a zombie spirit inside
             EntityVengeanceSpiritData spiritData = new EntityVengeanceSpiritData();
             spiritData.setInnerEntityType(EntityType.ZOMBIE);
             CompoundTag spiritTag = IModHelpers.get().getMinecraftHelpers().valueOutputToNbt(spiritData::writeNBT);
-            ItemStack filledStack = new ItemStack(RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get().asItem());
-            filledStack.set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), spiritTag);
-            BlockBoxOfEternalClosure.boxOfEternalClosureFilled = ItemStackTemplate.fromNonEmptyStack(filledStack);
+            // Not through a stack: the components of the item are not bound yet on Fabric at this point
+            BlockBoxOfEternalClosure.boxOfEternalClosureFilled = new ItemStackTemplate(RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get().asItem(),
+                    net.minecraft.core.component.DataComponentPatch.builder().set(RegistryEntries.COMPONENT_BOX_SPIRIT_DATA.get(), spiritTag).build());
         }
     }
 

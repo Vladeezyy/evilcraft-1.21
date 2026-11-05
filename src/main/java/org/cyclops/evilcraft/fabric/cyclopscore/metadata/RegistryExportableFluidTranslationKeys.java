@@ -26,7 +26,7 @@ public class RegistryExportableFluidTranslationKeys implements IRegistryExportab
         element.add("fluids", elements);
         for (Map.Entry<ResourceKey<Fluid>, Fluid> fluidEntry : BuiltInRegistries.FLUID.entrySet()) {
             FluidStack value = new FluidStack(fluidEntry.getValue(), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
-            String translationKey = value.getFluidType().getDescriptionId(value);
+            String translationKey = org.cyclops.evilcraft.fabric.fluids.FluidHelpersFabricExtra.getDescriptionId(value.getFluid());
 
             JsonObject object = new JsonObject();
             object.addProperty("translationKey", translationKey);

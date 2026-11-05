@@ -36,7 +36,7 @@ public class ContainerScreenPrimedPendant extends ContainerScreenExtended<Contai
     @Override
     protected void extractLabels(GuiGraphicsExtractor guiGraphics, int x, int y) {
         // super.drawGuiContainerForegroundLayer(matrixStack, x, y);
-        ItemStack itemStack = container.getItemStack(getMinecraft().player);
+        ItemStack itemStack = container.getItemStack(net.minecraft.client.Minecraft.getInstance().player);
         guiGraphics.text(this.font, itemStack.getHoverName(), 28, 6, 4210752, false);
     }
 

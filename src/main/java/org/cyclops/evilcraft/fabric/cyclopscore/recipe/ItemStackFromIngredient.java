@@ -62,7 +62,7 @@ public class ItemStackFromIngredient {
         }
 
         // Obtain all stacks for the given tag
-        HolderSet<Item> matchingItems = getIngredient().getValues();
+        java.util.List<net.minecraft.core.Holder<Item>> matchingItems = getIngredient().items().toList();
 
         // Create a mod id to order index map
         Map<String, Integer> modPriorityIndex = Maps.newHashMap();

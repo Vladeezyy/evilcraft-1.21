@@ -171,7 +171,7 @@ public class ItemBloodContainer extends DamageIndicatedItemFluidContainer implem
         int drained = 0;
         while(it.hasNext() && amount > 0) {
             ItemLocation current = it.nextIndexed();
-            ResourceHandler<FluidResource> containerItem = new Capabilities.Fluid.ITEM.getCapability(ItemAccessItemLocation(player, current), null);
+            ResourceHandler<FluidResource> containerItem = new ItemAccessItemLocation(player, current).getCapability(Capabilities.Fluid.ITEM);
             if(current.getItemStack(player) != itemStack && containerItem != null) {
                 int thisDrained = containerItem.extract(FluidResource.of(fluid), amount, transaction);
                 if (thisDrained > 0) {

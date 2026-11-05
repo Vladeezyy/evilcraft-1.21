@@ -12,7 +12,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.bus.api.EventPriority;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
@@ -122,7 +121,7 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
      */
     public boolean canDrain(int amount, ItemStack itemStack) {
         ItemAccess itemAccess = ItemAccess.forStack(itemStack);
-        ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
+        ResourceHandler<FluidResource> fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
         if (fluidHandler == null) return false;
         FluidResource resource = fluidHandler.getResource(0);
         // Avoid IllegalArgumentException when the fluid handler has no fluid (empty resource is not allowed in NeoForge extract calls)

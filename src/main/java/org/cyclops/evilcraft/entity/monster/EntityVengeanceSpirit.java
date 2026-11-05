@@ -37,8 +37,6 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.cyclops.cyclopscore.client.particle.ParticleBlurData;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -204,8 +202,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         data.readNBT(valueInput);
     }
 
-    @Override
-    public Optional<ResourceKey<LootTable>> getLootTable() {
+    private Optional<ResourceKey<LootTable>> getSpiritLootTable() {
         return Optional.of(ResourceKey.create(Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath(Reference.MOD_ID, "entities/" + BuiltInRegistries.ENTITY_TYPE.getKey(getType()).getPath())));
     }
 
@@ -241,7 +238,8 @@ public class EntityVengeanceSpirit extends EntityNoMob {
 
     @Override
     protected void dropFromLootTable(ServerLevel level, DamageSource damageSource, boolean fromPlayer) {
-        super.dropFromLootTable(level, damageSource, fromPlayer);
+        // Mob#getLootTable is final without NeoForge
+        getSpiritLootTable().ifPresent(key -> dropFromLootTable(level, damageSource, fromPlayer, key));
 
         // Also drop loot from inner entity!
         LivingEntity innerEntity = getInnerEntity();

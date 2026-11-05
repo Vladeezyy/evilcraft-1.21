@@ -89,17 +89,17 @@ public class BlockBloodInfuser extends BlockWithEntityGuiTank implements IDynami
     @Override
     public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
         return IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityBloodInfuser.class)
-                .map(tile -> tile.isVisuallyWorking() ? 4 : super.getLightEmission(state, world, pos))
+                .map(tile -> tile.isVisuallyWorking() ? 4 : state.getLightEmission())
                 .orElse(0);
     }
 
     @Override
-    public boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest, FluidState fluid) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         IModHelpers.get().getBlockEntityHelpers().get(world, pos, BlockEntityBloodInfuser.class)
                 .ifPresent(tile -> {
                     EntityHelpers.spawnXpAtPlayer(player.level(), player, (int) Math.floor(tile.getXp()));
                     tile.resetXp();
                 });
-        return super.onDestroyedByPlayer(state, world, pos, player, toolStack, willHarvest, fluid);
+        return super.playerWillDestroy(world, pos, state, player);
     }
 }

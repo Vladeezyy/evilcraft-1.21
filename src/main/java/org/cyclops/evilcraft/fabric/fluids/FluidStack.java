@@ -145,8 +145,9 @@ public final class FluidStack {
     }
 
     @Nullable
+    @SuppressWarnings("unchecked")
     public <T> T set(DataComponentType<? super T> type, @Nullable T component) {
-        return components.set(type, component);
+        return (T) components.set((DataComponentType<T>) type, component);
     }
 
     @Nullable
@@ -253,7 +254,7 @@ public final class FluidStack {
         if (variant.isBlank() || amount <= 0) {
             return EMPTY;
         }
-        return new FluidStack(variant.getFluid().builtInRegistryHolder(), amount, variant.getComponents());
+        return new FluidStack(variant.getFluid().builtInRegistryHolder(), amount, variant.getComponentsPatch());
     }
 
     public Component getHoverName() {

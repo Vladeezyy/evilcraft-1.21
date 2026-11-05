@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -77,11 +76,11 @@ public abstract class PlayerInteractEvent extends CancellableEvent {
                 if (event.useBlock == TriState.TRUE && player.isSecondaryUseActive()) {
                     // Vanilla skips the block when sneaking with an item, use it anyway
                     BlockState state = level.getBlockState(hitResult.getBlockPos());
-                    ItemInteractionResult itemResult = state.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
+                    InteractionResult itemResult = state.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
                     if (itemResult.consumesAction()) {
-                        return itemResult.result();
+                        return itemResult;
                     }
-                    if (itemResult == ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION && hand == InteractionHand.MAIN_HAND) {
+                    if (itemResult instanceof InteractionResult.TryEmptyHandInteraction && hand == InteractionHand.MAIN_HAND) {
                         InteractionResult result = state.useWithoutItem(level, player, hitResult);
                         if (result.consumesAction()) {
                             return result;

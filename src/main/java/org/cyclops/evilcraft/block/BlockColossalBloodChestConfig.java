@@ -51,12 +51,4 @@ public class BlockColossalBloodChestConfig extends UpgradableBlockContainerConfi
     }
 
 
-    @Override
-    public void onForgeRegistered() {
-        super.onForgeRegistered();
-        if (getMod().getModHelpers().getMinecraftHelpers().isClientSide()) {
-            RenderItemStackBlockEntityBloodChest.ItemRenderProperties.register(getItemInstance());
-        }
-    }
-
 }

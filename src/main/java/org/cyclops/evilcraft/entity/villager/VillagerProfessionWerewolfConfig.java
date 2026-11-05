@@ -1,12 +1,7 @@
 package org.cyclops.evilcraft.entity.villager;
 
-import java.util.List;
-import com.google.common.collect.Lists;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
-import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;

@@ -9,7 +9,6 @@ import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
-import org.cyclops.evilcraft.fabric.cyclopscore.helper.IFluidHelpersNeoForge;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTankInventory;
 import org.cyclops.evilcraft.core.blockentity.BlockEntityTickingTankInventory;
@@ -27,8 +26,8 @@ public class EmptyFluidContainerInTankTickAction<T extends BlockEntityTickingTan
     public void onTick(T tile, ItemStack itemStack, int slot, int tick) {
         ItemStack containerStackOriginal = tile.getInventory().getItem(slot).copy();
         ItemAccess containerItemAccess = ItemAccess.forHandlerIndex(VanillaContainerWrapper.of(tile.getInventory()), slot).oneByOne();
-        ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(containerItemAccess, null);
-        IFluidHelpersNeoForge fh = IModHelpersNeoForge.get().getFluidHelpers();
+        ResourceHandler<FluidResource> container = containerItemAccess.getCapability(Capabilities.Fluid.ITEM);
+        IModHelpersNeoForge.FluidHelpers fh = IModHelpersNeoForge.get().getFluidHelpers();
         if(container != null && fh.hasFluid(container)) {
             FluidStack moved = fh.move(container, tile.getTank(), MB_PER_TICK, null, false, false);
             if (moved.isEmpty()) {

@@ -54,10 +54,12 @@ public class GlobalCounters extends WorldStorage<GlobalCounters> {
         public Access(ModBaseNeoForge<?> mod) {
             super(new SavedDataType<>(
                     Identifier.fromNamespaceAndPath(mod.getModId(), "globalcounters"),
-                    (ctx) -> new GlobalCounters(Maps.newHashMap()),
-                    ctx -> RecordCodecBuilder.create(instance -> instance.group(
+                    () -> new GlobalCounters(Maps.newHashMap()),
+                    RecordCodecBuilder.<GlobalCounters>create(instance -> instance.group(
                             Codec.dispatchedMap(Codec.STRING, (key) -> Codec.INT).fieldOf("counters").forGetter(data -> data.counters)
-                    ).apply(instance, GlobalCounters::new))
+                    ).apply(instance, GlobalCounters::new)),
+                    // Vanilla needs a type to fix on load; this one has no rules for the fields of the mod
+                    net.minecraft.util.datafix.DataFixTypes.SAVED_DATA_COMMAND_STORAGE
             ), mod);
         }
     }

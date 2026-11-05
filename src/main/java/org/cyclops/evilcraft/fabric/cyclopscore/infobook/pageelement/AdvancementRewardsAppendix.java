@@ -8,7 +8,7 @@ import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
 
 
 import com.google.common.collect.Maps;
-import org.cyclops.cyclopscore.infobook.*;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
 import java.awt.*;

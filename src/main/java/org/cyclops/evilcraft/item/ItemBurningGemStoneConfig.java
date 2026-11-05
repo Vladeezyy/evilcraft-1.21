@@ -24,7 +24,7 @@ public class ItemBurningGemStoneConfig extends ItemConfigCommon<IModBase> {
                 (eConfig, properties) -> new ItemBurningGemStone(properties
                         .component(DataComponents.RARITY, Rarity.UNCOMMON)
                         .stacksTo(1)
-                        .setNoCombineRepair())
+                        )
         );
     }
 

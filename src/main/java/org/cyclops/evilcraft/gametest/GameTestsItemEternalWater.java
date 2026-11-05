@@ -1,7 +1,5 @@
 package org.cyclops.evilcraft.gametest;
 
-import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -108,7 +106,7 @@ public class GameTestsItemEternalWater {
         helper.setBlock(POS, RegistryEntries.BLOCK_DARK_TANK.get());
 
         // Right click with bucket as player
-        InteractionResult result = ((IItemUseFirst) itemStack.getItem()).onItemUseFirst(itemStack, new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
+        InteractionResult result = ((org.cyclops.evilcraft.fabric.extensions.IItemUseFirst) itemStack.getItem()).onItemUseFirst(itemStack, new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
 
         helper.succeedWhen(() -> {
             // Check result

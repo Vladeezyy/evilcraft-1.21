@@ -53,11 +53,6 @@ sourceSets {
         compileClasspath += main.compileClasspath + main.output
         runtimeClasspath += main.runtimeClasspath + main.output
     }
-    // The GameTests of the original (Fabric GameTest API), a separate mod in the gametest run; not in the jar
-    gametest {
-        compileClasspath += main.compileClasspath + main.output
-        runtimeClasspath += main.runtimeClasspath + main.output
-    }
 }
 
 loom {
@@ -67,9 +62,6 @@ loom {
         }
         evilcraft_scene {
             sourceSet sourceSets.scene
-        }
-        evilcraft_gametest {
-            sourceSet sourceSets.gametest
         }
     }
     accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
@@ -105,7 +97,6 @@ loom {
         gametest {
             server()
             name 'Game Test'
-            source sourceSets.gametest
             vmArg '-Dfabric-api.gametest'
             vmArg "-Dfabric-api.gametest.report-file=${file('build/gametest/junit.xml')}"
             runDir 'run-gametest'
@@ -132,9 +123,12 @@ dependencies {
         localRuntime "maven.modrinth:jade:${jade_modrinth_version}"
     }
 
+    // Runs the GameTests of the original (registered by Cyclops Core); not part of the Fabric API bundle
+    localRuntime "net.fabricmc.fabric-api:fabric-gametest-api-v1:${fabric_gametest_version}"
+
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
-    compileOnly 'org.projectlombok:lombok:1.18.36'
-    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    compileOnly 'org.projectlombok:lombok:1.18.48'
+    annotationProcessor 'org.projectlombok:lombok:1.18.48'
 
     testImplementation 'junit:junit:4.13.2'
 }

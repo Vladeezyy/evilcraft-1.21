@@ -50,6 +50,12 @@ public class BlockEternalWater extends BlockWithEntity {
         PlayerBlockBreakEvents.AFTER.register(this::afterBreak);
     }
 
+    protected void afterBreak(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+        if (state.getBlock() == this && level.getBlockState(pos).is(Blocks.WATER)) {
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        }
+    }
+
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;

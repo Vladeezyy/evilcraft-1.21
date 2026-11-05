@@ -36,7 +36,7 @@ public class SlotFluidContainer extends Slot {
     public static boolean checkIsItemValid(ItemStack itemStack, @Nullable Fluid fluid) {
         if (!itemStack.isEmpty()) {
             ItemAccess itemAccess = ItemAccess.forStack(itemStack);
-            ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
+            ResourceHandler<FluidResource> fluidHandler = itemAccess.getCapability(Capabilities.Fluid.ITEM);
             if (fluidHandler == null) {
                 return false;
             }

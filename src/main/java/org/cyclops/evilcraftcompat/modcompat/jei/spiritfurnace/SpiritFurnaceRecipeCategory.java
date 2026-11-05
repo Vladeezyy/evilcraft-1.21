@@ -10,14 +10,15 @@ import mezz.jei.api.helpers.IGuiHelper;
 import org.cyclops.evilcraftcompat.modcompat.jei.JeiFluids;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.client.gui.container.ContainerScreenBloodInfuser;
@@ -33,7 +34,7 @@ import javax.annotation.Nonnull;
  */
 public class SpiritFurnaceRecipeCategory implements IRecipeCategory<SpiritFurnaceRecipeJEI> {
 
-    public static final RecipeType<SpiritFurnaceRecipeJEI> TYPE = RecipeType.create(Reference.MOD_ID, "spirit_furnace", SpiritFurnaceRecipeJEI.class);
+    public static final IRecipeType<SpiritFurnaceRecipeJEI> TYPE = IRecipeType.create(Reference.MOD_ID, "spirit_furnace", SpiritFurnaceRecipeJEI.class);
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -51,7 +52,17 @@ public class SpiritFurnaceRecipeCategory implements IRecipeCategory<SpiritFurnac
     }
 
     @Override
-    public RecipeType<SpiritFurnaceRecipeJEI> getRecipeType() {
+    public int getWidth() {
+        return this.background.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return this.background.getHeight();
+    }
+
+    @Override
+    public IRecipeType<SpiritFurnaceRecipeJEI> getRecipeType() {
         return TYPE;
     }
 
@@ -59,12 +70,6 @@ public class SpiritFurnaceRecipeCategory implements IRecipeCategory<SpiritFurnac
     @Override
     public Component getTitle() {
         return Component.translatable(RegistryEntries.BLOCK_SPIRIT_FURNACE.get().getDescriptionId());
-    }
-
-    @Nonnull
-    @Override
-    public IDrawable getBackground() {
-        return background;
     }
 
     @Override
@@ -75,7 +80,7 @@ public class SpiritFurnaceRecipeCategory implements IRecipeCategory<SpiritFurnac
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, SpiritFurnaceRecipeJEI recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 42, 28)
-                .addItemStack(recipe.getInputItem());
+                .add(recipe.getInputItem());
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 6, 6)
                 .setOverlay(tankOverlay, 0, 0)
                 .setFluidRenderer(JeiFluids.amount(recipe.getInputFluid().getAmount()), true, ContainerScreenSpiritReanimator.TANKWIDTH, ContainerScreenSpiritReanimator.TANKHEIGHT)
@@ -87,13 +92,12 @@ public class SpiritFurnaceRecipeCategory implements IRecipeCategory<SpiritFurnac
 
     @Override
     public void draw(SpiritFurnaceRecipeJEI recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+        this.background.draw(guiGraphics);
         arrow.draw(guiGraphics, 65, 28);
 
         // Draw duration
         Font fontRenderer = Minecraft.getInstance().font;
         MutableComponent duration = JEIEvilCraftConfig.getDurationSecondsTextComponent(recipe.getDuration());
-        fontRenderer.drawInBatch(duration,
-                (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, 0xFF808080, false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+        guiGraphics.text(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, ARGB.opaque(0xFF808080), false);
     }
 }

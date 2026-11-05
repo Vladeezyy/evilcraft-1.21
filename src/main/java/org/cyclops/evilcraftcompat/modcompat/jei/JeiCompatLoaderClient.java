@@ -12,6 +12,14 @@ import org.cyclops.evilcraftcompat.network.packet.JeiSpiritFurnaceRecipePacket;
 @Environment(EnvType.CLIENT)
 public class JeiCompatLoaderClient {
 
+    /**
+     * The recipes the server synchronized, where Cyclops Core's Fabric helpers look for them. Also without JEI.
+     */
+    public static void initializeRecipes() {
+        net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent.EVENT.register((client, recipes) ->
+                org.cyclops.cyclopscore.helper.MinecraftClientHelpersFabric.RECIPE_MAP = net.minecraft.world.item.crafting.RecipeMap.create(recipes.recipes()));
+    }
+
     public static void initialize() {
         // Handlers run on the client thread
         ClientPlayNetworking.registerGlobalReceiver(JeiSpiritFurnaceRecipePacket.ID,

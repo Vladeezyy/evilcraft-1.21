@@ -37,7 +37,7 @@ public class BroomModifierRegistry implements IBroomModifierRegistry {
     private final List<Pair<Supplier<ItemStack>, Map<BroomModifier, Float>>> broomItems = Lists.newArrayList();
 
     public BroomModifierRegistry() {
-        if (MinecraftHelpers.isClientSide()) {
+        if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
             ItemTooltipEvent.addListener(this::onTooltipEvent);
         }
     }

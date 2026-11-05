@@ -89,18 +89,14 @@ public final class NeoForgeBiomeModifiers {
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     for (JsonElement element : spawners) {
                         JsonObject spawner = element.getAsJsonObject();
-                        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(Identifier.parse(spawner.get("type").getAsString()));
-                        addSpawn(context, new MobSpawnSettings.SpawnerData(entityType, spawner.get("weight").getAsInt(),
-                                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()));
+                        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
+                        context.getMobSpawnSettings().addSpawn(entityType.getCategory(), new MobSpawnSettings.SpawnerData(entityType,
+                                spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
                     }
                 });
             }
             default -> LOGGER.warn("Unsupported biome modifier type {} in {}", type, id);
         }
-    }
-
-    private static void addSpawn(BiomeModificationContext context, MobSpawnSettings.SpawnerData spawnerData) {
-        context.getSpawnSettings().addSpawn(spawnerData.type.getCategory(), spawnerData);
     }
 
     private static Predicate<BiomeSelectionContext> biomes(JsonElement json) {

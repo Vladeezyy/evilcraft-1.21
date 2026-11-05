@@ -1,5 +1,5 @@
 #!/bin/sh
-# Runs the GameTests of the original (src/gametest, Fabric GameTest API) on a dev server under the hang watchdog;
+# Runs the GameTests of the original (registered by Cyclops Core, src/main/java/.../gametest) on a dev server under the hang watchdog;
 # the server exits after the tests. Prints the failed tests and the summary; exit code 0 when all required tests pass.
 cd "$(dirname "$0")/.." || exit 1
 . tools/watchdog.sh

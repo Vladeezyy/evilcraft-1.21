@@ -154,7 +154,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
                                 key.getRight());
 
                         // Make sure we always pick the highest tier when there are multiple matches
-                        return ((ServerLevel) level).recipeAccess().recipeMap().getRecipesFor(getRegistry(), recipeInput, getLevel())
+                        return ((ServerLevel) level).recipeAccess().recipes.getRecipesFor(getRegistry(), recipeInput, getLevel())
                                 .map(RecipeHolder::value)
                                 .max(Comparator.comparingInt(r -> r.getInputTier().orElse(0)));
                     }
@@ -289,7 +289,7 @@ public class BlockEntityBloodInfuser extends BlockEntityWorking<BlockEntityBlood
         public boolean canConsume(ItemStack itemStack, Level world) {
             // Valid fluid handler
             if (!itemStack.isEmpty()) {
-                if (Capabilities.Fluid.ITEM.getCapability(ItemAccess.forStack(itemStack), null) != null) {
+                if (ItemAccess.forStack(itemStack).getCapability(Capabilities.Fluid.ITEM) != null) {
                     return true;
                 }
             }

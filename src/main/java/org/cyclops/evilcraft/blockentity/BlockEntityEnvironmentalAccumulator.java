@@ -57,7 +57,7 @@ import java.util.function.Supplier;
  * @author immortaleeb
  *
  */
-public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon implements IDegradable {
+public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon implements IDegradable, org.cyclops.evilcraft.fabric.extensions.IBlockEntityUpdateListener {
 
     public static final int MAX_AGE = 50;
     public static final int SPREAD = 25;
@@ -338,7 +338,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 entity.setItem(this.getInventory().getItem(0));
             } else {
                 // Recipe found, throw back the result
-                entity.setItem(recipe.value().assemble(getInventory()));
+                entity.setItem(recipe.value().assemble(getInventory().asRecipeInput()));
 
                 // Change the weather to the resulting weather
                 WeatherType weatherSource = recipe.value().getInputWeather();
@@ -406,11 +406,6 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     @Override
-    public void onDataPacket(Connection net, ValueInput valueInput) {
-        super.onDataPacket(net, valueInput);
-        onUpdateReceived();
-    }
-
     public void onUpdateReceived() {
         // If we receive an update from the server and our new state is the
         // finished processing item state, show the corresponding effect

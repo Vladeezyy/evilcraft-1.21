@@ -25,7 +25,7 @@ public class RegistryExportableAbstractCookingRecipe<T extends RecipeType<? exte
         JsonObject object = new JsonObject();
         JsonArray variants = new JsonArray();
         for (Ingredient ingredient : recipe.value().placementInfo().ingredients()) {
-            for (Holder<Item> matchingStack : ingredient.getValues()) {
+            for (Holder<Item> matchingStack : ingredient.items().toList()) {
                 variants.add(IRegistryExportable.serializeItemStack(new ItemStack(matchingStack)));
             }
         }

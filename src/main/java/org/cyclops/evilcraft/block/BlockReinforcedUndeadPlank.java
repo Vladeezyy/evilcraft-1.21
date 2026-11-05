@@ -61,7 +61,6 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
         return IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(blockState, ACTIVE, false);
     }
 
-    @Override
     public boolean shouldDisplayFluidOverlay(BlockState blockState, BlockAndLightGetter world, BlockPos pos, FluidState fluidState) {
         return true;
     }
@@ -89,7 +88,10 @@ public class BlockReinforcedUndeadPlank extends Block implements CubeDetector.ID
     }
 
     @Override
-    public void onBlockExploded(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion) {
+    protected void onExplosionHit(BlockState state, ServerLevel world, BlockPos pos, Explosion explosion, java.util.function.BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        if (state.isAir() || explosion.getBlockInteraction() == Explosion.BlockInteraction.TRIGGER_BLOCK) {
+            return;
+        }
         if(IModHelpers.get().getBlockHelpers().getSafeBlockStateProperty(state, ACTIVE, false)) BlockColossalBloodChest.triggerDetector(world, pos, false);
         // IForgeBlock.super.onBlockExploded(state, world, pos, explosion);
         world.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);

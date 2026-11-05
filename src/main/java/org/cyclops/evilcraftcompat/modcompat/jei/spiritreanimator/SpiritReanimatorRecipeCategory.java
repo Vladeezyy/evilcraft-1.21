@@ -10,16 +10,19 @@ import mezz.jei.api.helpers.IGuiHelper;
 import org.cyclops.evilcraftcompat.modcompat.jei.JeiFluids;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSpiritReanimatorConfig;
 import org.cyclops.evilcraft.client.gui.container.ContainerScreenBloodInfuser;
@@ -35,7 +38,7 @@ import javax.annotation.Nonnull;
  */
 public class SpiritReanimatorRecipeCategory implements IRecipeCategory<SpiritReanimatorRecipeJEI> {
 
-    public static final RecipeType<SpiritReanimatorRecipeJEI> TYPE = RecipeType.create(Reference.MOD_ID, "spirit_reanimator", SpiritReanimatorRecipeJEI.class);
+    public static final IRecipeType<SpiritReanimatorRecipeJEI> TYPE = IRecipeType.create(Reference.MOD_ID, "spirit_reanimator", SpiritReanimatorRecipeJEI.class);
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -53,7 +56,17 @@ public class SpiritReanimatorRecipeCategory implements IRecipeCategory<SpiritRea
     }
 
     @Override
-    public RecipeType<SpiritReanimatorRecipeJEI> getRecipeType() {
+    public int getWidth() {
+        return this.background.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return this.background.getHeight();
+    }
+
+    @Override
+    public IRecipeType<SpiritReanimatorRecipeJEI> getRecipeType() {
         return TYPE;
     }
 
@@ -61,12 +74,6 @@ public class SpiritReanimatorRecipeCategory implements IRecipeCategory<SpiritRea
     @Override
     public Component getTitle() {
         return Component.translatable(RegistryEntries.BLOCK_SPIRIT_REANIMATOR.get().getDescriptionId());
-    }
-
-    @Nonnull
-    @Override
-    public IDrawable getBackground() {
-        return background;
     }
 
     @Override
@@ -81,27 +88,26 @@ public class SpiritReanimatorRecipeCategory implements IRecipeCategory<SpiritRea
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, SpiritReanimatorRecipeJEI recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 50, 17)
-                .addItemStack(recipe.getInputItem());
+                .add(recipe.getInputItem());
         builder.addSlot(RecipeIngredientRole.INPUT, 88, 17)
-                .addItemStack(new ItemStack(Items.EGG));
+                .add(Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(ItemTags.EGGS)));
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 6, 6)
                 .setOverlay(tankOverlay, 0, 0)
                 .setFluidRenderer(JeiFluids.amount(getMaxTankSize()), true, ContainerScreenSpiritReanimator.TANKWIDTH, ContainerScreenSpiritReanimator.TANKHEIGHT)
                 .addFluidStack(recipe.getInputFluid().getFluid(), JeiFluids.amount(recipe.getInputFluid().getAmount()), recipe.getInputFluid().getComponentsPatch());
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 69, 47)
-                .addItemStack(recipe.getOutputItem());
+                .add(recipe.getOutputItem());
     }
 
     @Override
     public void draw(SpiritReanimatorRecipeJEI recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+        this.background.draw(guiGraphics);
         arrow.draw(guiGraphics, 72, 21);
 
         // Draw duration
         Font fontRenderer = Minecraft.getInstance().font;
         MutableComponent duration = JEIEvilCraftConfig.getDurationSecondsTextComponent(recipe.getDuration());
-        fontRenderer.drawInBatch(duration,
-                (background.getWidth() - fontRenderer.width(duration)) / 2 + 46, 50, 0xFF808080, false,
-                guiGraphics.pose().last().pose(), guiGraphics.bufferSource(), Font.DisplayMode.NORMAL, 0, 15728880);
+        guiGraphics.text(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 46, 50, ARGB.opaque(0xFF808080), false);
     }
 }

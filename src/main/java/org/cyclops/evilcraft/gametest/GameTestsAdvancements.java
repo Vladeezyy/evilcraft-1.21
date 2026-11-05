@@ -13,14 +13,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.gametest.GameTest;
-import org.cyclops.cyclopscore.helper.IModHelpers;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.blockentity.BlockEntityBoxOfEternalClosure;
@@ -68,7 +65,7 @@ public class GameTestsAdvancements {
                         helper.absolutePos(POS).getY(),
                         helper.absolutePos(POS).getZ(),
                         darkGemStack);
-        IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
+        org.cyclops.cyclopscore.events.IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -95,7 +92,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement second_age should exist");
 
         // Simulate crafting the blood_extractor, which fires the item_crafted trigger
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -232,7 +229,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement power_crafting should exist");
 
         // Simulate crafting the exalted_crafter, which fires the item_crafted trigger
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_EXALTED_CRAFTER.get()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_EXALTED_CRAFTER.get()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -245,7 +242,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement spirit_cooker should exist");
 
         // Simulate crafting the spirit_furnace, which fires the item_crafted trigger
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.BLOCK_SPIRIT_FURNACE.get().asItem()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.BLOCK_SPIRIT_FURNACE.get().asItem()));
 
         assertAdvancementDone(helper, player, advancement);
         helper.succeed();
@@ -265,7 +262,7 @@ public class GameTestsAdvancements {
                         helper.absolutePos(POS).getY(),
                         helper.absolutePos(POS).getZ(),
                         dirtStack);
-        IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
+        org.cyclops.cyclopscore.events.IItemPickupEvent.EVENT.invoker().onPickup(player, itemEntity);
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -292,7 +289,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement second_age should exist");
 
         // Simulate crafting dark_gem (not blood_extractor), which should NOT trigger the second_age advancement
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -414,7 +411,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement power_crafting should exist");
 
         // Simulate crafting dark_gem (not exalted_crafter), which should NOT trigger the power_crafting advancement
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_DARK_GEM.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -427,7 +424,7 @@ public class GameTestsAdvancements {
         helper.assertTrue(advancement != null, "Advancement spirit_cooker should exist");
 
         // Simulate crafting blood_extractor (not spirit_furnace), which should NOT trigger the spirit_cooker advancement
-        IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
+        org.cyclops.cyclopscore.events.IItemCraftedEvent.EVENT.invoker().onCrafted(player, new ItemStack(RegistryEntries.ITEM_BLOOD_EXTRACTOR.get()));
 
         assertAdvancementNotDone(helper, player, advancement);
         helper.succeed();
@@ -436,7 +433,7 @@ public class GameTestsAdvancements {
     private static void useMaceOfDistortionFullCharge(GameTestHelper helper, ServerPlayer player) {
         // Fill the mace with blood, then release with itemInUseCount=0 (full charge = maximum area of effect)
         ItemStack maceStack = new ItemStack(RegistryEntries.ITEM_MACE_OF_DISTORTION.get());
-        IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(maceStack)).ifPresent(
+        IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(maceStack)).ifPresent(
                 h -> {
                     try (var ctx = Transaction.openRoot()) {
                         h.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), h.getTankCapacity(0), ctx);

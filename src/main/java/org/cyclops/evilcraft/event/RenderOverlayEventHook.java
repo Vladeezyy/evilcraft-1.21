@@ -8,7 +8,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
@@ -35,8 +34,6 @@ public class RenderOverlayEventHook {
     protected static final Identifier BLOOD_OVERLAY = Identifier.fromNamespaceAndPath(Reference.MOD_ID, "textures/gui/overlay.png");
 
     private int filledHeight = -1;
-
-    @SubscribeEvent
     public void onRenderOverlayEvent(RenderGuiEvent.Post event) {
         if (!shouldRenderOverlays()) {
             return;

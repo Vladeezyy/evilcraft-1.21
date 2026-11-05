@@ -75,7 +75,7 @@ public class EntityPoisonousLibelle extends Mob implements Enemy {
     }
 
     @Override
-    public boolean checkSpawnRules(LevelAccessor level, MobSpawnType spawnType) {
+    public boolean checkSpawnRules(LevelAccessor level, net.minecraft.world.entity.EntitySpawnReason spawnType) {
         // No spawning below the configured height
         return this.getY() >= EntityPoisonousLibelleConfig.minY && super.checkSpawnRules(level, spawnType);
     }
