@@ -3,11 +3,11 @@ package org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid;
 
 
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccessFluidHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
 
 /**

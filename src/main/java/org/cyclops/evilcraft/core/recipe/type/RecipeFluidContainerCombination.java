@@ -1,13 +1,14 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -64,7 +65,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
     public ItemStack assemble(CraftingInput grid) {
         ItemStack output = new ItemStack(fluidContainer.items().findFirst().get());
         ItemAccess outputItemAccess = ItemAccess.forStack(output);
-        IFluidHandlerCapacity fluidHandlerOutput = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);
+        IFluidHandlerCapacity fluidHandlerOutput = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);
 
         FluidStack commonFluid = null;
         int totalCapacity = 0;
@@ -76,9 +77,9 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
             ItemStack element = grid.getItem(j).copy().split(1);
             if(!element.isEmpty()) {
                 if(fluidContainer.test(element)) {
-                    IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element)).orElse(null);
+                    IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element)).orElse(null);
                     inputItems++;
-                    FluidStack fluidStack = IModHelpers.get().getFluidHelpers().getFluid(fluidHandler);
+                    FluidStack fluidStack = IModHelpersNeoForge.get().getFluidHelpers().getFluid(fluidHandler);
                     if(!fluidStack.isEmpty()) {
                         if(commonFluid == null) {
                             commonFluid = fluidStack;

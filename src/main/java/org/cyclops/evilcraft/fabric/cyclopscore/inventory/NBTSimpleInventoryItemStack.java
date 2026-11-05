@@ -5,8 +5,8 @@ import org.cyclops.cyclopscore.inventory.SimpleInventory;
 
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 

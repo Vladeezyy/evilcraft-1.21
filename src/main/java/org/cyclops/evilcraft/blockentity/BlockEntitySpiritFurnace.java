@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,9 +20,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.transfer.SnapshotJournal;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.cyclops.cyclopscore.block.multi.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
@@ -81,7 +82,7 @@ public class BlockEntitySpiritFurnace extends BlockEntityWorking<BlockEntitySpir
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = IModHelpers.get().getFluidHelpers().getBucketVolume() * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     protected static final MinimumSizeValidator minimumSizeValidator = new MinimumSizeValidator(new Vec3i(2, 2, 2));
 

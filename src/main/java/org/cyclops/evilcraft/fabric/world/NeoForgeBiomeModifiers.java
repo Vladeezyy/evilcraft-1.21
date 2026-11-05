@@ -14,7 +14,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.Biome;
@@ -51,7 +51,7 @@ public final class NeoForgeBiomeModifiers {
             try (Stream<Path> files = Files.list(dir)) {
                 files.filter(p -> p.toString().endsWith(".json")).sorted().forEach(file -> {
                     String name = file.getFileName().toString();
-                    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(modId, name.substring(0, name.length() - ".json".length()));
+                    Identifier id = Identifier.fromNamespaceAndPath(modId, name.substring(0, name.length() - ".json".length()));
                     try (Reader reader = Files.newBufferedReader(file)) {
                         apply(id, JsonParser.parseReader(reader).getAsJsonObject());
                     } catch (IOException | RuntimeException e) {
@@ -64,7 +64,7 @@ public final class NeoForgeBiomeModifiers {
         });
     }
 
-    private static void apply(ResourceLocation id, JsonObject json) {
+    private static void apply(Identifier id, JsonObject json) {
         String type = json.get("type").getAsString();
         Predicate<BiomeSelectionContext> biomes = biomes(json.get("biomes"));
         switch (type) {
@@ -72,7 +72,7 @@ public final class NeoForgeBiomeModifiers {
                 GenerationStep.Decoration step = GenerationStep.Decoration.valueOf(json.get("step").getAsString().toUpperCase(Locale.ROOT));
                 List<ResourceKey<PlacedFeature>> features = new ArrayList<>();
                 for (String feature : strings(json.get("features"))) {
-                    features.add(ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.parse(feature)));
+                    features.add(ResourceKey.create(Registries.PLACED_FEATURE, Identifier.parse(feature)));
                 }
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     for (ResourceKey<PlacedFeature> feature : features) {
@@ -89,7 +89,7 @@ public final class NeoForgeBiomeModifiers {
                 BiomeModifications.create(id).add(ModificationPhase.ADDITIONS, biomes, context -> {
                     for (JsonElement element : spawners) {
                         JsonObject spawner = element.getAsJsonObject();
-                        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(spawner.get("type").getAsString()));
+                        EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(Identifier.parse(spawner.get("type").getAsString()));
                         addSpawn(context, new MobSpawnSettings.SpawnerData(entityType, spawner.get("weight").getAsInt(),
                                 spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()));
                     }
@@ -107,9 +107,9 @@ public final class NeoForgeBiomeModifiers {
         List<Predicate<BiomeSelectionContext>> selectors = new ArrayList<>();
         for (String biome : strings(json)) {
             if (biome.startsWith("#")) {
-                selectors.add(BiomeSelectors.tag(TagKey.create(Registries.BIOME, ResourceLocation.parse(biome.substring(1)))));
+                selectors.add(BiomeSelectors.tag(TagKey.create(Registries.BIOME, Identifier.parse(biome.substring(1)))));
             } else {
-                selectors.add(BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, ResourceLocation.parse(biome))));
+                selectors.add(BiomeSelectors.includeByKey(ResourceKey.create(Registries.BIOME, Identifier.parse(biome))));
             }
         }
         return context -> selectors.stream().anyMatch(selector -> selector.test(context));

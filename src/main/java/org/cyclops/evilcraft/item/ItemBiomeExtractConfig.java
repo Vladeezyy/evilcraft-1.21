@@ -5,7 +5,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
@@ -42,7 +42,7 @@ public class ItemBiomeExtractConfig extends ItemConfigCommon<IModBase> {
                 "biome_extract",
                 (eConfig, properties) -> new ItemBiomeExtract(properties)
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onCreativeModeTabBuildContents);
+        BuildCreativeModeTabContentsEvent.addListener(this::onCreativeModeTabBuildContents);
     }
 
     public static boolean isCraftingBlacklisted(Holder<Biome> biome) {

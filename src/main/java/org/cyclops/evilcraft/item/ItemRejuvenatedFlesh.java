@@ -12,10 +12,10 @@ import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.core.item.ItemBloodContainer;
 
 /**

@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.fabric.capabilities;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 /**
  * An item capability in the style of NeoForge, backed by a Fabric {@link ItemApiLookup}.
  * @param <T> The capability type.
- * @param <C> The context type ({@link Void} for none).
+ * @param <C> The context type.
  */
 public final class ItemCapability<T, C> {
 
@@ -19,8 +19,8 @@ public final class ItemCapability<T, C> {
         this.lookup = lookup;
     }
 
-    public static <T> ItemCapability<T, Void> createVoid(ResourceLocation name, Class<T> type) {
-        return new ItemCapability<>(ItemApiLookup.get(name, type, Void.class));
+    public static <T, C> ItemCapability<T, C> create(Identifier name, Class<T> type, Class<C> contextType) {
+        return new ItemCapability<>(ItemApiLookup.get(name, type, contextType));
     }
 
     public ItemApiLookup<T, C> lookup() {
@@ -29,9 +29,6 @@ public final class ItemCapability<T, C> {
 
     @Nullable
     public T getCapability(ItemStack stack, @Nullable C context) {
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return lookup.find(stack, context);
+        return stack.isEmpty() ? null : lookup.find(stack, context);
     }
 }

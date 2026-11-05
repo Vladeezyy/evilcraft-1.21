@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -73,7 +74,7 @@ public class BlockSanguinaryPedestal extends BlockWithEntity implements IBlockRa
 
     @Override
     public int getDefaultCapacity() {
-        return IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntitySanguinaryPedestal.TANK_BUCKETS;
+        return IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntitySanguinaryPedestal.TANK_BUCKETS;
     }
 
     @Override

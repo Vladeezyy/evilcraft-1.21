@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -42,14 +42,14 @@ public final class ModelRenderTypes {
     public static void init(String namespace) {
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
-            public ResourceLocation getFabricId() {
-                return ResourceLocation.fromNamespaceAndPath(namespace, "model_render_types");
+            public Identifier getFabricId() {
+                return Identifier.fromNamespaceAndPath(namespace, "model_render_types");
             }
 
             @Override
             public void onResourceManagerReload(ResourceManager resourceManager) {
                 for (Block block : BuiltInRegistries.BLOCK) {
-                    ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+                    Identifier id = BuiltInRegistries.BLOCK.getKey(block);
                     if (id.getNamespace().equals(namespace)) {
                         RenderType renderType = getRenderType(resourceManager, id);
                         if (renderType != null) {
@@ -62,7 +62,7 @@ public final class ModelRenderTypes {
     }
 
     @Nullable
-    private static RenderType getRenderType(ResourceManager resourceManager, ResourceLocation blockId) {
+    private static RenderType getRenderType(ResourceManager resourceManager, Identifier blockId) {
         JsonObject blockState = read(resourceManager, blockId.withPath(path -> "blockstates/" + path + ".json"));
         if (blockState == null) {
             return null;
@@ -79,7 +79,7 @@ public final class ModelRenderTypes {
             }
         }
         for (String model : models) {
-            String renderType = findRenderType(resourceManager, ResourceLocation.parse(model), 0);
+            String renderType = findRenderType(resourceManager, Identifier.parse(model), 0);
             if (renderType != null) {
                 return RENDER_TYPES.get(renderType.contains(":") ? renderType : "minecraft:" + renderType);
             }
@@ -99,7 +99,7 @@ public final class ModelRenderTypes {
     }
 
     @Nullable
-    private static String findRenderType(ResourceManager resourceManager, ResourceLocation model, int depth) {
+    private static String findRenderType(ResourceManager resourceManager, Identifier model, int depth) {
         JsonObject json = read(resourceManager, model.withPath(path -> "models/" + path + ".json"));
         if (json == null || depth > 16) {
             return null;
@@ -108,13 +108,13 @@ public final class ModelRenderTypes {
             return json.get("render_type").getAsString();
         }
         if (json.has("parent")) {
-            return findRenderType(resourceManager, ResourceLocation.parse(json.get("parent").getAsString()), depth + 1);
+            return findRenderType(resourceManager, Identifier.parse(json.get("parent").getAsString()), depth + 1);
         }
         return null;
     }
 
     @Nullable
-    private static JsonObject read(ResourceManager resourceManager, ResourceLocation file) {
+    private static JsonObject read(ResourceManager resourceManager, Identifier file) {
         Optional<Resource> resource = resourceManager.getResource(file);
         if (resource.isEmpty()) {
             return null;

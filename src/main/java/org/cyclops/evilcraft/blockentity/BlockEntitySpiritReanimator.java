@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -79,7 +80,7 @@ public class BlockEntitySpiritReanimator extends BlockEntityWorking<BlockEntityS
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = IModHelpers.get().getFluidHelpers().getBucketVolume() * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     private static final Map<Class<?>, ITickAction<BlockEntitySpiritReanimator>> REANIMATE_COOK_TICK_ACTIONS = new LinkedHashMap<Class<?>, ITickAction<BlockEntitySpiritReanimator>>();
     static {

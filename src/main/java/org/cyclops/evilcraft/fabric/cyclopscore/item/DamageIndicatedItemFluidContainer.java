@@ -15,10 +15,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.EventPriority;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.EvilCraft;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 
@@ -57,7 +57,7 @@ public abstract class DamageIndicatedItemFluidContainer extends Item implements 
         init();
 
         // Register at lowest priority to allow other mods to override it.
-        EvilCraft._instance.getModEventBus().addListener(EventPriority.LOWEST, this::registerCapability);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
     }
 
     private void registerCapability(RegisterCapabilitiesEvent event) {

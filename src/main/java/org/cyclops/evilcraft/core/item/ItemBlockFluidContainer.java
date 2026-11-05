@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -17,10 +18,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -67,7 +68,7 @@ public class ItemBlockFluidContainer extends ItemBlockNBT {
 
     @Override
     protected boolean itemStackDataToTile(ItemStack itemStack, BlockEntity tile) {
-        IModHelpers.get().getCapabilityHelpers().getCapability(tile.getLevel(), tile.getBlockPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
+        IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(tile.getLevel(), tile.getBlockPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                 .ifPresent(fluidHandlerTile -> {
                     Optional.ofNullable(Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack)))
                             .ifPresent(fluidHandlerItem -> {

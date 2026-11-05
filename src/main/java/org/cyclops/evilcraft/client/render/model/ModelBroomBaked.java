@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.client.render.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AtomicLongMap;

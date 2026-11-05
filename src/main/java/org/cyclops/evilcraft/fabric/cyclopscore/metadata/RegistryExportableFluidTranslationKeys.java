@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.metadata;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 
 
 import com.google.gson.JsonArray;
@@ -24,7 +25,7 @@ public class RegistryExportableFluidTranslationKeys implements IRegistryExportab
         JsonArray elements = new JsonArray();
         element.add("fluids", elements);
         for (Map.Entry<ResourceKey<Fluid>, Fluid> fluidEntry : BuiltInRegistries.FLUID.entrySet()) {
-            FluidStack value = new FluidStack(fluidEntry.getValue(), IModHelpers.get().getFluidHelpers().getBucketVolume());
+            FluidStack value = new FluidStack(fluidEntry.getValue(), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
             String translationKey = value.getFluidType().getDescriptionId(value);
 
             JsonObject object = new JsonObject();

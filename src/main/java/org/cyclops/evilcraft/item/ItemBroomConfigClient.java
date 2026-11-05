@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.item;
 
-import net.neoforged.neoforge.client.event.RegisterItemModelsEvent;
+import org.cyclops.evilcraft.fabric.event.RegisterItemModelsEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
@@ -12,6 +12,6 @@ import org.cyclops.evilcraft.client.render.model.ItemModelBroom;
 public class ItemBroomConfigClient extends ItemClientConfig<ModBaseNeoForge<?>> {
     public ItemBroomConfigClient(ItemConfigCommon<ModBaseNeoForge<?>> itemConfig) {
         super(itemConfig);
-        itemConfig.getMod().getModEventBus().addListener((RegisterItemModelsEvent event) -> event.register(ItemModelBroom.Unbaked.ID, ItemModelBroom.Unbaked.MAP_CODEC));
+        RegisterItemModelsEvent.addListener((RegisterItemModelsEvent event) -> event.register(ItemModelBroom.Unbaked.ID, ItemModelBroom.Unbaked.MAP_CODEC));
     }
 }

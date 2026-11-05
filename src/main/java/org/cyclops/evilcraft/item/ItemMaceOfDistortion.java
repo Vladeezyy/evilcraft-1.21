@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -41,7 +42,7 @@ public class ItemMaceOfDistortion extends ItemMace {
     private static final int MAXIMUM_CHARGE = 100;
     private static final float MELEE_DAMAGE = 7.0F;
     private static final float RADIAL_DAMAGE = 3.0F;
-    private static final int CONTAINER_SIZE = IModHelpers.get().getFluidHelpers().getBucketVolume() * 4;
+    private static final int CONTAINER_SIZE = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 4;
     private static final int HIT_USAGE = 5;
     private static final int POWER_LEVELS = 5;
 

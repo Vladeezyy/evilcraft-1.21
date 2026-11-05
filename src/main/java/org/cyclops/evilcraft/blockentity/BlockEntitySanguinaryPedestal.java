@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -8,9 +9,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.FluidHandlerWrapper;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -43,7 +44,7 @@ public class BlockEntitySanguinaryPedestal extends BlockEntityTankInventory {
     private RegionIterator regionIterator;
 
     public BlockEntitySanguinaryPedestal(BlockPos blockPos, BlockState blockState) {
-        super(RegistryEntries.BLOCK_ENTITY_SANGUINARY_PEDESTAL.get(), blockPos, blockState, 0, 1, IModHelpers.get().getFluidHelpers().getBucketVolume() * TANK_BUCKETS, RegistryEntries.FLUID_BLOOD.get());
+        super(RegistryEntries.BLOCK_ENTITY_SANGUINARY_PEDESTAL.get(), blockPos, blockState, 0, 1, IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * TANK_BUCKETS, RegistryEntries.FLUID_BLOOD.get());
         this.bonusFluidHandler = new FluidHandlerWrapper(getTank()) {
             @Override
             public int insert(int slot, FluidResource fluidResource, int amount, TransactionContext transactionContext) {
@@ -101,9 +102,9 @@ public class BlockEntitySanguinaryPedestal extends BlockEntityTankInventory {
                 BlockPos location = blockEntity.getNextLocation();
                 Block block = level.getBlockState(location).getBlock();
                 if(block instanceof BlockBloodStain) {
-                    IModHelpers.get().getCapabilityHelpers().getCapability(level, location, org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
+                    IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(level, location, org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                             .ifPresent((source) -> {
-                                FluidStack moved = IModHelpers.get().getFluidHelpers().move(source, blockEntity.getBonusFluidHandler(), Integer.MAX_VALUE, null, false, false);
+                                FluidStack moved = IModHelpersNeoForge.get().getFluidHelpers().move(source, blockEntity.getBonusFluidHandler(), Integer.MAX_VALUE, null, false, false);
                                 if (!moved.isEmpty()) {
                                     blockEntity.afterBlockReplace((ServerLevel) level, location);
                                 }
@@ -115,11 +116,11 @@ public class BlockEntitySanguinaryPedestal extends BlockEntityTankInventory {
             // Auto-drain the inner tank
             if(!blockEntity.getTank().isEmpty()) {
                 for(Direction direction : Direction.values()) {
-                    IModHelpers.get().getCapabilityHelpers().getCapability(level, pos.relative(direction),
+                    IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(level, pos.relative(direction),
                                     direction.getOpposite(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                             .ifPresent(handler -> {
                                 if(!blockEntity.getTank().isEmpty()) {
-                                    IModHelpers.get().getFluidHelpers().move(blockEntity.getTank(), handler, Math.min(MB_RATE, blockEntity.getTank().getFluidAmount()), null, false, false);
+                                    IModHelpersNeoForge.get().getFluidHelpers().move(blockEntity.getTank(), handler, Math.min(MB_RATE, blockEntity.getTank().getFluidAmount()), null, false, false);
                                 }
                             });
                 }

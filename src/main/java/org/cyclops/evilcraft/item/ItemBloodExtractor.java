@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -22,12 +23,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.HitResult;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -65,10 +66,10 @@ public class ItemBloodExtractor extends ItemBloodContainer {
                 RandomSource random = context.getLevel().getRandom();
 
                 // Fill the extractor a bit
-                return IModHelpers.get().getCapabilityHelpers().getCapability(context.getLevel(), context.getClickedPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
+                return IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(context.getLevel(), context.getClickedPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                         .<InteractionResult>map((source) -> {
                             ItemAccess itemAccess = ItemAccess.forStack(itemStack);
-                            FluidStack moved = IModHelpers.get().getFluidHelpers().move(source, Capabilities.Fluid.ITEM.getCapability(itemStack, itemAccess), Integer.MAX_VALUE, context.getPlayer(), false, false);
+                            FluidStack moved = IModHelpersNeoForge.get().getFluidHelpers().move(source, Capabilities.Fluid.ITEM.getCapability(itemStack, itemAccess), Integer.MAX_VALUE, context.getPlayer(), false, false);
                             if (!moved.isEmpty() && context.getLevel().isClientSide()) {
                                 ParticleHelpers.spawnBloodSplashParticles(context.getLevel(), context.getClickedPos(), 5, 1 + random.nextInt(2));
                             }

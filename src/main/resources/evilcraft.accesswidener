@@ -17,7 +17,7 @@ accessible method net/minecraft/world/entity/LivingEntity onEffectUpdated (Lnet/
 accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayer Lnet/minecraft/world/entity/player/Player;
 # Particles
 accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
-accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+accessible class net/minecraft/client/particle/ParticleResources$SpriteParticleRegistration
 # Rendering
 accessible field net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers Ljava/util/Map;
 # Menus (also opened by Cyclops Core's access widener, which is not applied when compiling this mod)
@@ -48,3 +48,6 @@ accessible field net/minecraft/world/level/storage/loot/LootTable pools Ljava/ut
 accessible field net/minecraft/world/level/storage/loot/LootPool entries Ljava/util/List;
 # A registered POI type is only found by its blocks once its block states are in PoiTypes (NeoForge does this itself)
 accessible method net/minecraft/world/entity/ai/village/poi/PoiTypes registerBlockStates (Lnet/minecraft/core/Holder;Ljava/util/Set;)V
+# Block entity types of the mod (NeoForge makes these public)
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V

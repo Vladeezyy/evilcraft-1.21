@@ -38,7 +38,7 @@ import net.neoforged.bus.api.EventPriority;
 import org.cyclops.evilcraft.fabric.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.TagsUpdatedEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import org.cyclops.evilcraft.fabric.event.LivingDamageEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;

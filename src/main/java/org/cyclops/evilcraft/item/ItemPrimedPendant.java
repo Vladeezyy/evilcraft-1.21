@@ -30,7 +30,7 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.inventory.InventoryLocationPlayer;
 import org.cyclops.cyclopscore.inventory.ItemLocation;

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 
 
 import net.minecraft.core.NonNullList;
@@ -12,9 +13,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.material.Fluid;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 
@@ -59,7 +60,7 @@ public class DamageIndicatedItemComponent {
     public void fillDefaultCreativeTabEntries(NonNullList<ItemStack> items, Fluid fluid) {
         // Add the 'full' container.
         ItemAccess itemStackFullAccess = ItemAccess.forStack(new ItemStack(this.item));
-        IFluidHandlerCapacity fluidHanderFull = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemStackFullAccess).orElse(null);
+        IFluidHandlerCapacity fluidHanderFull = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(itemStackFullAccess).orElse(null);
         if (fluidHanderFull != null) {
             try (var tx = Transaction.openRoot()) {
                 fluidHanderFull.insert(FluidResource.of(fluid), fluidHanderFull.getTankCapacity(0), tx);
@@ -80,10 +81,10 @@ public class DamageIndicatedItemComponent {
      */
     public MutableComponent getInfo(ItemStack itemStack) {
         int amount = 0;
-        FluidStack fluidStack = net.neoforged.neoforge.transfer.fluid.FluidUtil.getFirstStackContained(itemStack);
+        FluidStack fluidStack = org.cyclops.evilcraft.fabric.transfer.FluidUtil.getFirstStackContained(itemStack);
         if (!fluidStack.isEmpty())
             amount = fluidStack.getAmount();
-        IFluidHandlerCapacity fluidHander = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        IFluidHandlerCapacity fluidHander = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
         return getInfo(fluidStack, amount, fluidHander == null ? 0 : fluidHander.getTankCapacity(0));
     }
 
@@ -126,10 +127,10 @@ public class DamageIndicatedItemComponent {
      * @return The displayed durability.
      */
     public int getDurability(ItemStack itemStack) {
-        FluidStack fluidStack = net.neoforged.neoforge.transfer.fluid.FluidUtil.getFirstStackContained(itemStack);
-        IFluidHandlerCapacity fluidHander = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        FluidStack fluidStack = org.cyclops.evilcraft.fabric.transfer.FluidUtil.getFirstStackContained(itemStack);
+        IFluidHandlerCapacity fluidHander = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
         double capacity = fluidHander == null ? 0 : fluidHander.getTankCapacity(0);
-        double amount = IModHelpers.get().getFluidHelpers().getAmount(fluidStack);
+        double amount = IModHelpersNeoForge.get().getFluidHelpers().getAmount(fluidStack);
         return (int) Math.round(amount * 13 / capacity);
     }
 

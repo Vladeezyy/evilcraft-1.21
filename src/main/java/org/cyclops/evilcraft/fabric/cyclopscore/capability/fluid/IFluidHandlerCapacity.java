@@ -2,9 +2,9 @@ package org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid;
 
 
 
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 
 /**
  * A fluid handler with a mutable capacity.

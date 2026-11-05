@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.BlockPos;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.cyclops.cyclopscore.block.multi.*;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
@@ -80,7 +81,7 @@ public class BlockEntityColossalBloodChest extends BlockEntityWorking<BlockEntit
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = IModHelpers.get().getFluidHelpers().getBucketVolume() * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     public static final int MAX_EFFICIENCY = 200;
 

@@ -1,5 +1,11 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButton;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.AdvancedButtonEnum;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.IInfoBook;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.InfoSection;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.ScreenInfoBook;
+
 
 
 import com.google.common.collect.Lists;

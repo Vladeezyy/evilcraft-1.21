@@ -1,5 +1,13 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ConfigSectionConditionHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.FluidSectionConditionHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ISectionConditionHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ItemSectionConditionHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.ModSectionConditionHandler;
+import org.cyclops.evilcraft.fabric.cyclopscore.infobook.condition.TagSectionConditionHandler;
+
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 
 
 import com.google.common.collect.Lists;
@@ -440,7 +448,7 @@ public class InfoBookParser {
      * @throws InvalidAppendixException If the node was incorrectly structured.
      */
     public static FluidStack createFluidStack(Element node) throws InvalidAppendixException {
-        int amount = IModHelpers.get().getFluidHelpers().getBucketVolume();
+        int amount = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
         if(!node.getAttribute("amount").isEmpty()) {
             amount = Integer.parseInt(node.getAttribute("amount"));
         }

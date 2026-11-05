@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
+
 import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -32,9 +34,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import net.neoforged.neoforge.model.data.ModelProperty;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.item.IInformationProvider;

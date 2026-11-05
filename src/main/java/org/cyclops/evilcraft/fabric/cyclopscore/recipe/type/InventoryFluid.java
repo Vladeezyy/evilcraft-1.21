@@ -5,9 +5,9 @@ package org.cyclops.evilcraft.fabric.cyclopscore.recipe.type;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidStacksResourceHandler;
 
 /**
  * Default implementation of {@link IInventoryFluid}.

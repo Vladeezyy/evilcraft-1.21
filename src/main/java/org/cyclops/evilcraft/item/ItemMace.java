@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.extensions.IItemLeftClickEntity;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
@@ -25,9 +26,9 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -204,7 +205,7 @@ public abstract class ItemMace extends ItemBloodContainer implements IItemLeftCl
     @Override
     public boolean releaseUsing(ItemStack itemStack, Level world, LivingEntity entity, int itemInUseCount) {
         if(entity instanceof Player) {
-            IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+            IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
             Player player = (Player) entity;
             // Actual usage length
             int itemUsedCount = getUseDuration(itemStack, entity) - itemInUseCount;

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.event.RenderGuiEvent;
 import org.cyclops.evilcraft.fabric.event.ComputeFovModifierEvent;
 import com.google.common.collect.Sets;
@@ -16,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
+import org.cyclops.evilcraft.fabric.event.ComputeFovModifierEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -46,9 +47,9 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     private static final float Y_SPAWN_OFFSET = 1.5f;
 
     public ItemBroom(Item.Properties properties) {
-        super(properties, 10 * IModHelpers.get().getFluidHelpers().getBucketVolume());
+        super(properties, 10 * IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume());
         if (IModHelpers.get().getMinecraftHelpers().isClientSide()) {
-            NeoForge.EVENT_BUS.addListener(this::onFovEvent);
+            ComputeFovModifierEvent.addListener(this::onFovEvent);
         }
     }
 
@@ -87,7 +88,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         if (!context.getLevel().isClientSide() && context.getPlayer().isCrouching()) {
             BlockPos blockPos = context.getClickedPos();
-            if (!IModHelpers.get().getCapabilityHelpers().getCapability(context.getLevel(), blockPos, context.getClickedFace(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK).isPresent()
+            if (!IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(context.getLevel(), blockPos, context.getClickedFace(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK).isPresent()
                     && context.getLevel().isEmptyBlock(blockPos.offset(0, (int) Y_SPAWN_OFFSET, 0))) {
                 EntityBroom entityBroom = new EntityBroom(context.getLevel(), blockPos.getX() + 0.5, blockPos.getY() + Y_SPAWN_OFFSET, blockPos.getZ() + 0.5);
                 entityBroom.setBroomStack(stack);
@@ -122,7 +123,7 @@ public class ItemBroom extends ItemBloodContainer implements IBroom {
 
     @Override
     public int consumeBroom(int amount, ItemStack itemStack, @Nullable LivingEntity entityLiving) {
-        return IModHelpers.get().getFluidHelpers().getAmount(consume(amount, itemStack, entityLiving instanceof Player ? (Player) entityLiving : null));
+        return IModHelpersNeoForge.get().getFluidHelpers().getAmount(consume(amount, itemStack, entityLiving instanceof Player ? (Player) entityLiving : null));
     }
 
     @Override

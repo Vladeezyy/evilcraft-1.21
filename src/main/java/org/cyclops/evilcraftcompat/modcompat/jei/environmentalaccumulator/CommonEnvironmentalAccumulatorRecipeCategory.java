@@ -7,8 +7,8 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.core.weather.WeatherType;
@@ -29,14 +29,14 @@ public abstract class CommonEnvironmentalAccumulatorRecipeCategory<T extends Com
         this.weatherInPos = weatherInPos;
         this.weatherOutPos = weatherOutPos;
         weatherIcons = Maps.newHashMap();
-        ResourceLocation weatherResourceLocation = ResourceLocation.parse(Reference.MOD_ID + ":" + Reference.TEXTURE_PATH_GUI + "weathers.png");
+        Identifier weatherResourceLocation = Identifier.parse(Reference.MOD_ID + ":" + Reference.TEXTURE_PATH_GUI + "weathers.png");
         weatherIcons.put(WeatherType.CLEAR, guiHelper.createDrawable(weatherResourceLocation, 0, 0, 16, 16));
         weatherIcons.put(WeatherType.RAIN, guiHelper.createDrawable(weatherResourceLocation, 16, 0, 16, 16));
         weatherIcons.put(WeatherType.LIGHTNING, guiHelper.createDrawable(weatherResourceLocation, 32, 0, 16, 16));
     }
 
     @Override
-    public void draw(T recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(T recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         // The recipe drawn, not the last one laid out: JEI shares the category between the recipes of a page
         if(recipe.getInputWeather() != WeatherType.ANY) {
             weatherIcons.get(recipe.getInputWeather()).draw(guiGraphics, weatherInPos.getLeft(), weatherInPos.getRight());

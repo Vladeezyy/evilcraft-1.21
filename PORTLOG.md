@@ -1,7 +1,7 @@
 # Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
 
-Status (2026-11-04): **does not build yet.** Upstream 26.1.2 is merged into the Fabric port, the Gradle build is set
-up for 26.x and stops at `compileJava`.
+Status (2026-11-05): **does not build yet.** Upstream 26.1.2 is merged into the Fabric port, the Gradle build is set
+up for 26.x and stops at `compileJava` with **532 errors in 166 files**. Nothing has run in the game on this branch.
 
 ## How this branch was made
 - `vendor/26.1.2` (local branch): upstream CyclopsMC/EvilCraft `master-26-lts` @ 94d5b596 (1.2.109) on top of the
@@ -61,7 +61,32 @@ up for 26.x and stops at `compileJava`.
    - Model loaders and the dark tank render layer (removed from `ClientProxy`) go with the model rewrite.
    - IMC is gone: other mods call `EntityVengeanceSpirit.addToBlacklistIMC` directly.
    Not checked: key category registration (`getMainKeyCategory`), block items order, setup order, packets in game.
-3. Transfer API shim, then compile and fix errors (`tools/port/errs.sh`), with the saved conflict notes.
+3. In progress (2026-11-05, on the Mac: `JAVA_HOME=~/.gradle/jdks/eclipse_adoptium-25-aarch64-os_x.2/jdk-25.0.4.1+1/Contents/Home`).
+   **1,853 -> 532 errors.** Everything below compiles only; **none of it has run yet**.
+   - Done: `fabric/transfer`, the names of NeoForge's transfer API written anew over Fabric's Transfer API (not copied:
+     NeoForge is LGPL-2.1-only). Transactions wrap Fabric's, so they nest with other mods' transactions; `SnapshotJournal`
+     is its own (Fabric's SnapshotParticipant does not pass the original state to the final commit, `onRootCommit` needs
+     it); `ResourceHandlerStorage` and `StorageResourceHandler` adapt both ways, mB <-> droplets, only whole mB move.
+     Replaces `fabric/fluids/capability`, `fabric/fluids/transfer` and the old `FluidUtil`.
+   - Done: `fabric/capabilities` with the names `Capabilities.Fluid/Item.BLOCK/ITEM` (fallbacks to `FluidStorage`/`ItemStorage`;
+     the mod's handlers are exposed to them), `IModHelpersNeoForge` (fluid helpers in mB, capability helpers),
+     `FluidStackTemplate`, bus registrations -> static `addListener` of `fabric/event`.
+   - Scripts for the 26.2 and 26.3 merges, run in this order: `tools/port/rewrite_transfer.py`, `rewrite_cc_shim.py`,
+     `rewrite_events.py`, `autoimport.py`; `errsummary.sh` compiles and summarizes (edit its paths for another machine).
+   - The saved conflict notes are on the Windows machine (`D:/mods/_ref/ec-notes`), and so are `vendor/*`, `gen/*`. Not needed
+     to continue: our side of any conflict is `git show main:<path>`.
+   - Left, biggest first (`errsummary.sh`): models (`client/render`, `fabric/client`: ModelData, BakedColors/BakedNormals,
+     CustomUnbakedBlockStateModel, the Register* model events), JEI (`evilcraftcompat`), remaining events (`NeoForge.EVENT_BUS.post`,
+     `@SubscribeEvent`, `RegisterEvent`, `TagsUpdatedEvent`, `ServerStartedEvent`, `DefaultDataComponentsBoundEvent`,
+     `BreakBlockEvent`), `method does not override` (NeoForge item and block extensions), the GameTest move of step 2.
+   - To check in game first: `ItemAccess.forStack` (mutates the stack directly and restores it on abort, also components
+     through `PatchedDataComponentMap.restorePatch`), hoppers on `ResourceHandlerStorage`, buckets through the
+     `FluidStorage.ITEM` fallback, `FluidStacksResourceHandler` saving (`stacks` key; 1.21.1 port worlds wrote `Fluid`).
 4. fabric.mod.json, the access widener entries (the header is done; entries are still from 1.21.1), mixins checked with
    javap.
 5. Tests: GameTests, scene, production server, stress; then 26.2 (`master-26.2`) and 26.3 (`master-26`).
+6. 1.21.11: upstream has no such branch. The closest is `master-1.21.10` (1.2.62), older than our 1.2.99 and 1.2.109. Plan:
+   backport from the finished 26.1.2 (the API is close; `fabric/transfer` carries over) with obfuscated Loom + Parchment,
+   Java 21, against Cyclops Core `1.21.11-1.25.5-964` (Modrinth `g86bbBfU`, Fabric, 2026-03-28), which is older than
+   CC 26: check what it lacks before starting. Dependencies on Modrinth (Fabric): Forge Config API Port 21.11.1, JEI
+   27.54.0.116, MezzConfig 0.6.10, Jade 21.1.6.

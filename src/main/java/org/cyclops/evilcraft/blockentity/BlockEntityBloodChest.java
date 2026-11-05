@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -72,7 +73,7 @@ public class BlockEntityBloodChest extends BlockEntityTickingTankInventory<Block
     /**
      * The capacity of the tank.
      */
-    public static final int LIQUID_PER_SLOT = IModHelpers.get().getFluidHelpers().getBucketVolume() * 10;
+    public static final int LIQUID_PER_SLOT = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * 10;
 
     private final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter() {
         @Override

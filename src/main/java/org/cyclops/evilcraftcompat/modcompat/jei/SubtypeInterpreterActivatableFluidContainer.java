@@ -5,7 +5,7 @@ import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.evilcraft.core.helper.ItemHelpers;
 
 import javax.annotation.Nonnull;

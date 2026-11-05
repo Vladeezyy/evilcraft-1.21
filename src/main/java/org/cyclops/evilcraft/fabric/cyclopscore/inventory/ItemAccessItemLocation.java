@@ -5,9 +5,9 @@ import org.cyclops.cyclopscore.inventory.ItemLocation;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.ItemResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 
 /**
  * An item access backed by an item location.

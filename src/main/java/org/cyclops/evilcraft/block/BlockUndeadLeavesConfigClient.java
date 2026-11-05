@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.block;
 
 import net.minecraft.client.color.block.BlockTintSources;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.evilcraft.EvilCraft;
@@ -18,7 +18,7 @@ public class BlockUndeadLeavesConfigClient extends BlockClientConfig<EvilCraft> 
 
     public BlockUndeadLeavesConfigClient(BlockConfigCommon<EvilCraft> blockConfig) {
         super(blockConfig);
-        blockConfig.getMod().getModEventBus().addListener(this::onRegisterColors);
+        RegisterColorHandlersEvent.BlockTintSources.addListener(this::onRegisterColors);
     }
 
     public void onRegisterColors(RegisterColorHandlersEvent.BlockTintSources event) {

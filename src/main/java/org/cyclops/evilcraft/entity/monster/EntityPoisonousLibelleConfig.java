@@ -6,8 +6,8 @@ import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import org.cyclops.evilcraft.fabric.event.EntityAttributeCreationEvent;
+import org.cyclops.evilcraft.fabric.event.RegisterSpawnPlacementsEvent;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.EntityConfigCommon;
@@ -39,8 +39,8 @@ public class EntityPoisonousLibelleConfig extends EntityConfigCommon<ModBaseNeoF
                         .fireImmune(),
                 getDefaultSpawnEggItemConfigConstructor(EvilCraft._instance, "poisonous_libelle_spawn_egg")
         );
-        EvilCraft._instance.getModEventBus().addListener(this::onEntityAttributeCreationEvent);
-        EvilCraft._instance.getModEventBus().addListener(this::registerSpawnPlacements);
+        EntityAttributeCreationEvent.addListener(this::onEntityAttributeCreationEvent);
+        RegisterSpawnPlacementsEvent.addListener(this::registerSpawnPlacements);
     }
 
     @Override

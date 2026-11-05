@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.helper;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
+
 
 
 import com.google.common.collect.Maps;

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.BlockItem;
@@ -10,10 +11,10 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -88,7 +89,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
                         }
                         totalContent = IModHelpers.get().getBaseHelpers().addSafe(totalContent, fluidStack.getAmount() * element.getCount());
                     }
-                    totalCapacity = IModHelpers.get().getBaseHelpers().addSafe(totalCapacity, IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element))
+                    totalCapacity = IModHelpers.get().getBaseHelpers().addSafe(totalCapacity, IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element))
                             .map(h -> h.getTankCapacity(0))
                             .orElse(0) * element.getCount());
                 } else if(element.getItem() instanceof ItemBloodExtractor) {
@@ -100,7 +101,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
                         }
                         totalContent = IModHelpers.get().getBaseHelpers().addSafe(totalContent, fluidStack.getAmount() * element.getCount());
                     }
-                    totalCapacity = IModHelpers.get().getBaseHelpers().addSafe(totalCapacity, IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element))
+                    totalCapacity = IModHelpers.get().getBaseHelpers().addSafe(totalCapacity, IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(element))
                             .map(h -> h.getTankCapacity(0))
                             .orElse(0) * element.getCount());
                 } else {
@@ -116,7 +117,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
 
         // Set capacity and fill fluid into output.
         ItemAccess outputItemAccess = ItemAccess.forStack(output);
-        IFluidHandlerCapacity fluidHandlerOutput = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);
+        IFluidHandlerCapacity fluidHandlerOutput = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);
         try (var tx = Transaction.openRoot()) {
             fluidHandlerOutput.setTankCapacity(0, totalCapacity, tx);
             fluidHandlerOutput.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), totalContent, tx);

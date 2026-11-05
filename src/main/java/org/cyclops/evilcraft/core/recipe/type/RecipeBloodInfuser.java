@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidStackTemplate;
+import org.cyclops.evilcraft.fabric.fluids.FluidStackTemplate;
 import org.cyclops.evilcraft.fabric.cyclopscore.recipe.ItemStackFromIngredient;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.recipe.display.RecipeDisplayBloodInfuser;

@@ -12,7 +12,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.LogManager;
@@ -34,8 +34,8 @@ import java.util.function.Supplier;
 public final class ModelLoaders {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Map<ResourceLocation, IGeometryLoader<?>> LOADERS = Maps.newHashMap();
-    private static final Set<Supplier<? extends Iterable<ResourceLocation>>> ADDITIONAL_MODELS = Sets.newLinkedHashSet();
+    private static final Map<Identifier, IGeometryLoader<?>> LOADERS = Maps.newHashMap();
+    private static final Set<Supplier<? extends Iterable<Identifier>>> ADDITIONAL_MODELS = Sets.newLinkedHashSet();
     private static final JsonDeserializationContext CONTEXT = new JsonDeserializationContext() {
         @Override
         @SuppressWarnings("unchecked")
@@ -50,14 +50,14 @@ public final class ModelLoaders {
     private ModelLoaders() {
     }
 
-    public static void registerLoader(ResourceLocation id, IGeometryLoader<?> loader) {
+    public static void registerLoader(Identifier id, IGeometryLoader<?> loader) {
         LOADERS.put(id, loader);
     }
 
     /**
      * @param models Models to bake in addition to the models of blocks and items, read when models are loaded.
      */
-    public static void registerAdditionalModels(Supplier<? extends Iterable<ResourceLocation>> models) {
+    public static void registerAdditionalModels(Supplier<? extends Iterable<Identifier>> models) {
         ADDITIONAL_MODELS.add(models);
     }
 
@@ -68,13 +68,13 @@ public final class ModelLoaders {
         PreparableModelLoadingPlugin.register(
                 (resourceManager, executor) -> load(resourceManager, executor, namespace),
                 (models, pluginContext) -> {
-                    for (Supplier<? extends Iterable<ResourceLocation>> additional : ADDITIONAL_MODELS) {
-                        for (ResourceLocation id : additional.get()) {
+                    for (Supplier<? extends Iterable<Identifier>> additional : ADDITIONAL_MODELS) {
+                        for (Identifier id : additional.get()) {
                             pluginContext.addModels(id);
                         }
                     }
                     pluginContext.modifyModelOnLoad().register((original, context) -> {
-                        ResourceLocation id = context.resourceId();
+                        Identifier id = context.resourceId();
                         if (id != null) {
                             UnbakedModel custom = models.get(id);
                             if (custom != null) {
@@ -86,26 +86,26 @@ public final class ModelLoaders {
                 });
     }
 
-    private static CompletableFuture<Map<ResourceLocation, UnbakedModel>> load(ResourceManager resourceManager, Executor executor, String namespace) {
+    private static CompletableFuture<Map<Identifier, UnbakedModel>> load(ResourceManager resourceManager, Executor executor, String namespace) {
         return CompletableFuture.supplyAsync(() -> {
-            Map<ResourceLocation, UnbakedModel> models = Maps.newHashMap();
+            Map<Identifier, UnbakedModel> models = Maps.newHashMap();
             // Models (item models) that only name a custom model as parent: vanilla wants a BlockModel as parent,
             // NeoForge inherits the custom geometry, so they get the custom model itself
-            Map<ResourceLocation, ResourceLocation> childOfCustom = Maps.newHashMap();
-            Map<ResourceLocation, Resource> resources = resourceManager.listResources("models",
+            Map<Identifier, Identifier> childOfCustom = Maps.newHashMap();
+            Map<Identifier, Resource> resources = resourceManager.listResources("models",
                     id -> id.getNamespace().equals(namespace) && id.getPath().endsWith(".json"));
             resources.forEach((file, resource) -> {
                 try (Reader reader = resource.openAsReader()) {
                     JsonElement json = JsonParser.parseReader(reader);
                     String path = file.getPath();
-                    ResourceLocation modelId = file.withPath(path.substring("models/".length(), path.length() - ".json".length()));
+                    Identifier modelId = file.withPath(path.substring("models/".length(), path.length() - ".json".length()));
                     if (json.isJsonObject() && !json.getAsJsonObject().has("loader") && json.getAsJsonObject().has("parent")
                             && json.getAsJsonObject().size() == 1) {
-                        childOfCustom.put(modelId, ResourceLocation.parse(json.getAsJsonObject().get("parent").getAsString()));
+                        childOfCustom.put(modelId, Identifier.parse(json.getAsJsonObject().get("parent").getAsString()));
                     }
                     if (json.isJsonObject() && json.getAsJsonObject().has("loader")) {
                         JsonObject object = json.getAsJsonObject();
-                        IGeometryLoader<?> loader = LOADERS.get(ResourceLocation.parse(object.get("loader").getAsString()));
+                        IGeometryLoader<?> loader = LOADERS.get(Identifier.parse(object.get("loader").getAsString()));
                         if (loader != null) {
                             models.put(modelId, loader.read(object, CONTEXT));
                         }

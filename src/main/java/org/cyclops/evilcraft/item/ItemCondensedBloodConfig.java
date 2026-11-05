@@ -4,7 +4,7 @@ import net.minecraft.world.item.Item;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.item.ItemResource;
+import org.cyclops.evilcraft.fabric.transfer.ItemResource;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.ResourceHandlerFluidSwapEmpty;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;

@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.client.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+
 
 
 import net.minecraft.client.multiplayer.ClientLevel;

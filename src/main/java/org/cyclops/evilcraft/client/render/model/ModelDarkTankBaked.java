@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.client.render.model;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelData;
+
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -24,7 +27,7 @@ import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import net.neoforged.neoforge.model.data.ModelData;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DelegatingChildDynamicItemAndBlockModel;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -111,10 +114,10 @@ public class ModelDarkTankBaked extends DelegatingChildDynamicItemAndBlockModel 
 
     @Override
     public List<BakedQuad> handleItemState(ItemStack itemStack, net.minecraft.world.level.Level world, ItemOwner entity) {
-        IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
         if(!itemStack.isEmpty() && fluidHandler != null) {
             int capacity = fluidHandler.getTankCapacity(0);
-            FluidStack fluidStack = IModHelpers.get().getFluidHelpers().getFluid(fluidHandler);
+            FluidStack fluidStack = IModHelpersNeoForge.get().getFluidHelpers().getFluid(fluidHandler);
             return new ModelDarkTankBaked(baseModel, capacity, fluidStack, itemStack, (ClientLevel) world, entity != null ? entity.asLivingEntity() : null).getGeneralQuads();
         }
         return new ModelDarkTankBaked(baseModel, 0, null, itemStack, (ClientLevel) world, entity.asLivingEntity()).getGeneralQuads();

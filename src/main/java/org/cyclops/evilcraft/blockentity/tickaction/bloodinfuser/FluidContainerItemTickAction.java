@@ -1,12 +1,13 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodinfuser;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.IFluidHelpersNeoForge;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -52,14 +53,14 @@ public class FluidContainerItemTickAction extends BloodInfuserTickAction{
                 tx.commit();
             }
             tile.getInventory().setItem(tile.getTileWorkingMetadata().getConsumeSlot(), infuseStack);
-            if (!IModHelpers.get().getFluidHelpers().getFluid(container).isEmpty() && IModHelpers.get().getFluidHelpers().getAmount(IModHelpers.get().getFluidHelpers().getFluid(container)) == IModHelpers.get().getFluidHelpers().getCapacity(container)) {
+            if (!IModHelpersNeoForge.get().getFluidHelpers().getFluid(container).isEmpty() && IModHelpersNeoForge.get().getFluidHelpers().getAmount(IModHelpersNeoForge.get().getFluidHelpers().getFluid(container)) == IModHelpersNeoForge.get().getFluidHelpers().getCapacity(container)) {
                 if (addToProduceSlot(tile, infuseStack)) {
                     tile.getInventory().removeItem(tile.getTileWorkingMetadata().getConsumeSlot(), 1);
                 }
             }
         } else {
             // We might be dealing with a bucket
-            FluidStack moved = IModHelpers.get().getFluidHelpers().move(tile.getTank(), container, Integer.MAX_VALUE, null, false, false);
+            FluidStack moved = IModHelpersNeoForge.get().getFluidHelpers().move(tile.getTank(), container, Integer.MAX_VALUE, null, false, false);
             if (!moved.isEmpty()) {
                 ItemStack result = itemAccessInfuse.getResource().toStack(itemAccessInfuse.getAmount());
                 if (addToProduceSlot(tile, result)) {
@@ -85,7 +86,7 @@ public class FluidContainerItemTickAction extends BloodInfuserTickAction{
         if (itemStackHandler == null) {
             return ItemStack.EMPTY;
         }
-        IFluidHelpersNeoForge fh = IModHelpers.get().getFluidHelpers();
+        IFluidHelpersNeoForge fh = IModHelpersNeoForge.get().getFluidHelpers();
         FluidStack moved = fh.move(tile.getTank(), itemStackHandler, MB_PER_TICK, null, false, true);
         if (moved.isEmpty()) {
             fh.move(tile.getTank(), itemStackHandler, MB_PER_TICK, null, false, true);

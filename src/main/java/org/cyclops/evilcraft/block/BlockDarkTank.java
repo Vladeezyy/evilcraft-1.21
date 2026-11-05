@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
+
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.extensions.IDynamicLightBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -26,10 +29,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import net.neoforged.neoforge.model.data.ModelProperty;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -156,7 +159,7 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynam
         int lastCapacity;
         do {
             ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(this));
-            IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
+            IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
             try (var tx0 = Transaction.openRoot()) {
                 fluidHandler.setTankCapacity(0, capacity, tx0);
                 tx0.commit();
@@ -177,7 +180,7 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynam
                 if (fluid != RegistryEntries.FLUID_BLOOD.get() && fluid.isSource(fluid.defaultFluidState())) {
                     try {
                         ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(this));
-                        IFluidHandlerCapacity fluidHandlerFilled = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
+                        IFluidHandlerCapacity fluidHandlerFilled = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
                         try (var tx = Transaction.openRoot()) {
                             fluidHandlerFilled.setTankCapacity(0, capacityOriginal, tx);
                             fluidHandlerFilled.insert(FluidResource.of(fluid), capacityOriginal, tx);

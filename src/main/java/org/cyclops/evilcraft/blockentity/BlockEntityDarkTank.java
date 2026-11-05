@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -11,9 +12,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.ItemAccessItemLocation;
@@ -66,7 +67,7 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
     @Nullable
     protected boolean fill(ItemAccess itemAccess) {
         ResourceHandler<FluidResource> container = Capabilities.Fluid.ITEM.getCapability(itemAccess, null);
-        return !IModHelpers.get().getFluidHelpers().move(getTank(), container, Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()), null, false, false).isEmpty();
+        return !IModHelpersNeoForge.get().getFluidHelpers().move(getTank(), container, Math.min(GeneralConfig.mbFlowRate, getTank().getFluidAmount()), null, false, false).isEmpty();
     }
 
     @Override
@@ -82,10 +83,10 @@ public class BlockEntityDarkTank extends BlockEntityTankInventory {
 
             if(!blockEntity.getTank().isEmpty() && blockEntity.isEnabled()) {
                 Direction down = Direction.DOWN;
-                ResourceHandler<FluidResource> handler = IModHelpers.get().getCapabilityHelpers().getCapability(level, pos.relative(down), down.getOpposite(),
+                ResourceHandler<FluidResource> handler = IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(level, pos.relative(down), down.getOpposite(),
                         org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK).orElse(null);
                 if(handler != null) {
-                    IModHelpers.get().getFluidHelpers().move(blockEntity.getTank(), handler, Math.min(GeneralConfig.mbFlowRate, blockEntity.getTank().getFluidAmount()), null, false, false);
+                    IModHelpersNeoForge.get().getFluidHelpers().move(blockEntity.getTank(), handler, Math.min(GeneralConfig.mbFlowRate, blockEntity.getTank().getFluidAmount()), null, false, false);
                 } else {
                     // Try to fill fluid container items below
                     List<Entity> entities = level.getEntitiesOfClass(Entity.class,

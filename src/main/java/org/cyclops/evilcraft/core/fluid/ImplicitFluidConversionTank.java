@@ -1,8 +1,8 @@
 package org.cyclops.evilcraft.core.fluid;
 
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.evilcraft.fabric.cyclopscore.fluid.SingleUseTank;
 
 /**

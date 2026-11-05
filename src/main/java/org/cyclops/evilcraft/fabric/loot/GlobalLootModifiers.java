@@ -15,7 +15,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
@@ -42,9 +42,9 @@ import java.util.Map;
 public final class GlobalLootModifiers {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final ResourceLocation LIST = ResourceLocation.fromNamespaceAndPath("neoforge", "loot_modifiers/global_loot_modifiers.json");
-    private static final Map<ResourceLocation, MapCodec<? extends IGlobalLootModifier>> CODECS = Maps.newHashMap();
-    public static final Codec<IGlobalLootModifier> CODEC = ResourceLocation.CODEC.dispatch(
+    private static final Identifier LIST = Identifier.fromNamespaceAndPath("neoforge", "loot_modifiers/global_loot_modifiers.json");
+    private static final Map<Identifier, MapCodec<? extends IGlobalLootModifier>> CODECS = Maps.newHashMap();
+    public static final Codec<IGlobalLootModifier> CODEC = Identifier.CODEC.dispatch(
             modifier -> codecId(modifier.codec()),
             id -> {
                 MapCodec<? extends IGlobalLootModifier> codec = CODECS.get(id);
@@ -54,27 +54,27 @@ public final class GlobalLootModifiers {
                 return codec;
             });
 
-    private static Map<ResourceLocation, JsonElement> rawModifiers = Map.of();
+    private static Map<Identifier, JsonElement> rawModifiers = Map.of();
     private static List<IGlobalLootModifier> modifiers = List.of();
-    private static Map<LootTable, ResourceLocation> lootTableIds = new IdentityHashMap<>();
+    private static Map<LootTable, Identifier> lootTableIds = new IdentityHashMap<>();
     private static boolean registered = false;
 
     static {
         // Cyclops Core's item injection modifier, which EvilCraft's data uses
-        CODECS.put(ResourceLocation.fromNamespaceAndPath("cyclopscore", "inject_item"),
+        CODECS.put(Identifier.fromNamespaceAndPath("cyclopscore", "inject_item"),
                 org.cyclops.evilcraft.fabric.cyclopscore.loot.modifier.LootModifierInjectItem.CODEC.get());
     }
 
     private GlobalLootModifiers() {
     }
 
-    public static void registerCodec(ResourceLocation id, MapCodec<? extends IGlobalLootModifier> codec) {
+    public static void registerCodec(Identifier id, MapCodec<? extends IGlobalLootModifier> codec) {
         CODECS.put(id, codec);
         registerListeners();
     }
 
-    private static ResourceLocation codecId(MapCodec<? extends IGlobalLootModifier> codec) {
-        for (Map.Entry<ResourceLocation, MapCodec<? extends IGlobalLootModifier>> entry : CODECS.entrySet()) {
+    private static Identifier codecId(MapCodec<? extends IGlobalLootModifier> codec) {
+        for (Map.Entry<Identifier, MapCodec<? extends IGlobalLootModifier>> entry : CODECS.entrySet()) {
             if (entry.getValue() == codec) {
                 return entry.getKey();
             }
@@ -89,8 +89,8 @@ public final class GlobalLootModifiers {
         registered = true;
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
-            public ResourceLocation getFabricId() {
-                return ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "global_loot_modifiers");
+            public Identifier getFabricId() {
+                return Identifier.fromNamespaceAndPath(Reference.MOD_ID, "global_loot_modifiers");
             }
 
             @Override
@@ -104,8 +104,8 @@ public final class GlobalLootModifiers {
         ILootTableModifyEvent.EVENT.register(GlobalLootModifiers::apply);
     }
 
-    private static Map<ResourceLocation, JsonElement> readModifiers(ResourceManager resourceManager) {
-        List<ResourceLocation> entries = Lists.newArrayList();
+    private static Map<Identifier, JsonElement> readModifiers(ResourceManager resourceManager) {
+        List<Identifier> entries = Lists.newArrayList();
         for (Resource resource : resourceManager.getResourceStack(LIST)) {
             try (Reader reader = resource.openAsReader()) {
                 JsonObject list = JsonParser.parseReader(reader).getAsJsonObject();
@@ -113,7 +113,7 @@ public final class GlobalLootModifiers {
                     entries.clear();
                 }
                 for (JsonElement entry : list.getAsJsonArray("entries")) {
-                    ResourceLocation id = ResourceLocation.parse(entry.getAsString());
+                    Identifier id = Identifier.parse(entry.getAsString());
                     if (!entries.contains(id)) {
                         entries.add(id);
                     }
@@ -122,9 +122,9 @@ public final class GlobalLootModifiers {
                 LOGGER.error("Could not read loot modifier list {} of pack {}", LIST, resource.sourcePackId(), e);
             }
         }
-        Map<ResourceLocation, JsonElement> result = new LinkedHashMap<>();
-        for (ResourceLocation id : entries) {
-            ResourceLocation file = id.withPath(path -> "loot_modifiers/" + path + ".json");
+        Map<Identifier, JsonElement> result = new LinkedHashMap<>();
+        for (Identifier id : entries) {
+            Identifier file = id.withPath(path -> "loot_modifiers/" + path + ".json");
             resourceManager.getResource(file).ifPresentOrElse(resource -> {
                 try (Reader reader = resource.openAsReader()) {
                     result.put(id, JsonParser.parseReader(reader));
@@ -142,14 +142,14 @@ public final class GlobalLootModifiers {
         rawModifiers.forEach((id, json) -> {
             // Only types that are known (other mods' NeoForge loot modifiers can be in the list)
             if (json.isJsonObject() && json.getAsJsonObject().has("type")
-                    && CODECS.containsKey(ResourceLocation.parse(json.getAsJsonObject().get("type").getAsString()))) {
+                    && CODECS.containsKey(Identifier.parse(json.getAsJsonObject().get("type").getAsString()))) {
                 CODEC.parse(ops, json)
                         .resultOrPartial(error -> LOGGER.error("Could not parse loot modifier {}: {}", id, error))
                         .ifPresent(parsed::add);
             }
         });
         modifiers = parsed;
-        Map<LootTable, ResourceLocation> ids = new IdentityHashMap<>();
+        Map<LootTable, Identifier> ids = new IdentityHashMap<>();
         server.reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE).entrySet()
                 .forEach(entry -> ids.put(entry.getValue(), entry.getKey().location()));
         lootTableIds = ids;
@@ -159,7 +159,7 @@ public final class GlobalLootModifiers {
         if (modifiers.isEmpty()) {
             return;
         }
-        ResourceLocation id = lootTableIds.get(lootTable);
+        Identifier id = lootTableIds.get(lootTable);
         if (id == null) {
             return;
         }
@@ -178,14 +178,14 @@ public final class GlobalLootModifiers {
         }
     }
 
-    private static final ThreadLocal<ResourceLocation> QUERIED = new ThreadLocal<>();
+    private static final ThreadLocal<Identifier> QUERIED = new ThreadLocal<>();
 
     /**
      * @return The id of the loot table whose loot is being modified, the queried loot table id of NeoForge's loot
      *         context.
      */
     @Nullable
-    public static ResourceLocation getQueriedLootTableId(LootContext context) {
+    public static Identifier getQueriedLootTableId(LootContext context) {
         return QUERIED.get();
     }
 }

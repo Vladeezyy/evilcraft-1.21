@@ -26,7 +26,7 @@ import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;

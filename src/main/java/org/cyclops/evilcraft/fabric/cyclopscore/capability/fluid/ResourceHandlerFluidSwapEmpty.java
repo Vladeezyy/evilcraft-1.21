@@ -3,20 +3,19 @@ package org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid;
 
 
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ItemAccessResourceHandler;
-import net.neoforged.neoforge.transfer.TransferPreconditions;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.BucketResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccessResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.TransferPreconditions;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.ItemResource;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
  * A fluid resource handler that swaps an item to empty when drained.
- * Inspired by {@link BucketResourceHandler}.
+ * Inspired by NeoForge's BucketResourceHandler.
  * @author rubensworks
  */
 public class ResourceHandlerFluidSwapEmpty extends ItemAccessResourceHandler<FluidResource> {

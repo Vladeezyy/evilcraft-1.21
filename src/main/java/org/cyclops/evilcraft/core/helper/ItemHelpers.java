@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.helper;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -8,10 +9,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.GeneralConfig;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -99,12 +100,12 @@ public class ItemHelpers {
     public static ItemStack tryFillContainerForPlayer(ResourceHandler<FluidResource> toDrain, ItemStack toDrainItem, ItemAccess toFill, ItemStack toFillItem, FluidStack tickFluid, Player player) {
         int maxFill = MB_FILL_PERTICK;
         if (toFillItem.getItem() == Items.BUCKET) {
-            maxFill = IModHelpers.get().getFluidHelpers().getBucketVolume();
+            maxFill = IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
         }
         ResourceHandler<FluidResource> toFillHandler = Capabilities.Fluid.ITEM.getCapability(toFill, null);
         if(toFillHandler != null && toFillItem != toDrainItem
                 && player.getUseItemRemainingTicks() == 0) {
-            FluidStack moved = IModHelpers.get().getFluidHelpers().move(toDrain, toFillHandler, Math.min(maxFill, tickFluid.getAmount()), null, false, false);
+            FluidStack moved = IModHelpersNeoForge.get().getFluidHelpers().move(toDrain, toFillHandler, Math.min(maxFill, tickFluid.getAmount()), null, false, false);
             return moved.isEmpty() ? ItemStack.EMPTY : toFill.getResource().toStack(toFill.getAmount());
         }
         return ItemStack.EMPTY;

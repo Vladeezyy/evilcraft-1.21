@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 
@@ -26,26 +26,26 @@ public final class IClientFluidTypeExtensions {
         return new IClientFluidTypeExtensions(fluid);
     }
 
-    private static ResourceLocation name(TextureAtlasSprite[] sprites, int index) {
+    private static Identifier name(TextureAtlasSprite[] sprites, int index) {
         if (sprites == null || sprites.length <= index || sprites[index] == null) {
             return MissingTextureAtlasSprite.getLocation();
         }
         return sprites[index].contents().name();
     }
 
-    public ResourceLocation getStillTexture() {
+    public Identifier getStillTexture() {
         return name(FluidVariantRendering.getSprites(FluidVariant.of(fluid)), 0);
     }
 
-    public ResourceLocation getFlowingTexture() {
+    public Identifier getFlowingTexture() {
         return name(FluidVariantRendering.getSprites(FluidVariant.of(fluid)), 1);
     }
 
-    public ResourceLocation getStillTexture(FluidStack stack) {
+    public Identifier getStillTexture(FluidStack stack) {
         return name(FluidVariantRendering.getSprites(stack.toVariant()), 0);
     }
 
-    public ResourceLocation getFlowingTexture(FluidStack stack) {
+    public Identifier getFlowingTexture(FluidStack stack) {
         return name(FluidVariantRendering.getSprites(stack.toVariant()), 1);
     }
 

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.blockentity;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -7,10 +8,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.cyclopscore.blockentity.BlockEntityTickerDelayed;
 import org.cyclops.cyclopscore.blockentity.CyclopsBlockEntity;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.registrar.BlockEntityCapabilityRegistrar;
@@ -101,7 +102,7 @@ public class BlockEntityEternalWater extends CyclopsBlockEntity {
 
             if (blockEntity.isEnabled()) {
                 for(Direction direction : Direction.values()) {
-                    IModHelpers.get().getCapabilityHelpers().getCapability(level, pos.relative(direction),
+                    IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(level, pos.relative(direction),
                                     direction.getOpposite(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)
                             .ifPresent(handler -> {
                                 try (var tx = Transaction.openRoot()) {

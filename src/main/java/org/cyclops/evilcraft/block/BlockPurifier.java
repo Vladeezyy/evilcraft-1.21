@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.block;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,7 +22,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.cyclopscore.block.BlockWithEntity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -123,7 +124,7 @@ public class BlockPurifier extends BlockWithEntity implements IBlockTank {
 
     @Override
     public int getDefaultCapacity() {
-        return IModHelpers.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS;
+        return IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() * BlockEntityPurifier.MAX_BUCKETS;
     }
 
     @Override

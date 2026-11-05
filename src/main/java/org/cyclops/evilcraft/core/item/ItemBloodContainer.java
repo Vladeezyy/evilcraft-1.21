@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,12 +20,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.ItemAccessItemLocation;
@@ -50,20 +51,20 @@ public class ItemBloodContainer extends DamageIndicatedItemFluidContainer implem
     @Override
     public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-        IFluidHandlerCapacity fluidHandler = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
+        IFluidHandlerCapacity fluidHandler = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(ItemAccess.forStack(itemStack)).orElse(null);
         FluidStack fluidStack = FluidUtil.getFirstStackContained(itemStack);
         int drained;
         try (var tx = Transaction.openRoot()) {
             if (fluidStack.isEmpty()) {
                 drained = 0;
             } else {
-                drained = fluidHandler.extract(FluidResource.of(fluidStack), IModHelpers.get().getFluidHelpers().getBucketVolume(), tx);
+                drained = fluidHandler.extract(FluidResource.of(fluidStack), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), tx);
             }
         }
 
-        boolean hasBucket = drained == IModHelpers.get().getFluidHelpers().getBucketVolume();
+        boolean hasBucket = drained == IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume();
         boolean hasSpace = fluidStack.isEmpty()
-                || (fluidStack.getAmount() + IModHelpers.get().getFluidHelpers().getBucketVolume() <= fluidHandler.getTankCapacity(0));
+                || (fluidStack.getAmount() + IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume() <= fluidHandler.getTankCapacity(0));
         BlockHitResult movingobjectpositionDrain = (BlockHitResult) this.getPlayerPOVHitResult(world, player, ClipContext.Fluid.NONE);
         BlockHitResult movingobjectpositionFill = (BlockHitResult) this.getPlayerPOVHitResult(world, player, ClipContext.Fluid.SOURCE_ONLY);
 
@@ -79,7 +80,7 @@ public class ItemBloodContainer extends DamageIndicatedItemFluidContainer implem
                     if(hasSpace) {
                         world.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
                         try (var tx = Transaction.openRoot()) {
-                            fluidHandler.insert(FluidResource.of(getFluid()), IModHelpers.get().getFluidHelpers().getBucketVolume(), tx);
+                            fluidHandler.insert(FluidResource.of(getFluid()), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), tx);
                             tx.commit();
                         }
                     }
@@ -96,7 +97,7 @@ public class ItemBloodContainer extends DamageIndicatedItemFluidContainer implem
 
                 if (this.tryPlaceContainedLiquid(world, blockPos, true)) {
                     try (var tx = Transaction.openRoot()) {
-                        fluidHandler.extract(FluidResource.of(fluidStack), IModHelpers.get().getFluidHelpers().getBucketVolume(), tx);
+                        fluidHandler.extract(FluidResource.of(fluidStack), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), tx);
                         tx.commit();
                     }
                     return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -19,10 +20,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -82,7 +83,7 @@ public class ItemCreativeBloodDrop extends ItemBloodContainer {
                     ItemStack held = player.getItemInHand(hand);
                     ResourceHandler<FluidResource> fluidHandler = Capabilities.Fluid.ITEM.getCapability(held, ItemAccess.forPlayerInteraction(player, hand));
                     if (!held.isEmpty() && held != itemStack && fluidHandler != null && player.getUseItemRemainingTicks() == 0) {
-                        IModHelpers.get().getFluidHelpers().move(source, fluidHandler, MB_FILL_PERTICK, null, false, false);
+                        IModHelpersNeoForge.get().getFluidHelpers().move(source, fluidHandler, MB_FILL_PERTICK, null, false, false);
                     }
                 }
             }
@@ -109,7 +110,7 @@ public class ItemCreativeBloodDrop extends ItemBloodContainer {
                     if (context.getLevel().getBlockState(pos).getBlock() == RegistryEntries.BLOCK_BLOOD_STAIN.get()) {
                         // Add blood to existing block
                         IModHelpers.get().getBlockEntityHelpers().get(context.getLevel(), pos, BlockEntityBloodStain.class)
-                                .ifPresent(tile -> tile.addAmount(IModHelpers.get().getFluidHelpers().getBucketVolume(), true));
+                                .ifPresent(tile -> tile.addAmount(IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), true));
                     }
                 }
                 return InteractionResult.PASS;

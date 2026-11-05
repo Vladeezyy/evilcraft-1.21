@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraftcompat.Reference;
 import org.cyclops.evilcraftcompat.modcompat.jei.spiritfurnace.SpiritFurnaceRecipeJEI;
 
@@ -18,7 +18,7 @@ import java.util.List;
  */
 public record JeiSpiritFurnaceRecipePacket(List<SpiritFurnaceRecipeJEI> recipes) implements CustomPacketPayload {
 
-    public static final Type<JeiSpiritFurnaceRecipePacket> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MOD_ID, "jei_spirit_furnace_recipe"));
+    public static final Type<JeiSpiritFurnaceRecipePacket> ID = new Type<>(Identifier.fromNamespaceAndPath(Reference.MOD_ID, "jei_spirit_furnace_recipe"));
     public static final StreamCodec<RegistryFriendlyByteBuf, JeiSpiritFurnaceRecipePacket> CODEC = StreamCodec.of(
             (output, packet) -> {
                 output.writeVarInt(packet.recipes().size());

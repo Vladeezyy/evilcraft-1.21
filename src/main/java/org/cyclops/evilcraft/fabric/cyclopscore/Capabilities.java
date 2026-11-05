@@ -5,7 +5,7 @@ import org.cyclops.evilcraft.Reference;
 
 import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.fabric.capabilities.ItemCapability;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 
 /**

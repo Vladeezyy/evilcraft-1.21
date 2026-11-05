@@ -1,5 +1,7 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.extensions.ICustomItemEntity;
+
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;

@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import org.cyclops.evilcraft.fabric.event.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.EvilCraft;
@@ -46,7 +46,7 @@ public class BroomPartRegistry implements IBroomPartRegistry {
 
     public BroomPartRegistry() {
         EvilCraft._instance.getModEventBus().addListener(EventPriority.HIGHEST, this::beforeItemsRegistered);
-        NeoForge.EVENT_BUS.addListener(this::onTooltipEvent);
+        ItemTooltipEvent.addListener(this::onTooltipEvent);
         partModels = Maps.newHashMap();
     }
 

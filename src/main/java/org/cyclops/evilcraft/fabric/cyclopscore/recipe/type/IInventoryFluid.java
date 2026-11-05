@@ -3,8 +3,8 @@ package org.cyclops.evilcraft.fabric.cyclopscore.recipe.type;
 
 
 import net.minecraft.world.item.crafting.RecipeInput;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 
 /**
  * An inventory that can also contain fluids.

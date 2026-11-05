@@ -7,7 +7,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
+import org.cyclops.evilcraft.fabric.event.EntityStruckByLightningEvent;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.entity.monster.EntityWerewolf;
 import org.cyclops.evilcraft.entity.villager.VillagerProfessionWerewolfConfig;

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,13 +14,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ItemAccessResourceHandler;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccessResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.ItemResource;
+import org.cyclops.evilcraft.fabric.transfer.SnapshotJournal;
+import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.ItemAccessItemLocation;
 import org.cyclops.cyclopscore.inventory.ItemLocation;
@@ -59,7 +60,7 @@ public class ItemEntangledChalice extends ItemBlockFluidContainer {
             FluidStack tickFluid;
             PlayerExtendedInventoryIterator it = new PlayerExtendedInventoryIterator(player);
             do {
-                tickFluid = IModHelpers.get().getFluidHelpers().getFluid(source);
+                tickFluid = IModHelpersNeoForge.get().getFluidHelpers().getFluid(source);
                 ItemLocation toFillLocation = it.nextIndexed();
                 ItemStack toFill = toFillLocation.getItemStack(player);
                 if (tickFluid != null && !toFill.isEmpty() && toFill.getCount() == 1) {

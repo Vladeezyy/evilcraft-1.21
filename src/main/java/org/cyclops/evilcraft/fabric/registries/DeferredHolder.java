@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.fabric.registries;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.cyclops.cyclopscore.config.DeferredHolderCommon;
 
 import java.util.function.Supplier;
@@ -16,7 +16,7 @@ public class DeferredHolder<R, T extends R> extends DeferredHolderCommon<R, T> i
         super(key);
     }
 
-    public static <R, T extends R> DeferredHolder<R, T> create(ResourceKey<? extends Registry<R>> registryKey, ResourceLocation valueName) {
+    public static <R, T extends R> DeferredHolder<R, T> create(ResourceKey<? extends Registry<R>> registryKey, Identifier valueName) {
         return new DeferredHolder<>(ResourceKey.create(registryKey, valueName));
     }
 
@@ -25,7 +25,7 @@ public class DeferredHolder<R, T extends R> extends DeferredHolderCommon<R, T> i
         return value();
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return key.location();
     }
 

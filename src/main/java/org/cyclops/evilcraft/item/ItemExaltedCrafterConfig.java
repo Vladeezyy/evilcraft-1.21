@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.item;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Rarity;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import org.cyclops.evilcraft.fabric.transfer.VanillaContainerWrapper;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
@@ -28,7 +28,7 @@ public class ItemExaltedCrafterConfig extends ItemConfigCommon<IModBase> {
                         .component(DataComponents.RARITY, empowered ? Rarity.UNCOMMON : Rarity.COMMON)
                         .stacksTo(1), wooden, empowered)
         );
-        EvilCraft._instance.getModEventBus().addListener(this::registerCapability);
+        RegisterCapabilitiesEvent.addListener(this::registerCapability);
     }
 
     protected void registerCapability(RegisterCapabilitiesEvent event) {

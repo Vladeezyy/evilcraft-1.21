@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.fabric.capabilities;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,12 +23,8 @@ public final class BlockCapability<T, C> {
         this.lookup = lookup;
     }
 
-    public static <T> BlockCapability<T, Direction> createSided(ResourceLocation name, Class<T> type) {
+    public static <T> BlockCapability<T, Direction> createSided(Identifier name, Class<T> type) {
         return new BlockCapability<>(BlockApiLookup.get(name, type, Direction.class));
-    }
-
-    public static <T, C> BlockCapability<T, C> of(BlockApiLookup<T, C> lookup) {
-        return new BlockCapability<>(lookup);
     }
 
     public BlockApiLookup<T, C> lookup() {

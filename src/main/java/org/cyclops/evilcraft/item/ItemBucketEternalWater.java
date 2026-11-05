@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.item;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentPatch;
@@ -24,9 +25,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.HitResult;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -62,11 +63,11 @@ public class ItemBucketEternalWater extends BucketItem implements IItemUseFirst 
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-        ResourceHandler<FluidResource> handler = IModHelpers.get().getCapabilityHelpers().getCapability(context.getLevel(), context.getClickedPos(),
+        ResourceHandler<FluidResource> handler = IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(context.getLevel(), context.getClickedPos(),
                 context.getClickedFace(), Capabilities.Fluid.BLOCK).orElse(null);
         if(handler != null && !context.getLevel().isClientSide()) {
             try (var tx = Transaction.openRoot()) {
-                handler.insert(FluidResource.of(Fluids.WATER), IModHelpers.get().getFluidHelpers().getBucketVolume(), tx);
+                handler.insert(FluidResource.of(Fluids.WATER), IModHelpersNeoForge.get().getFluidHelpers().getBucketVolume(), tx);
                 tx.commit();
             }
             return InteractionResult.SUCCESS;

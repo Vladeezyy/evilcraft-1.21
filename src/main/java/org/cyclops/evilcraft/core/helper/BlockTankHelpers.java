@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.helper;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.fabricmc.fabric.api.util.TriState;
 import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import net.minecraft.network.chat.MutableComponent;
@@ -8,13 +9,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.FluidUtil;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.Capabilities;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -74,7 +75,7 @@ public class BlockTankHelpers {
             }
             ResourceHandler<FluidResource> fluidHandlerItem = org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemStack, itemStackItemAccess);
             if (fluidHandlerItem != null) {
-                IModHelpers.get().getFluidHelpers().move(fluidHandlerTile, fluidHandlerItem, Integer.MAX_VALUE, null, false, false);
+                IModHelpersNeoForge.get().getFluidHelpers().move(fluidHandlerTile, fluidHandlerItem, Integer.MAX_VALUE, null, false, false);
             }
             return itemStackItemAccess.getResource().toStack(itemStackItemAccess.getAmount());
         }
@@ -101,7 +102,7 @@ public class BlockTankHelpers {
 
             ResourceHandler<FluidResource> fluidHandlerItem = org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM.getCapability(itemStack, ItemAccess.forStack(itemStack));
             if (fluidHandlerItem != null) {
-                IModHelpers.get().getFluidHelpers().move(fluidHandlerItem, fluidHandlerTile, Integer.MAX_VALUE, null, false, false);
+                IModHelpersNeoForge.get().getFluidHelpers().move(fluidHandlerItem, fluidHandlerTile, Integer.MAX_VALUE, null, false, false);
             }
         }
     }

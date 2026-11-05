@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.loot.modifier;
 
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -12,9 +13,9 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.cyclops.evilcraft.fabric.loot.IGlobalLootModifier;
 import org.cyclops.evilcraft.fabric.loot.LootModifier;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
+import org.cyclops.evilcraft.fabric.transfer.FluidResource;
+import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.IFluidHandlerCapacity;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -55,7 +56,7 @@ public class LootModifierInjectBroom extends LootModifier {
             ItemAccess itemAccess = ItemAccess.forStack(new ItemStack(RegistryEntries.ITEM_BROOM));
 
             // Fill with blood
-            IFluidHandlerCapacity fluidHanderFull = IModHelpers.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
+            IFluidHandlerCapacity fluidHanderFull = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(itemAccess).orElse(null);
             try (var tx = Transaction.openRoot()) {
                 fluidHanderFull.insert(FluidResource.of(RegistryEntries.FLUID_BLOOD), fluidHanderFull.getTankCapacity(0) / 2 + context.getRandom().nextInt(fluidHanderFull.getTankCapacity(0) / 2), tx);
                 tx.commit();

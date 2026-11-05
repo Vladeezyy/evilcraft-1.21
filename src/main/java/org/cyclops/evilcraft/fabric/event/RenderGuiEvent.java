@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 import java.util.function.Consumer;
 
@@ -14,15 +14,15 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public class RenderGuiEvent {
 
-    private final GuiGraphics guiGraphics;
+    private final GuiGraphicsExtractor guiGraphics;
     private final DeltaTracker partialTick;
 
-    public RenderGuiEvent(GuiGraphics guiGraphics, DeltaTracker partialTick) {
+    public RenderGuiEvent(GuiGraphicsExtractor guiGraphics, DeltaTracker partialTick) {
         this.guiGraphics = guiGraphics;
         this.partialTick = partialTick;
     }
 
-    public GuiGraphics getGuiGraphics() {
+    public GuiGraphicsExtractor getGuiGraphics() {
         return guiGraphics;
     }
 
@@ -34,7 +34,7 @@ public class RenderGuiEvent {
      * After the HUD was rendered.
      */
     public static class Post extends RenderGuiEvent {
-        public Post(GuiGraphics guiGraphics, DeltaTracker partialTick) {
+        public Post(GuiGraphicsExtractor guiGraphics, DeltaTracker partialTick) {
             super(guiGraphics, partialTick);
         }
 
