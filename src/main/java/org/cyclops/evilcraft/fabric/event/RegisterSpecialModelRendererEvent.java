@@ -19,7 +19,7 @@ public final class RegisterSpecialModelRendererEvent {
         listener.accept(new RegisterSpecialModelRendererEvent());
     }
 
-    public void register(Identifier id, MapCodec<? extends SpecialModelRenderer.Unbaked<?>> codec) {
+    public void register(Identifier id, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
         SpecialModelRenderers.ID_MAPPER.put(id, codec);
     }
 }

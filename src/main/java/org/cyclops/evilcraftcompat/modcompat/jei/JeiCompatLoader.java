@@ -26,7 +26,7 @@ public class JeiCompatLoader {
             net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization.synchronizeRecipeSerializer(org.cyclops.evilcraft.RegistryEntries.RECIPESERIALIZER_BLOOD_INFUSER.get());
             net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization.synchronizeRecipeSerializer(org.cyclops.evilcraft.RegistryEntries.RECIPESERIALIZER_ENVIRONMENTAL_ACCUMULATOR.get());
         });
-        PayloadTypeRegistry.clientboundPlay().register(JeiSpiritFurnaceRecipePacket.ID, JeiSpiritFurnaceRecipePacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(JeiSpiritFurnaceRecipePacket.ID, JeiSpiritFurnaceRecipePacket.CODEC);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerJoin(handler.getPlayer()));
         // The recipes come from loot tables, which data packs change
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> SERVER_RECIPES = null);

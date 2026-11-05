@@ -35,7 +35,11 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.cyclops.cyclopscore.helper.IModHelpers;
-import org.cyclops.evilcraft.*;
+import org.cyclops.evilcraft.EvilCraft;
+import org.cyclops.evilcraft.ExtendedDamageSources;
+import org.cyclops.evilcraft.GeneralConfig;
+import org.cyclops.evilcraft.Reference;
+import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 import org.cyclops.evilcraft.core.broom.PotionEffectBroomCollision;
 import org.cyclops.evilcraft.entity.item.EntityBroom;
@@ -402,7 +406,7 @@ public class BroomModifiers {
                 && event.getContainer().getSource().getDirectEntity() instanceof Projectile) {
             EntityBroom broom = (EntityBroom) event.getEntity().getVehicle();
             float modifierValue = broom.getModifier(BroomModifiers.WITHERSHIELD);
-            if (modifierValue > 0 && modifierValue > broom.level().getRandom().nextInt((int) BroomModifiers.WITHERSHIELD.getMaxTierValue())) {
+            if (modifierValue > 0 && modifierValue > broom.level().random.nextInt((int) BroomModifiers.WITHERSHIELD.getMaxTierValue())) {
                 event.getContainer().setNewDamage(0);
             }
         }

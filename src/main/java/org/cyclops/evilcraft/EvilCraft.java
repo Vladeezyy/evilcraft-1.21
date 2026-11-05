@@ -2,7 +2,7 @@ package org.cyclops.evilcraft;
 
 import org.cyclops.evilcraft.fabric.cyclopscore.metadata.RegistryExportableRegistry;
 import org.cyclops.evilcraft.fabric.cyclopscore.metadata.IRegistryExportableRegistry;
-import net.fabricmc.fabric.api.registry.CompostableRegistry;
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import org.cyclops.evilcraft.fabric.world.NeoForgeBiomeModifiers;
 import org.cyclops.evilcraft.fabric.extensions.ItemExtensions;
@@ -130,7 +130,7 @@ public class EvilCraft extends ModBaseNeoForge<EvilCraft> {
         PersistentData.load();
         ItemExtensions.register();
         NeoForgeBiomeModifiers.register(Reference.MOD_ID);
-        ModLifecycle.afterRegistries(() -> CompostableRegistry.INSTANCE.add(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 0.3F));
+        ModLifecycle.afterRegistries(() -> CompostingChanceRegistry.INSTANCE.add(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 0.3F));
 
         // EvilCraft-Compat (JEI, Jade), bundled as in the original
         EvilCraftCompat.load();

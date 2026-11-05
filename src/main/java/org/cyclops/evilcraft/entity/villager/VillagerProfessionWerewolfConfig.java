@@ -1,7 +1,5 @@
 package org.cyclops.evilcraft.entity.villager;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -9,7 +7,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
-import net.minecraft.world.item.trading.TradeSet;
+import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
+import org.cyclops.evilcraft.fabric.event.ModLifecycle;
 import org.cyclops.cyclopscore.config.ConfigurablePropertyCommon;
 import org.cyclops.cyclopscore.config.extendedconfig.VillagerConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
@@ -30,23 +29,42 @@ public class VillagerProfessionWerewolfConfig extends VillagerConfigCommon<IModB
         super(
                 EvilCraft._instance,
                 "werewolf",
-                eConfig -> {
-                    Int2ObjectMap<ResourceKey<TradeSet>> tradeSets = new Int2ObjectOpenHashMap<>();
-                    for (int level = 1; level <= 4; level++) {
-                        tradeSets.put(level, ResourceKey.create(Registries.TRADE_SET,
-                                Identifier.fromNamespaceAndPath(Reference.MOD_ID, "werewolf/level_" + level)));
-                    }
-                    return new VillagerProfession(
-                            Component.translatable("entity." + Reference.MOD_ID + ".villager." + eConfig.getNamedId()),
-                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
-                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
-                            ImmutableSet.of(),
-                            ImmutableSet.of(),
-                            SoundEvents.VILLAGER_WORK_BUTCHER,
-                            tradeSets
-                    );
-                }
+                eConfig -> new VillagerProfession(
+                        Component.translatable("entity." + Reference.MOD_ID + ".villager." + eConfig.getNamedId()),
+                        (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
+                        (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
+                        ImmutableSet.of(),
+                        ImmutableSet.of(),
+                        SoundEvents.VILLAGER_WORK_BUTCHER
+                )
         );
+        ModLifecycle.afterRegistries(this::registerTrades);
+    }
+
+    public void registerTrades() {
+        ResourceKey<VillagerProfession> key = ResourceKey.create(Registries.VILLAGER_PROFESSION, Identifier.fromNamespaceAndPath(Reference.MOD_ID, getNamedId()));
+        TradeOfferHelper.registerVillagerOffers(key, 2, listings -> {
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_DARK_GEM.get(), 10, 50, 2));
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_HARDENED_BLOOD_SHARD.get(), 20, 50, 2));
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_POISON_SAC.get(), 3, 50, 2));
+            listings.add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_DARK_GEM_CRUSHED.get(), 1, 5, 10));
+        });
+        TradeOfferHelper.registerVillagerOffers(key, 3, listings -> {
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOK.get(), 2, 30, 5));
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA.get(), 2, 30, 6));
+            listings.add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_UNDEAD_SAPLING.get(), 1, 3, 10));
+        });
+        TradeOfferHelper.registerVillagerOffers(key, 4, listings -> {
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_INVERTED_POTENTIA_EMPOWERED.get(), 1, 25, 10));
+            listings.add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_VENGEANCE_FOCUS.get(), 3, 2, 10));
+            listings.add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_BOX_OF_ETERNAL_CLOSURE.get(), 7, 1, 10));
+        });
+        TradeOfferHelper.registerVillagerOffers(key, 5, listings -> {
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_BLOOD_INFUSION_CORE.get(), 3, 20, 10));
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_BONE.get(), 2, 20, 20));
+            listings.add(new EmeraldForItemsTrade(RegistryEntries.ITEM_WEREWOLF_FUR.get(), 1, 20, 20));
+            listings.add(new ItemsForEmeraldsTrade(RegistryEntries.ITEM_GARMONBOZIA.get(), 10, 1, 30));
+        });
     }
 
 }

@@ -1,31 +1,32 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.client.render.model;
 
+
 import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
-
-
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DynamicItemAndBlockModel;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
 
 import java.util.List;
 
 /**
  * @author rubensworks
  */
-public record ItemDynamicItemAndBlockModel(DynamicItemAndBlockModel resolvedModel, ModelRenderProperties modelRenderProperties) implements ItemModel {
+public record ItemDynamicItemAndBlockModel(DynamicItemAndBlockModel resolvedModel, ModelRenderProperties modelRenderProperties, @Nullable RenderType renderType) implements ItemModel {
+
+    public ItemDynamicItemAndBlockModel(DynamicItemAndBlockModel resolvedModel, ModelRenderProperties modelRenderProperties) {
+        this(resolvedModel, modelRenderProperties, null);
+    }
 
     @Override
     public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext, @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed) {
@@ -48,10 +49,11 @@ public record ItemDynamicItemAndBlockModel(DynamicItemAndBlockModel resolvedMode
         }
 
         @Override
-        public ItemModel bake(BakingContext bakingContext, Matrix4fc matrix4fc) {
+        public ItemModel bake(BakingContext bakingContext) {
             ModelBaker modelbaker = bakingContext.blockModelBaker();
             DynamicItemAndBlockModel resolvedModel = (DynamicItemAndBlockModel) modelbaker.getModel(this.model);
             TextureSlots textureslots = resolvedModel.getTopTextureSlots();
+//            List<BakedQuad> quads = resolvedModel.bakeTopGeometry(textureslots, modelbaker, BlockModelRotation.X0_Y0).getAll();
             ModelRenderProperties modelRenderProperties = ModelRenderProperties.fromResolvedModel(modelbaker, resolvedModel, textureslots);
             return new ItemDynamicItemAndBlockModel(resolvedModel, modelRenderProperties);
         }

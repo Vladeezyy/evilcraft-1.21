@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.fabric.transfer;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.world.Container;
 
 /**
@@ -12,6 +12,6 @@ public final class VanillaContainerWrapper {
     }
 
     public static ResourceHandler<ItemResource> of(Container container) {
-        return StorageResourceHandler.ofItem(ContainerStorage.of(container, null));
+        return StorageResourceHandler.ofItem(InventoryStorage.of(container, null));
     }
 }

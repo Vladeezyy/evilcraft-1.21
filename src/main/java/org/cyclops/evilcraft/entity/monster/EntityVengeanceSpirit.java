@@ -273,8 +273,8 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         super.remove(removalReason);
         if (level().isClientSide() && isVisible()) {
             spawnSmoke();
-            playSound(getDeathSound(), 0.1F + level().getRandom().nextFloat() * 0.9F,
-                    0.1F + level().getRandom().nextFloat() * 0.9F);
+            playSound(getDeathSound(), 0.1F + level().random.nextFloat() * 0.9F,
+                    0.1F + level().random.nextFloat() * 0.9F);
         }
     }
 
@@ -592,7 +592,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
      */
     public void onHit(double hitX, double hitY, double hitZ,
                       double impactMotionX, double impactMotionY, double impactMotionZ) {
-        addFrozenDuration(level().getRandom().nextInt(4) + 3);
+        addFrozenDuration(level().random.nextInt(4) + 3);
         if (level().isClientSide()) {
             showBurstParticles(hitX, hitY, hitZ, impactMotionX, impactMotionY, impactMotionZ);
         }
@@ -600,7 +600,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
 
     private void showBurstParticles(double hitX, double hitY, double hitZ,
                                     double impactMotionX, double impactMotionY, double impactMotionZ) {
-        for (int i = 0; i < level().getRandom().nextInt(5); i++) {
+        for (int i = 0; i < level().random.nextInt(5); i++) {
             float scale = 0.04F - random.nextFloat() * 0.02F;
             float red = random.nextFloat() * 0.2F + 0.3F;
             float green = random.nextFloat() * 0.2F + 0.3F;
@@ -687,7 +687,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
     }
 
     @Override
-    protected boolean updateFluidInteraction() {
+    protected boolean updateInWaterStateAndDoFluidPushing() {
         // Ignore water movement and particles
         return this.wasTouchingWater;
     }

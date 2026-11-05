@@ -4,7 +4,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfigCommon;
 import org.cyclops.cyclopscore.helper.IModHelpers;
@@ -23,7 +22,7 @@ public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extend
     public RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_display_stand",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DISPLAY_STAND.get()), (inventory, staticOutput) -> {
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStack(RegistryEntries.BLOCK_DISPLAY_STAND.get()), (inventory, staticOutput) -> {
                     Wrapper<ItemStack> plankWoodStack = new Wrapper<>(ItemStack.EMPTY);
                     for (int i = 0; i < inventory.size(); i++) {
                         int finalI = i;
@@ -42,7 +41,7 @@ public class RecipeSerializerCraftingShapedCustomOutputDisplayStandConfig extend
                     }
                     BlockState plankWoodBlockState = IModHelpers.get().getBlockHelpers().getBlockStateFromItemStack(plankWoodStack.get());
                     return RegistryEntries.BLOCK_DISPLAY_STAND.get().getTypedDisplayStandItem(plankWoodBlockState);
-                }).getRecipeSerializer());
+                }));
     }
 
 }

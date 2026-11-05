@@ -90,7 +90,7 @@ public final class NeoForgeBiomeModifiers {
                     for (JsonElement element : spawners) {
                         JsonObject spawner = element.getAsJsonObject();
                         EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(spawner.get("type").getAsString()));
-                        context.getMobSpawnSettings().addSpawn(entityType.getCategory(), new MobSpawnSettings.SpawnerData(entityType,
+                        context.getSpawnSettings().addSpawn(entityType.getCategory(), new MobSpawnSettings.SpawnerData(entityType,
                                 spawner.get("minCount").getAsInt(), spawner.get("maxCount").getAsInt()), spawner.get("weight").getAsInt());
                     }
                 });

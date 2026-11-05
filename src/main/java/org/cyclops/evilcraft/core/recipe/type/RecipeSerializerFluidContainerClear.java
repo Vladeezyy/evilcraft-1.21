@@ -24,5 +24,15 @@ public class RecipeSerializerFluidContainerClear {
             RecipeFluidContainerClear::new
     );
 
-    public static final RecipeSerializer<RecipeFluidContainerClear> SERIALIZER = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+    public static final RecipeSerializer<RecipeFluidContainerClear> SERIALIZER = new RecipeSerializer<>() {
+        @Override
+        public MapCodec<RecipeFluidContainerClear> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, RecipeFluidContainerClear> streamCodec() {
+            return STREAM_CODEC;
+        }
+    };
 }

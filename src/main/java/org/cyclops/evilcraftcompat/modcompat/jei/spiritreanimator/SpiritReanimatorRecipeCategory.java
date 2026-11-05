@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -101,13 +101,13 @@ public class SpiritReanimatorRecipeCategory implements IRecipeCategory<SpiritRea
     }
 
     @Override
-    public void draw(SpiritReanimatorRecipeJEI recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(SpiritReanimatorRecipeJEI recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         this.background.draw(guiGraphics);
         arrow.draw(guiGraphics, 72, 21);
 
         // Draw duration
         Font fontRenderer = Minecraft.getInstance().font;
         MutableComponent duration = JEIEvilCraftConfig.getDurationSecondsTextComponent(recipe.getDuration());
-        guiGraphics.text(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 46, 50, ARGB.opaque(0xFF808080), false);
+        guiGraphics.drawString(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 46, 50, ARGB.opaque(0xFF808080), false);
     }
 }

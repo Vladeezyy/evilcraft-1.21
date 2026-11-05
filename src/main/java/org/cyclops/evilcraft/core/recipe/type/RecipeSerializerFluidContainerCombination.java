@@ -14,7 +14,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
  * Recipe serializer for energy container combinations.
  * @author rubensworks
  */
-public class RecipeSerializerFluidContainerCombination {
+public class RecipeSerializerFluidContainerCombination implements RecipeSerializer<RecipeFluidContainerCombination> {
 
     public static final MapCodec<RecipeFluidContainerCombination> CODEC = RecordCodecBuilder.mapCodec(
             builder -> builder.group(
@@ -28,5 +28,14 @@ public class RecipeSerializerFluidContainerCombination {
             ByteBufCodecs.INT, RecipeFluidContainerCombination::getMaxCapacity,
             (inputIngredient, maxCapacity) -> new RecipeFluidContainerCombination(CraftingBookCategory.MISC, inputIngredient, maxCapacity)
     );
-    public static final RecipeSerializer<RecipeFluidContainerCombination> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
+
+    @Override
+    public MapCodec<RecipeFluidContainerCombination> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, RecipeFluidContainerCombination> streamCodec() {
+        return STREAM_CODEC;
+    }
 }

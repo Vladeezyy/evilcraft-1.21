@@ -31,7 +31,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
     private final int maxCapacity;
 
     public RecipeBloodExtractorCombination(CraftingBookCategory category, int maxCapacity) {
-        super();
+        super(category);
         this.maxCapacity = maxCapacity;
     }
 
@@ -41,7 +41,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid).isEmpty();
+        return !assemble(grid, world.registryAccess()).isEmpty();
     }
 
     public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
@@ -54,8 +54,7 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
 
         for (int i = 0; i < aitemstack.size(); ++i) {
             ItemStack itemstack = inventory.getItem(i);
-            net.minecraft.world.item.ItemStackTemplate remainder = itemstack.getCraftingRemainder();
-            aitemstack.set(i, remainder != null ? remainder.create() : ItemStack.EMPTY);
+            aitemstack.set(i, itemstack.getRecipeRemainder());
         }
 
         return aitemstack;
@@ -67,8 +66,8 @@ public class RecipeBloodExtractorCombination extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid) {
-        ItemStack output = getResultItem(null).copy();
+    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
+        ItemStack output = getResultItem(registryAccess).copy();
 
         int totalCapacity = 0;
         int totalContent = 0;

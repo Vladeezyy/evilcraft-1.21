@@ -1,8 +1,10 @@
 package org.cyclops.evilcraft.block;
 
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -45,8 +47,8 @@ public class BlockDarkTankConfigClient extends BlockClientConfig<ModBaseNeoForge
         public void update(ItemStackRenderState renderState, ItemStack stack, ItemModelResolver itemModelResolver, ItemDisplayContext displayContext,
                            @Nullable ClientLevel level, @Nullable ItemOwner owner, int seed) {
             if (model == null) {
-                ModelDarkTankBaked baked = new ModelDarkTankBaked(Minecraft.getInstance().getModelManager().getBlockStateModelSet()
-                        .get(RegistryEntries.BLOCK_DARK_TANK.get().defaultBlockState()));
+                ModelDarkTankBaked baked = new ModelDarkTankBaked(Minecraft.getInstance().getModelManager().getBlockModelShaper()
+                        .getBlockModel(RegistryEntries.BLOCK_DARK_TANK.get().defaultBlockState()));
                 model = new ItemDynamicItemAndBlockModel(baked, baked.getModelRenderProperties());
             }
             model.update(renderState, stack, itemModelResolver, displayContext, level, owner, seed);

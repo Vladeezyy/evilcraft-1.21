@@ -5,7 +5,6 @@ package org.cyclops.evilcraft.fabric.cyclopscore.persist.world;
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import org.cyclops.evilcraft.fabric.cyclopscore.init.ModBaseNeoForge;
 
@@ -53,11 +52,11 @@ public class GlobalCounters extends WorldStorage<GlobalCounters> {
 
         public Access(ModBaseNeoForge<?> mod) {
             super(new SavedDataType<>(
-                    Identifier.fromNamespaceAndPath(mod.getModId(), "globalcounters"),
+                    mod.getModId() + "_globalcounters",
                     () -> new GlobalCounters(Maps.newHashMap()),
-                    RecordCodecBuilder.<GlobalCounters>create(instance -> instance.group(
+                    RecordCodecBuilder.create(instance -> instance.group(
                             Codec.dispatchedMap(Codec.STRING, (key) -> Codec.INT).fieldOf("counters").forGetter(data -> data.counters)
-                    ).apply(instance, GlobalCounters::new)),
+                    ).apply(instance, counters -> new GlobalCounters(Maps.newHashMap(counters)))),
                     // Vanilla needs a type to fix on load; this one has no rules for the fields of the mod
                     net.minecraft.util.datafix.DataFixTypes.SAVED_DATA_COMMAND_STORAGE
             ), mod);

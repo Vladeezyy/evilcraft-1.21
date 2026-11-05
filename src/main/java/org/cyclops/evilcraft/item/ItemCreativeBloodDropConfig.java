@@ -5,8 +5,11 @@ import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.capabilities.RegisterCapabilitiesEvent;
 import org.cyclops.evilcraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import org.cyclops.evilcraft.fabric.fluids.SimpleFluidContent;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.TransactionContext;
+import org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries;
 import org.cyclops.evilcraft.fabric.cyclopscore.capability.fluid.FluidHandlerItemCapacity;
 import org.cyclops.cyclopscore.config.extendedconfig.ItemConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
@@ -36,7 +39,7 @@ public class ItemCreativeBloodDropConfig extends ItemConfigCommon<IModBase> {
     }
 
     @Override
-    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
+    public Collection<ItemStack> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

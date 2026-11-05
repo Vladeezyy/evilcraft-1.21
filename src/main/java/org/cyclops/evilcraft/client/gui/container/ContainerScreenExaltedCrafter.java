@@ -1,7 +1,7 @@
 package org.cyclops.evilcraft.client.gui.container;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.component.DataComponents;
@@ -39,7 +39,7 @@ public class ContainerScreenExaltedCrafter extends ContainerScreenExtended<Conta
 
     @Override
     public boolean charTyped(CharacterEvent evt) {
-        return handleKeyCode(new KeyEvent(evt.codepoint(), 0, 0)) || super.charTyped(evt);
+        return handleKeyCode(new KeyEvent(evt.codepoint(), 0, evt.modifiers())) || super.charTyped(evt);
     }
 
     @Override
@@ -90,14 +90,14 @@ public class ContainerScreenExaltedCrafter extends ContainerScreenExtended<Conta
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int x, int y) {
+    protected void renderLabels(GuiGraphics guiGraphics, int x, int y) {
         // super.drawGuiContainerForegroundLayer(matrixStack, x, y);
         ItemStack itemStack = container.getItemStack(this.minecraft.player);
         Component name = Component.translatable("gui.exalted_crafting");
         if(itemStack.has(DataComponents.CUSTOM_NAME)) {
             name = itemStack.getHoverName();
         }
-        guiGraphics.text(font, name, 28, 6, 4210752, false);
+        guiGraphics.drawString(font, name, 28, 6, 4210752, false);
     }
 
 }

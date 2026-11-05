@@ -39,7 +39,6 @@ public abstract class FluidConfigNeoForge extends ExtendedConfigCommon<FluidConf
         FluidType.Properties fluidAttributes = FluidType.Properties.create();
         fluidAttributesConsumer.accept(fluidAttributes);
         FluidType fluidType = new FluidType(fluidAttributes);
-
         Wrapper<BaseFlowingFluid.Properties> properties = new Wrapper<>();
         final Wrapper<Fluid> source = new Wrapper<>();
         final Wrapper<Fluid> flowing = new Wrapper<>();

@@ -6,28 +6,17 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.dispatch.ModelState;
-import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ResolvableModel;
-import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.client.resources.model.cuboid.ItemTransforms;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.client.resources.model.sprite.Material;
-import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
@@ -51,9 +40,9 @@ import java.util.List;
  */
 public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
 
-    private final SingleCache<Material, BlockStateModelPart> modelCache = new SingleCache<>(new SingleCache.ICacheUpdater<>() {
+    private final SingleCache<Material, BlockModelPart> modelCache = new SingleCache<>(new SingleCache.ICacheUpdater<>() {
         @Override
-        public BlockStateModelPart getNewValue(Material key) {
+        public BlockModelPart getNewValue(Material key) {
             return bakeModel(key);
         }
 
@@ -67,49 +56,43 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
     private final ResolvedModel resolvedModel;
     private final ModelState modelState;
     private final TextureSlots textureSlots;
-    private final Material.Baked particleMaterialBaked;
-    private final BlockStateModelPart untexturedModel;
+    private final TextureAtlasSprite particleIcon;
+    private final BlockModelPart untexturedModel;
 
-    public ModelDisplayStandBaked(ModelBaker baker, ResolvedModel resolvedModel, ModelState modelState, TextureSlots textureSlots, Material.Baked particleMaterialBaked) {
+    public ModelDisplayStandBaked(ModelBaker baker, ResolvedModel resolvedModel, ModelState modelState, TextureSlots textureSlots, TextureAtlasSprite particleIcon) {
         super(true, false);
         this.baker = baker;
         this.resolvedModel = resolvedModel;
         this.modelState = modelState;
         this.textureSlots = textureSlots;
-        this.particleMaterialBaked = particleMaterialBaked;
+        this.particleIcon = particleIcon;
         // Bake the model with its own default textures, for when no display stand type is set
         this.untexturedModel = new SimpleModelWrapper(
                 resolvedModel.bakeTopGeometry(textureSlots, baker, modelState),
                 resolvedModel.getTopAmbientOcclusion(),
-                resolvedModel.resolveParticleMaterial(textureSlots, baker));
+                resolvedModel.resolveParticleSprite(textureSlots, baker));
     }
 
     @Override
-    public Material.Baked particleMaterial() {
-        return particleMaterialBaked;
+    public TextureAtlasSprite particleIcon() {
+        return particleIcon;
     }
 
-    @Override
-    public int materialFlags() {
-        return 0;
-    }
-
-    protected BlockStateModelPart handleDisplayStandType(ItemStack displayStandType) {
+    @Nullable
+    protected BlockModelPart handleDisplayStandType(ItemStack displayStandType) {
         if (displayStandType != null && !displayStandType.isEmpty()) {
             // Get reference texture
             BlockState blockState = IModHelpers.get().getBlockHelpers().getBlockStateFromItemStack(displayStandType);
-            BlockStateModel blockModel = Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(blockState);
-            Material.Baked blockParticleMaterial = blockModel.particleMaterial();
-            if (blockParticleMaterial != null) {
-                return modelCache.get(new Material(blockParticleMaterial.sprite().contents().name()));
-            }
+            TextureAtlasSprite texture = Minecraft.getInstance().getModelManager().getBlockModelShaper()
+                    .getBlockModel(blockState).particleIcon();
+            return modelCache.get(new Material(texture.atlasLocation(), texture.contents().name()));
         }
         // Fall back to the default (untextured) model, e.g. for display stands without a type,
         // such as the ones shown in recipe viewers like JEI.
         return untexturedModel;
     }
 
-    public BlockStateModelPart bakeModel(Material material) {
+    public BlockModelPart bakeModel(Material material) {
         // Override all textures in the model to the given texture
         // Get the original texture slot names from the wrapped model
         TextureSlots.Data originalData = resolvedModel.wrapped().textureSlots();
@@ -128,11 +111,9 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
         // because those cache their result without taking the texture slots into account,
         // which would make this texture override be silently ignored.
         boolean useAmbientOcclusion = resolvedModel.getTopAmbientOcclusion();
-        Material.Baked particleMatBaked = baker.materials().resolveSlot(textureSlotsOverride, "particle", resolvedModel);
-        QuadCollection quadcollection = resolvedModel.getTopGeometry()
-                .bake(textureSlotsOverride, baker, modelState, resolvedModel);
-
-        return new SimpleModelWrapper(quadcollection, useAmbientOcclusion, particleMatBaked);
+        TextureAtlasSprite textureatlassprite = resolvedModel.resolveParticleSprite(textureSlotsOverride, baker);
+        QuadCollection quadcollection = resolvedModel.getTopGeometry().bake(textureSlotsOverride, baker, modelState, resolvedModel);
+        return new SimpleModelWrapper(quadcollection, useAmbientOcclusion, textureatlassprite);
     }
 
     @Nonnull
@@ -156,14 +137,20 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
     @Override
     public List<BakedQuad> handleBlockState(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side, RandomSource rand, ModelData extraData, ChunkSectionLayer renderType) {
         List<BakedQuad> quads = Lists.newLinkedList();
-        quads.addAll(handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY)).getQuads(null));
+        BlockModelPart blockModelPart = handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY));
+        if (blockModelPart != null) {
+            quads.addAll(blockModelPart.getQuads(null));
+        }
         return quads;
     }
 
     @Override
     public List<BakedQuad> handleItemState(@Nullable ItemStack stack, @Nullable Level level, @Nullable ItemOwner entity) {
         List<BakedQuad> quads = Lists.newLinkedList();
-        quads.addAll(handleDisplayStandType(RegistryEntries.BLOCK_DISPLAY_STAND.get().getDisplayStandType(stack)).getQuads(null));
+        BlockModelPart blockModelPart = handleDisplayStandType(RegistryEntries.BLOCK_DISPLAY_STAND.get().getDisplayStandType(stack));
+        if (blockModelPart != null) {
+            quads.addAll(blockModelPart.getQuads(null));
+        }
         return quads;
     }
 
@@ -204,9 +191,12 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
     }
 
     @Override
-    public Material.Baked particleMaterial(BlockAndTintGetter level, BlockPos pos, BlockState state) {
-        return handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY))
-                .particleMaterial();
+    public TextureAtlasSprite particleSprite(BlockAndTintGetter level, BlockPos pos, BlockState state) {
+        BlockModelPart part = handleDisplayStandType(ModelHelpers.getSafeProperty(getModelData(level, pos), BlockDisplayStand.TYPE, ItemStack.EMPTY));
+        if (part != null) {
+            return part.particleIcon();
+        }
+        return particleIcon();
     }
 
     @Override
@@ -233,8 +223,8 @@ public class ModelDisplayStandBaked extends DynamicItemAndBlockModel {
         public BlockStateModel bake(ModelBaker baker) {
             ResolvedModel resolvedModel = baker.getModel(base);
             TextureSlots textureslots = resolvedModel.getTopTextureSlots();
-            Material.Baked particleMatBaked = resolvedModel.resolveParticleMaterial(textureslots, baker);
-            return new ModelDisplayStandBaked(baker, resolvedModel, modelState.asModelState(), textureslots, particleMatBaked);
+            TextureAtlasSprite textureatlassprite = resolvedModel.resolveParticleSprite(textureslots, baker);
+            return new ModelDisplayStandBaked(baker, resolvedModel, modelState.asModelState(), textureslots, textureatlassprite);
         }
 
         @Override

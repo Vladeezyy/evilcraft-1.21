@@ -141,7 +141,7 @@ public class EntityBroom extends Entity {
     }
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand, net.minecraft.world.phys.Vec3 vec3) {
+    public InteractionResult interact(Player player, InteractionHand hand) {
         if (!this.level().isClientSide() && !isVehicle() && !player.isCrouching()) {
             player.startRiding(this);
             lastMounted = player;
@@ -387,7 +387,7 @@ public class EntityBroom extends Entity {
 
     public void consume(int amount, LivingEntity entityLiving) {
         float efficiencyFactor = Math.min(0.9F, Math.max(0.0F, getModifier(BroomModifiers.EFFICIENCY) / BroomModifiers.EFFICIENCY.getMaxTierValue()));
-        if(level().getRandom().nextFloat() > efficiencyFactor) {
+        if(level().random.nextFloat() > efficiencyFactor) {
             ItemStack broomStack = getBroomStack();
             ((IBroom) broomStack.getItem()).consumeBroom(amount, broomStack, entityLiving);
             setBroomStack(broomStack);

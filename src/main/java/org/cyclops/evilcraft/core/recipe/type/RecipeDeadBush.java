@@ -29,8 +29,8 @@ public class RecipeDeadBush extends CustomRecipe {
 
     private PlacementInfo placementInfo;
 
-    public RecipeDeadBush() {
-        super();
+    public RecipeDeadBush(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class RecipeDeadBush extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inv) {
-        return new ItemStack(Items.DEAD_BUSH);
+    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider registryAccess) {
+        return getResultItem(registryAccess).copy();
     }
 
     public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
@@ -100,8 +100,7 @@ public class RecipeDeadBush extends CustomRecipe {
                     }
                 }
             } else {
-                net.minecraft.world.item.ItemStackTemplate remainder = itemStack.getCraftingRemainder();
-                itemStack = remainder != null ? remainder.create() : ItemStack.EMPTY;
+                itemStack = itemStack.getRecipeRemainder();
             }
             stacks.add(itemStack);
         }

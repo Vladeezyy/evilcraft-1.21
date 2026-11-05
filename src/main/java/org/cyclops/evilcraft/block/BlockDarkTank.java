@@ -1,5 +1,8 @@
 package org.cyclops.evilcraft.block;
 
+
+
+
 import org.cyclops.evilcraft.fabric.client.model.ModelProperty;
 
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
@@ -104,10 +107,10 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynam
             IModHelpers.get().getBlockEntityHelpers().get(worldIn, pos, BlockEntityDarkTank.class)
                     .ifPresent(tile -> {
                         tile.setEnabled(!tile.isEnabled());
-                        player.sendOverlayMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
+                        player.displayClientMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
                                 .append(" / ")
                                 .append(String.format(Locale.ROOT, "%,d", tile.getTank().getCapacity()))
-                                .append(" mB"));
+                                .append(" mB"), true);
                     });
             return InteractionResult.SUCCESS;
         }

@@ -66,7 +66,7 @@ public final class FluidResource implements Resource {
     }
 
     public Holder<Fluid> typeHolder() {
-        return variant.typeHolder();
+        return variant.getRegistryEntry();
     }
 
     @Override
@@ -79,11 +79,11 @@ public final class FluidResource implements Resource {
     }
 
     public DataComponentMap getComponents() {
-        return variant.getComponents();
+        return variant.getComponentMap();
     }
 
     public DataComponentPatch getComponentsPatch() {
-        return variant.getComponentsPatch();
+        return variant.getComponents();
     }
 
     public boolean isComponentsPatchEmpty() {
@@ -91,7 +91,7 @@ public final class FluidResource implements Resource {
     }
 
     public <D> FluidResource with(DataComponentType<D> type, D data) {
-        return of(variant.withComponents(DataComponentPatch.builder().set(type, data).build()));
+        return of(variant.withComponentChanges(DataComponentPatch.builder().set(type, data).build()));
     }
 
     public <D> FluidResource with(Supplier<? extends DataComponentType<D>> type, D data) {
@@ -99,7 +99,7 @@ public final class FluidResource implements Resource {
     }
 
     public FluidResource without(DataComponentType<?> type) {
-        return of(variant.withComponents(DataComponentPatch.builder().remove(type).build()));
+        return of(variant.withComponentChanges(DataComponentPatch.builder().remove(type).build()));
     }
 
     public FluidStack toStack(int amount) {

@@ -1,12 +1,9 @@
 package org.cyclops.evilcraft.block;
 
-import net.minecraft.client.color.block.BlockTintSources;
 import org.cyclops.evilcraft.fabric.event.RegisterColorHandlersEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockClientConfig;
 import org.cyclops.cyclopscore.config.extendedconfig.BlockConfigCommon;
 import org.cyclops.evilcraft.EvilCraft;
-
-import java.util.List;
 
 /**
  * @author rubensworks
@@ -18,10 +15,10 @@ public class BlockUndeadLeavesConfigClient extends BlockClientConfig<EvilCraft> 
 
     public BlockUndeadLeavesConfigClient(BlockConfigCommon<EvilCraft> blockConfig) {
         super(blockConfig);
-        RegisterColorHandlersEvent.BlockTintSources.addListener(this::onRegisterColors);
+        RegisterColorHandlersEvent.Block.addListener(this::onRegisterColors);
     }
 
-    public void onRegisterColors(RegisterColorHandlersEvent.BlockTintSources event) {
-        event.register(List.of(BlockTintSources.constant(UNDEAD_LEAVES_COLOR)), getBlockConfig().getInstance());
+    public void onRegisterColors(RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tintIndex) -> UNDEAD_LEAVES_COLOR, getBlockConfig().getInstance());
     }
 }

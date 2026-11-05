@@ -14,7 +14,7 @@ import mezz.jei.api.recipe.types.IRecipeHolderType;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -103,11 +103,11 @@ public class SanguinaryEnvironmentalAccumulatorRecipeCategory extends CommonEnvi
                 .addFluidStack(fluidStack.getFluid(), JeiFluids.amount(fluidStack.getAmount()), fluidStack.getComponentsPatch());
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 28)
-                .add(recipe.getOutputItem().map(l -> Ingredient.of(l.typeHolder().value()), ItemStackFromIngredient::getIngredient));
+                .add(recipe.getOutputItem().map(l -> Ingredient.of(l.getItem()), ItemStackFromIngredient::getIngredient));
     }
 
     @Override
-    public void draw(RecipeHolder<RecipeEnvironmentalAccumulator> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<RecipeEnvironmentalAccumulator> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
         this.background.draw(guiGraphics);
         arrow.draw(guiGraphics, 65, 28);
@@ -115,6 +115,6 @@ public class SanguinaryEnvironmentalAccumulatorRecipeCategory extends CommonEnvi
         // Draw duration
         Font fontRenderer = Minecraft.getInstance().font;
         MutableComponent duration = JEIEvilCraftConfig.getDurationSecondsTextComponent(recipe.value().getDuration());
-        guiGraphics.text(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, ARGB.opaque(0xFF808080), false);
+        guiGraphics.drawString(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, ARGB.opaque(0xFF808080), false);
     }
 }

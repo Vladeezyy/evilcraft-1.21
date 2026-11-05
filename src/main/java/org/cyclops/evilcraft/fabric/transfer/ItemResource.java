@@ -54,7 +54,7 @@ public final class ItemResource implements Resource {
     }
 
     public Holder<Item> typeHolder() {
-        return variant.typeHolder();
+        return variant.getRegistryEntry();
     }
 
     @Override
@@ -67,31 +67,31 @@ public final class ItemResource implements Resource {
     }
 
     public boolean is(TagKey<Item> tag) {
-        return variant.typeHolder().is(tag);
+        return variant.getRegistryEntry().is(tag);
     }
 
     public DataComponentMap getComponents() {
-        return variant.getComponents();
+        return variant.getComponentMap();
     }
 
     public DataComponentPatch getComponentsPatch() {
-        return variant.getComponentsPatch();
+        return variant.getComponents();
     }
 
     public <D> D get(DataComponentType<? extends D> type) {
-        return variant.getComponents().get(type);
+        return variant.getComponentMap().get(type);
     }
 
     public <D> D getOrDefault(DataComponentType<? extends D> type, D defaultValue) {
-        return variant.getComponents().getOrDefault(type, defaultValue);
+        return variant.getComponentMap().getOrDefault(type, defaultValue);
     }
 
     public boolean has(DataComponentType<?> type) {
-        return variant.getComponents().has(type);
+        return variant.getComponentMap().has(type);
     }
 
     public <D> ItemResource with(DataComponentType<D> type, D data) {
-        return of(variant.withComponents(DataComponentPatch.builder().set(type, data).build()));
+        return of(variant.withComponentChanges(DataComponentPatch.builder().set(type, data).build()));
     }
 
     public <D> ItemResource with(Supplier<? extends DataComponentType<D>> type, D data) {
@@ -99,7 +99,7 @@ public final class ItemResource implements Resource {
     }
 
     public ItemResource without(DataComponentType<?> type) {
-        return of(variant.withComponents(DataComponentPatch.builder().remove(type).build()));
+        return of(variant.withComponentChanges(DataComponentPatch.builder().remove(type).build()));
     }
 
     public ItemStack toStack(int count) {
@@ -111,7 +111,7 @@ public final class ItemResource implements Resource {
     }
 
     public int getMaxStackSize() {
-        return variant.getComponents().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
+        return variant.getComponentMap().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE, 1);
     }
 
     public boolean matches(ItemStack stack) {

@@ -1,17 +1,14 @@
 package org.cyclops.evilcraft.fabric.cyclopscore.client.model;
 
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import org.cyclops.evilcraft.fabric.client.model.ModelData;
-
-
-
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -33,7 +30,7 @@ public abstract class DelegatingChildDynamicItemAndBlockModel extends Delegating
         this.baseModel = baseModel;
     }
 
-    public DelegatingChildDynamicItemAndBlockModel(BlockStateModel baseModel, ItemStack itemStack, ClientLevel level, LivingEntity entity) {
+    public DelegatingChildDynamicItemAndBlockModel(BlockStateModel baseModel, ItemStack itemStack, Level level, LivingEntity entity) {
         super(itemStack, level, entity);
         this.baseModel = baseModel;
     }

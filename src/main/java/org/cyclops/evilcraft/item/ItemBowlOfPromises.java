@@ -1,8 +1,7 @@
 package org.cyclops.evilcraft.item;
 
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.RegistryEntries;
 
 /**
@@ -15,12 +14,20 @@ public class ItemBowlOfPromises extends Item {
     private final Type type;
 
     public ItemBowlOfPromises(Properties properties, Type type) {
-        super(type.isActive() ? properties.craftRemainder(new ItemStackTemplate(RegistryEntries.ITEM_BOWL_OF_PROMISES_EMPTY, 1, DataComponentPatch.EMPTY)) : properties);
+        super(properties);
         this.type = type;
     }
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public ItemStack getRecipeRemainder(ItemStack itemStack) {
+        if(type.isActive()) {
+            return new ItemStack(RegistryEntries.ITEM_BOWL_OF_PROMISES_EMPTY);
+        }
+        return super.getRecipeRemainder(itemStack);
     }
 
     public static enum Type {

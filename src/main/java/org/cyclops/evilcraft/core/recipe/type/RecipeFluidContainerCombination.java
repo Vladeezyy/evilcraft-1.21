@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import net.minecraft.core.HolderLookup;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +25,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
     private final int maxCapacity;
 
     public RecipeFluidContainerCombination(CraftingBookCategory category, Ingredient fluidContainer, int maxCapacity) {
-        super();
+        super(category);
         this.fluidContainer = fluidContainer;
         this.maxCapacity = maxCapacity;
     }
@@ -39,7 +40,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid).isEmpty();
+        return !assemble(grid, world.registryAccess()).isEmpty();
     }
 
     @Override
@@ -48,8 +49,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
 
         for (int i = 0; i < aitemstack.size(); ++i) {
             ItemStack itemstack = inventory.getItem(i);
-            net.minecraft.world.item.ItemStackTemplate remainder = itemstack.getCraftingRemainder();
-            aitemstack.set(i, remainder != null ? remainder.create() : ItemStack.EMPTY);
+            aitemstack.set(i, itemstack.getRecipeRemainder());
         }
 
         return aitemstack;
@@ -61,7 +61,7 @@ public class RecipeFluidContainerCombination extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid) {
+    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
         ItemStack output = new ItemStack(fluidContainer.items().findFirst().get());
         ItemAccess outputItemAccess = ItemAccess.forStack(output);
         IFluidHandlerCapacity fluidHandlerOutput = IModHelpersNeoForge.get().getFluidHelpers().getFluidHandlerItemCapacity(outputItemAccess).orElse(null);

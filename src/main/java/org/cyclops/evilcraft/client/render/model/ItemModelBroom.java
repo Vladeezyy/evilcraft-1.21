@@ -1,15 +1,15 @@
 package org.cyclops.evilcraft.client.render.model;
 
 import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
+
 import com.google.common.collect.Maps;
 import com.mojang.math.OctahedralGroup;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
@@ -20,7 +20,6 @@ import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.api.broom.IBroomPart;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public record ItemModelBroom(ModelBroomBaked model, ModelRenderProperties modelR
         }
 
         @Override
-        public ItemModel bake(BakingContext bakingContext, org.joml.Matrix4fc matrix4fc) {
+        public ItemModel bake(BakingContext bakingContext) {
             ModelBaker baker = bakingContext.blockModelBaker();
             Map<IBroomPart, BlockStateModel> broomPartModels = Maps.newIdentityHashMap();
             for(IBroomPart part : BroomParts.REGISTRY.getParts()) {

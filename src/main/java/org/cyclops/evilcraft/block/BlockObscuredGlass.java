@@ -16,7 +16,7 @@ public class BlockObscuredGlass extends TintedGlassBlock {
     }
 
     @Override
-    public int getLightDampening(BlockState state) {
+    public int getLightBlock(BlockState state) {
         return 10;
     }
 }

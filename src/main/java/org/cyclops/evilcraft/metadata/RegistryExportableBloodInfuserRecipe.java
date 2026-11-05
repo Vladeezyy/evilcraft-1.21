@@ -50,7 +50,7 @@ public class RegistryExportableBloodInfuserRecipe extends RegistryExportableReci
         }
         inputObject.add("item", arrayInputs);
         recipe.getInputFluid()
-                .ifPresent(inputFluid -> inputObject.add("fluid", IRegistryExportable.serializeFluidStack(inputFluid.create())));
+                .ifPresent(inputFluid -> inputObject.add("fluid", IRegistryExportable.serializeFluidStack(inputFluid)));
 
         // Outputs
         JsonObject outputObject = new JsonObject();

@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -42,7 +41,6 @@ import org.cyclops.evilcraft.entity.monster.EntityVengeanceSpiritData;
 import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * A box that can hold beings from higher dimensions.
@@ -61,7 +59,7 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
     public static final VoxelShape SHAPE_EW = Block.box(0.25F * 16F, 0F, 0.0F, 0.75F * 16F, 0.43F * 16F, 1.0F * 16F);
     public static final VoxelShape SHAPE_NS = Block.box(0.0F, 0F, 0.25F * 16F, 1.0F * 16F, 0.43F * 16F, 0.75F * 16F);
 
-    public static ItemStackTemplate boxOfEternalClosureFilled;
+    public static ItemStack boxOfEternalClosureFilled;
 
     public BlockBoxOfEternalClosure(Block.Properties properties) {
         super(properties, BlockEntityBoxOfEternalClosure::new);
@@ -205,9 +203,9 @@ public class BlockBoxOfEternalClosure extends BlockWithEntity implements IBlockR
                 .orElse(0);
     }
 
-    public void fillItemCategory(NonNullList<Supplier<ItemStack>> items) {
-        items.add(() -> new ItemStack(this));
-        items.add(() -> BlockBoxOfEternalClosure.boxOfEternalClosureFilled.create());
+    public void fillItemCategory(NonNullList<ItemStack> items) {
+        items.add(new ItemStack(this));
+        items.add(org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.boxOfEternalClosureFilled);
     }
 
     @Override

@@ -4,7 +4,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
@@ -60,9 +60,9 @@ public class AdvancedButton extends Button {
     }
 
     @Override
-    public void extractContents(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if(isVisible() && isHover(mouseX, mouseY)) {
-            guiGraphics.text(Minecraft.getInstance().font, getMessage(), getX(), getY(), IModHelpers.get().getBaseHelpers().RGBAToInt(100, 100, 150, 255), false);
+            guiGraphics.drawString(Minecraft.getInstance().font, getMessage(), getX(), getY(), IModHelpers.get().getBaseHelpers().RGBAToInt(100, 100, 150, 255), false);
         }
     }
 
@@ -73,7 +73,7 @@ public class AdvancedButton extends Button {
      * @param mx Mouse x.
      * @param my Mouse Y.
      */
-    public void renderTooltip(GuiGraphicsExtractor guiGraphics, Font font, int mx, int my) {
+    public void renderTooltip(GuiGraphics guiGraphics, Font font, int mx, int my) {
 
     }
 

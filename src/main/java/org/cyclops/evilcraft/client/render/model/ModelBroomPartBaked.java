@@ -1,23 +1,23 @@
 package org.cyclops.evilcraft.client.render.model;
 
+
 import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
 import org.cyclops.evilcraft.fabric.client.model.ModelData;
-
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.client.resources.model.cuboid.ItemTransforms;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.cyclops.evilcraft.fabric.cyclopscore.client.model.DynamicItemAndBlockModel;
@@ -27,7 +27,6 @@ import org.cyclops.evilcraft.api.broom.IBroomPart;
 import org.cyclops.evilcraft.core.broom.BroomParts;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +76,7 @@ public class ModelBroomPartBaked extends DynamicItemAndBlockModel {
         IBroomPart part = BroomParts.REGISTRY.getPartFromItem(itemStack);
         BlockStateModel model = broomPartModels.get(part);
         if (model != null) {
-            List<BlockStateModelPart> partsList = new ArrayList<>();
-            model.collectParts(this.rand, partsList);
-            for (BlockStateModelPart blockModelPart : partsList) {
+            for (BlockModelPart blockModelPart : model.collectParts(this.rand)) {
                 quads.addAll(color(blockModelPart.getQuads(null), part.getModelColor()));
             }
         }
@@ -96,19 +93,14 @@ public class ModelBroomPartBaked extends DynamicItemAndBlockModel {
     private Collection<? extends BakedQuad> color(List<BakedQuad> quads, int color) {
         List<BakedQuad> offsetQuads = Lists.newArrayListWithExpectedSize(quads.size());
         for (BakedQuad quad : quads) {
-            offsetQuads.add(ColoredQuads.withColor(new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.direction(), quad.materialInfo()), color));
+            offsetQuads.add(ColoredQuads.withColor(new BakedQuad(quad.position0(), quad.position1(), quad.position2(), quad.position3(), quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(), quad.tintIndex(), quad.direction(), quad.sprite(), false, 3), color));
         }
         return offsetQuads;
     }
 
     @Override
-    public Material.Baked particleMaterial() {
+    public TextureAtlasSprite particleIcon() {
         return null;
-    }
-
-    @Override
-    public int materialFlags() {
-        return 0;
     }
 
     @Override

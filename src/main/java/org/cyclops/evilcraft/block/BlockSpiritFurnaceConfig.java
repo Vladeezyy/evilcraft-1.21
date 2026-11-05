@@ -58,7 +58,7 @@ public class BlockSpiritFurnaceConfig extends UpgradableBlockContainerConfig {
                         .requiresCorrectToolForDrops()
                         .strength(5.0F)
                         .sound(SoundType.STONE)
-                        .isValidSpawn((_, _, _, _) -> false)),
+                        .isValidSpawn((a, b, c, d) -> false)),
                 (eConfig, block) -> new ItemBlockFluidContainer(block, eConfig.createDefaultItemProperties())
         );
     }

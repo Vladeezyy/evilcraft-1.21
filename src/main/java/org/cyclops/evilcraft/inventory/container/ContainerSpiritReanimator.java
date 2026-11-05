@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotFluidContainer;
 import org.cyclops.cyclopscore.inventory.slot.SlotRemoveOnly;
-import org.cyclops.cyclopscore.inventory.slot.SlotSingleIngredient;
+import org.cyclops.evilcraft.fabric.cyclopscore.inventory.slot.SlotSingleIngredient;
 import org.cyclops.evilcraft.RegistryEntries;
 import org.cyclops.evilcraft.block.BlockSpiritReanimator;
 import org.cyclops.evilcraft.blockentity.BlockEntitySpiritReanimator;

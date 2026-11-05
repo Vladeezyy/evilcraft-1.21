@@ -6,18 +6,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.dispatch.Variant;
+import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ResolvableModel;
-import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.client.resources.model.cuboid.ItemTransform;
-import net.minecraft.client.resources.model.cuboid.ItemTransforms;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -25,7 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.client.model.loading.v1.CustomUnbakedBlockStateModel;
@@ -36,7 +28,6 @@ import org.cyclops.evilcraft.block.BlockBoxOfEternalClosure;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -80,21 +71,15 @@ public class ModelBoxOfEternalClosureBaked extends DelegatingDynamicItemAndBlock
     public List<BakedQuad> getGeneralQuads() {
         List<BakedQuad> quads = Lists.newLinkedList();
 
-        List<BlockStateModelPart> boxParts = new ArrayList<>();
-        boxModel.collectParts(rand, boxParts);
-        for (BlockStateModelPart blockModelPart : boxParts) {
+        for (BlockModelPart blockModelPart : boxModel.collectParts(rand)) {
             quads.addAll(blockModelPart.getQuads(null));
         }
         if (isOpen) {
-            List<BlockStateModelPart> lidRotParts = new ArrayList<>();
-            boxLidRotatedModel.collectParts(rand, lidRotParts);
-            for (BlockStateModelPart blockModelPart : lidRotParts) {
+            for (BlockModelPart blockModelPart : boxLidRotatedModel.collectParts(rand)) {
                 quads.addAll(blockModelPart.getQuads(null));
             }
         } else {
-            List<BlockStateModelPart> lidParts = new ArrayList<>();
-            boxLidModel.collectParts(rand, lidParts);
-            for (BlockStateModelPart blockModelPart : lidParts) {
+            for (BlockModelPart blockModelPart : boxLidModel.collectParts(rand)) {
                 quads.addAll(blockModelPart.getQuads(null));
             }
         }
@@ -124,13 +109,8 @@ public class ModelBoxOfEternalClosureBaked extends DelegatingDynamicItemAndBlock
     }
 
     @Override
-    public Material.Baked particleMaterial() {
-        return this.boxModel.particleMaterial();
-    }
-
-    @Override
-    public int materialFlags() {
-        return 0;
+    public TextureAtlasSprite particleIcon() {
+        return this.boxModel.particleIcon();
     }
 
     @Override
@@ -207,7 +187,7 @@ public class ModelBoxOfEternalClosureBaked extends DelegatingDynamicItemAndBlock
 
         @Override
         public BlockStateModel bake(ModelBaker baker) {
-            net.minecraft.client.renderer.block.dispatch.ModelState modelState = this.modelState.asModelState();
+            ModelState modelState = this.modelState.asModelState();
             return new ModelBoxOfEternalClosureBaked(
                     ModelHelpers.bakeSingleBlockStateModel(baker, box, modelState),
                     ModelHelpers.bakeSingleBlockStateModel(baker, boxLid, modelState),

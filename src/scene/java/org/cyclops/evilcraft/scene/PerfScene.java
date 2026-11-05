@@ -97,7 +97,7 @@ public final class PerfScene {
             // Uncapped frames, or the FPS of both windows is the display's refresh rate
             mc.options.enableVsync().set(false);
             mc.options.framerateLimit().set(260);
-            LevelSettings settings = new LevelSettings(WORLD, GameType.SURVIVAL, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
+            LevelSettings settings = new LevelSettings(WORLD, GameType.SURVIVAL, false, Difficulty.NORMAL, true, new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS), WorldDataConfiguration.DEFAULT);
             mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
             return;
         }
@@ -192,9 +192,9 @@ public final class PerfScene {
         MinecraftServer server = player.level().getServer();
         // Survival rules, but a fixed day and no natural spawns: the same load in both windows
         player.setGameMode(GameType.SPECTATOR);
-        server.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
-        server.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
-        server.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+        player.level().getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+        player.level().getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+        player.level().getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
         // The day time and the weather are clocks since 26.1, the commands set them
         player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "time set 6000");
         player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "weather clear");

@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.core.client.gui.container;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.cyclops.evilcraft.client.gui.container.WidgetUpgradeTab;
@@ -43,8 +43,8 @@ public abstract class ContainerScreenTileWorking<C extends ContainerTileWorking<
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor guiGraphics, int x, int y, float f) {
-        super.extractBackground(guiGraphics, x, y, f);
+    protected void renderBg(GuiGraphics guiGraphics, float f, int x, int y) {
+        super.renderBg(guiGraphics, f, x, y);
         upgrades.drawBackground(guiGraphics, leftPos, topPos);
     }
 

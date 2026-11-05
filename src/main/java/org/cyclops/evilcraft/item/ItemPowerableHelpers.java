@@ -4,7 +4,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.Reference;
@@ -51,8 +50,8 @@ public class ItemPowerableHelpers {
             if(!world.isClientSide()) {
                 int newPower = (getPower(itemStack) + 1) % powerLevels;
                 setPower(itemStack, newPower);
-                player.sendOverlayMessage(Component.translatable("item." + Reference.MOD_ID + ".powerable.set_power", newPower)
-                        .withStyle(ChatFormatting.DARK_PURPLE));
+                player.displayClientMessage(Component.translatable("item." + Reference.MOD_ID + ".powerable.set_power", newPower)
+                        .withStyle(ChatFormatting.DARK_PURPLE), true);
             }
             return true;
         }
@@ -64,8 +63,8 @@ public class ItemPowerableHelpers {
      * @param itemStack The itemstack with a power
      * @param lines The lines to add the information to.
      */
-    public static void addPreInformation(ItemStack itemStack, Consumer<Component> lines, TooltipFlag flag) {
-        IModHelpers.get().getL10NHelpers().addOptionalInfo(lines, "item." + Reference.MOD_ID + ".powerable", flag);
+    public static void addPreInformation(ItemStack itemStack, Consumer<Component> lines) {
+        IModHelpers.get().getL10NHelpers().addOptionalInfo(lines, "item." + Reference.MOD_ID + ".powerable");
     }
 
     /**

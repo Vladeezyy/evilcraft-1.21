@@ -1,7 +1,9 @@
 package org.cyclops.evilcraft.blockentity.tickaction.bloodinfuser;
 
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+
 import net.minecraft.world.item.ItemStack;
-import org.cyclops.evilcraft.fabric.fluids.FluidStackTemplate;
+import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -48,7 +50,7 @@ public class InfuseItemTickAction extends BloodInfuserTickAction{
             return Integer.MAX_VALUE;
         }
         MutableInt amount = new MutableInt(recipe.get().getInputFluid()
-                .map(FluidStackTemplate::amount)
+                .map(FluidStack::getAmount)
                 .orElse(0));
         Upgrades.sendEvent(tile, new UpgradeSensitiveEvent<>(amount, BlockEntityBloodInfuser.UPGRADEEVENT_BLOODUSAGE));
         return Math.max(1, amount.getValue());

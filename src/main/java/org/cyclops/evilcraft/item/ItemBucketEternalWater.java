@@ -3,7 +3,6 @@ package org.cyclops.evilcraft.item;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.evilcraft.fabric.extensions.IItemUseFirst;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -12,7 +11,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
@@ -28,6 +26,7 @@ import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.transfer.ResourceHandler;
 import org.cyclops.evilcraft.fabric.transfer.FluidResource;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
+import org.cyclops.evilcraft.fabric.cyclopscore.helper.IModHelpersNeoForge;
 import org.cyclops.cyclopscore.helper.IModHelpers;
 import org.cyclops.evilcraft.RegistryEntries;
 
@@ -36,7 +35,12 @@ import org.cyclops.evilcraft.RegistryEntries;
  */
 public class ItemBucketEternalWater extends BucketItem implements IItemUseFirst {
     public ItemBucketEternalWater(Properties properties) {
-        super(Fluids.WATER, properties.craftRemainder(new ItemStackTemplate(RegistryEntries.ITEM_ETERNAL_WATER, 1, DataComponentPatch.EMPTY)));
+        super(Fluids.WATER, properties);
+    }
+
+    @Override
+    public ItemStack getRecipeRemainder(ItemStack itemStack) {
+        return new ItemStack(this);
     }
 
     @Override

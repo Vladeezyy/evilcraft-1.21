@@ -38,9 +38,9 @@ public class ReanimateTickAction implements ITickAction<BlockEntitySpiritReanima
             ItemStack spawnEgg = ItemStack.EMPTY;
             EntityType<?> entityType = tile.getEntityType();
             if(entityType != null) {
-                java.util.Optional<net.minecraft.core.Holder<net.minecraft.world.item.Item>> spawnEggOpt = SpawnEggItem.byId(entityType);
-                if (spawnEggOpt.isPresent() && spawnEggOpt.get().value() instanceof SpawnEggItem) {
-                    spawnEgg = new ItemStack(spawnEggOpt.get().value());
+                SpawnEggItem spawnEggItem = SpawnEggItem.byId(entityType);
+                if (spawnEggItem != null) {
+                    spawnEgg = new ItemStack(spawnEggItem);
                 }
             }
             if(!spawnEgg.isEmpty() && addToProduceSlot(tile, spawnEgg)) {

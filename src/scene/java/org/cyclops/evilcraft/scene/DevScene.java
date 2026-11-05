@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.scene;
 
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.fabric.api.client.creativetab.v1.FabricCreativeModeInventoryScreen;
+import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -185,7 +185,7 @@ public final class DevScene {
             if (mc.getLevelSource().levelExists(WORLD)) {
                 mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
             } else {
-                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
+                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.NORMAL, true, new net.minecraft.world.level.gamerules.GameRules(net.minecraft.world.flag.FeatureFlags.DEFAULT_FLAGS), WorldDataConfiguration.DEFAULT);
                 mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
             }
             return;
@@ -238,16 +238,16 @@ public final class DevScene {
 
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
         if (mc.screen instanceof CreativeModeInventoryScreen screen) {
-            ((FabricCreativeModeInventoryScreen) screen).setSelectedTab(tab);
+            ((FabricCreativeInventoryScreen) screen).setSelectedItemGroup(tab);
         }
     }
 
     private static void setup(ServerPlayer player) {
         MinecraftServer server = player.level().getServer();
         player.setGameMode(GameType.CREATIVE);
-        server.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
-        server.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
-        server.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+        player.level().getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+        player.level().getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+        player.level().getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
         // The day time and the weather are clocks since 26.1, the commands set them
         player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "time set 6000");
         player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "weather clear");
@@ -394,7 +394,7 @@ public final class DevScene {
         ItemStack chalice = new ItemStack(RegistryEntries.BLOCK_ENTANGLED_CHALICE.get().asItem());
         ItemStack stand = new ItemStack(RegistryEntries.BLOCK_DISPLAY_STAND.get().asItem());
         ItemStack[] items = {tank, new ItemStack(RegistryEntries.ITEM_DARK_TANK.get()), chalice, stand,
-                org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.boxOfEternalClosureFilled.create(),
+                org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.boxOfEternalClosureFilled.copy(),
                 new ItemStack(RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get().asItem()),
                 new ItemStack(RegistryEntries.ITEM_BROOM.get()), new ItemStack(RegistryEntries.BLOCK_BLOOD_CHEST.get().asItem())};
         for (int i = 0; i < items.length; i++) {

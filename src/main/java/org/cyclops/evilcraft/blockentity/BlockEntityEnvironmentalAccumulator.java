@@ -140,7 +140,6 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
 
     protected void recreateBossInfo() {
         this.bossInfo = (ServerBossEvent)(new ServerBossEvent(
-                java.util.UUID.randomUUID(),
                 Component.translatable("chat.evilcraft.boss_display.charge"),
                 BossEvent.BossBarColor.PURPLE,
                 BossEvent.BossBarOverlay.PROGRESS))
@@ -219,7 +218,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     protected void showWaterBeams() {
-        RandomSource random = level.getRandom();
+        RandomSource random = level.random;
         BlockPos target = getBlockPos();
         for (int j = 0; j < waterOffsets.length; j++) {
             BlockPos offset = waterOffsets[j];
@@ -254,7 +253,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
     }
 
     public static void showAccumulatingParticles(Level world, float centerX, float centerY, float centerZ, float spread) {
-        RandomSource rand = world.getRandom();
+        RandomSource rand = world.random;
         for (int j = 0; j < rand.nextInt(20); j++) {
             float scale = 0.6F - rand.nextFloat() * 0.4F;
             float red = rand.nextFloat() * 0.1F + 0.2F;
@@ -338,7 +337,7 @@ public class BlockEntityEnvironmentalAccumulator extends BlockEntityBeacon imple
                 entity.setItem(this.getInventory().getItem(0));
             } else {
                 // Recipe found, throw back the result
-                entity.setItem(recipe.value().assemble(getInventory().asRecipeInput()));
+                entity.setItem(recipe.value().assemble(getInventory().asRecipeInput(), level.registryAccess()));
 
                 // Change the weather to the resulting weather
                 WeatherType weatherSource = recipe.value().getInputWeather();

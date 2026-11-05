@@ -3,7 +3,7 @@ package org.cyclops.evilcraft.fabric.cyclopscore.infobook.pageelement;
 
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay;
@@ -32,7 +32,7 @@ public class FurnaceRecipeAppendixClient extends RecipeAppendixClient<FurnaceRec
     }
 
     @Override
-    public void drawElementInner(ScreenInfoBook gui, GuiGraphicsExtractor guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
+    public void drawElementInner(ScreenInfoBook gui, GuiGraphics guiGraphics, int x, int y, int width, int height, int page, int mx, int my) {
         int middle = (width - FurnaceRecipeAppendix.SLOT_SIZE) / 2;
         gui.drawArrowRight(guiGraphics, x + middle - 3, y + FurnaceRecipeAppendix.SLOT_OFFSET_Y + 2);
 

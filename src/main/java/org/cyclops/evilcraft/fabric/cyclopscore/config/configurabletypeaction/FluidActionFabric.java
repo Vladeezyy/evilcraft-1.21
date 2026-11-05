@@ -2,12 +2,11 @@ package org.cyclops.evilcraft.fabric.cyclopscore.config.configurabletypeaction;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
-import net.minecraft.client.renderer.block.FluidModel;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -57,7 +56,7 @@ public class FluidActionFabric extends ConfigurableTypeActionCommon<FluidConfigN
             }
 
             @Override
-            public int getLightEmission(FluidVariant variant) {
+            public int getLuminance(FluidVariant variant) {
                 return fluidType.getLightLevel();
             }
 
@@ -81,7 +80,7 @@ public class FluidActionFabric extends ConfigurableTypeActionCommon<FluidConfigN
 
     @Environment(EnvType.CLIENT)
     protected static void registerClient(Fluid still, Fluid flowing, FluidConfigNeoForge.TexturedProperties properties) {
-        FluidRenderingRegistry.register(still, flowing, new FluidModel.Unbaked(
-                new Material(properties.getStillTexture()), new Material(properties.getFlowTexture()), null, null));
+        FluidRenderHandlerRegistry.INSTANCE.register(still, flowing,
+                new SimpleFluidRenderHandler(properties.getStillTexture(), properties.getFlowTexture()));
     }
 }

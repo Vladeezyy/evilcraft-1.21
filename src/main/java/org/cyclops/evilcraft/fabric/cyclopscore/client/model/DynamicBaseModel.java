@@ -5,17 +5,18 @@ import org.cyclops.evilcraft.fabric.client.model.ModelData;
 
 
 import net.minecraft.client.model.geom.builders.UVPair;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
@@ -212,8 +213,11 @@ public abstract class DynamicBaseModel implements BlockStateModel {
                 UVPair.pack(texture.getU(uvs[(1 + rotation) % 4][0]), texture.getV(uvs[(1 + rotation) % 4][1])),
                 UVPair.pack(texture.getU(uvs[(2 + rotation) % 4][0]), texture.getV(uvs[(2 + rotation) % 4][1])),
                 UVPair.pack(texture.getU(uvs[(3 + rotation) % 4][0]), texture.getV(uvs[(3 + rotation) % 4][1])),
+                -1,
                 side,
-                new BakedQuad.MaterialInfo(texture, ChunkSectionLayer.CUTOUT, RenderTypes.entityCutout(texture.atlasLocation()), -1, false, 0)
+                texture,
+                false,
+                0
         );
         quads.add(isColored ? ColoredQuads.withColor(quad, shadeColor) : quad);
     }
@@ -236,7 +240,7 @@ public abstract class DynamicBaseModel implements BlockStateModel {
     }
 
     @Override
-    public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
+    public void collectParts(RandomSource random, List<BlockModelPart> output) {
         // Do nothing, as it's should be never called.
     }
 

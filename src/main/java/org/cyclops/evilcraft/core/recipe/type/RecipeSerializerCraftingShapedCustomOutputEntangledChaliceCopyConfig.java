@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
 import org.cyclops.evilcraft.fabric.transfer.ItemAccess;
 import org.cyclops.evilcraft.fabric.transfer.Transaction;
@@ -20,7 +20,7 @@ public class RecipeSerializerCraftingShapedCustomOutputEntangledChaliceCopyConfi
     public RecipeSerializerCraftingShapedCustomOutputEntangledChaliceCopyConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_entangled_chalice_copy",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_ENTANGLED_CHALICE.get(), 2), (inventory, staticOutput) -> {
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStack(RegistryEntries.ITEM_ENTANGLED_CHALICE, 2), (inventory, staticOutput) -> {
                     ItemAccess newStack = ItemAccess.forStack(staticOutput.copy());
                     String tankID = ((ItemEntangledChalice.FluidHandler) Capabilities.Fluid.ITEM.getCapability(inventory.getItem(4), ItemAccess.forStack(inventory.getItem(4)))).getTankID();
                     try (var tx = Transaction.openRoot()) {
@@ -28,7 +28,7 @@ public class RecipeSerializerCraftingShapedCustomOutputEntangledChaliceCopyConfi
                         tx.commit();
                     }
                     return newStack.getResource().toStack(2);
-                }).getRecipeSerializer());
+                }));
     }
 
 }

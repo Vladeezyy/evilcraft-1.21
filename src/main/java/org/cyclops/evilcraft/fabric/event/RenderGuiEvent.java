@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.Reference;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.function.Consumer;
 
@@ -16,15 +16,15 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public class RenderGuiEvent {
 
-    private final GuiGraphicsExtractor guiGraphics;
+    private final GuiGraphics guiGraphics;
     private final DeltaTracker partialTick;
 
-    public RenderGuiEvent(GuiGraphicsExtractor guiGraphics, DeltaTracker partialTick) {
+    public RenderGuiEvent(GuiGraphics guiGraphics, DeltaTracker partialTick) {
         this.guiGraphics = guiGraphics;
         this.partialTick = partialTick;
     }
 
-    public GuiGraphicsExtractor getGuiGraphics() {
+    public GuiGraphics getGuiGraphics() {
         return guiGraphics;
     }
 
@@ -36,7 +36,7 @@ public class RenderGuiEvent {
      * After the HUD was rendered.
      */
     public static class Post extends RenderGuiEvent {
-        public Post(GuiGraphicsExtractor guiGraphics, DeltaTracker partialTick) {
+        public Post(GuiGraphics guiGraphics, DeltaTracker partialTick) {
             super(guiGraphics, partialTick);
         }
 

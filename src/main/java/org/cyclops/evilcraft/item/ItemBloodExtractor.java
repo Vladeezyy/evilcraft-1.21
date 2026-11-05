@@ -60,7 +60,7 @@ public class ItemBloodExtractor extends ItemBloodContainer {
         Block block = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
         if(context.getPlayer().isCrouching()) {
             if(block instanceof BlockBloodStain) {
-                RandomSource random = context.getLevel().getRandom();
+                RandomSource random = context.getLevel().random;
 
                 // Fill the extractor a bit
                 return IModHelpersNeoForge.get().getCapabilityHelpers().getCapability(context.getLevel(), context.getClickedPos(), org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.BLOCK)

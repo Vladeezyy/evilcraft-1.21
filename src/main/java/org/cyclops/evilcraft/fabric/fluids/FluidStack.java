@@ -254,7 +254,7 @@ public final class FluidStack {
         if (variant.isBlank() || amount <= 0) {
             return EMPTY;
         }
-        return new FluidStack(variant.getFluid().builtInRegistryHolder(), amount, variant.getComponentsPatch());
+        return new FluidStack(variant.getFluid().builtInRegistryHolder(), amount, variant.getComponents());
     }
 
     public Component getHoverName() {

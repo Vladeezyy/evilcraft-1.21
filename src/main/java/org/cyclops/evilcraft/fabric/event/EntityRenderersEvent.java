@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.fabric.event;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 
@@ -24,7 +24,7 @@ public final class EntityRenderersEvent {
         }
 
         public void registerLayerDefinition(ModelLayerLocation layer, Supplier<LayerDefinition> definition) {
-            ModelLayerRegistry.registerModelLayer(layer, definition::get);
+            EntityModelLayerRegistry.registerModelLayer(layer, definition::get);
         }
     }
 }

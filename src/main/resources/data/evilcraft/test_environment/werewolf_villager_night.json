@@ -3,8 +3,7 @@
   "definitions": [
     "minecraft:default",
     {
-      "type": "minecraft:clock_time",
-      "clock": "minecraft:overworld",
+      "type": "minecraft:time_of_day",
       "time": 18000
     }
   ]

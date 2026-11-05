@@ -1,7 +1,6 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.ItemStack;
 import org.cyclops.cyclopscore.config.extendedconfig.RecipeConfigCommon;
 import org.cyclops.cyclopscore.init.IModBase;
 import org.cyclops.evilcraft.fabric.cyclopscore.recipe.type.RecipeCraftingShapedCustomOutput;
@@ -18,9 +17,11 @@ public class RecipeSerializerCraftingShapedCustomOutputDarkTankLargeConfig exten
     public RecipeSerializerCraftingShapedCustomOutputDarkTankLargeConfig() {
         super(EvilCraft._instance,
                 "crafting_shaped_custom_output_dark_tank_large",
-                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> new ItemStackTemplate(RegistryEntries.ITEM_DARK_TANK.get(), DataComponentPatch.builder()
-                        .set(org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries.COMPONENT_CAPACITY.get(), BlockEntityDarkTank.BASE_CAPACITY * 9)
-                        .build())).getRecipeSerializer());
+                eConfig -> new RecipeCraftingShapedCustomOutput.Serializer(() -> {
+                    ItemStack darkTankx9 = new ItemStack(RegistryEntries.ITEM_DARK_TANK.get());
+                    darkTankx9.set(org.cyclops.evilcraft.fabric.cyclopscore.RegistryEntries.COMPONENT_CAPACITY.get(), BlockEntityDarkTank.BASE_CAPACITY * 9);
+                    return darkTankx9;
+                }));
     }
 
 }

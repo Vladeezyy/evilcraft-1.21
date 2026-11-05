@@ -19,7 +19,7 @@ public class ItemDarkGemCrushedConfig extends ItemConfigCommon<IModBase> {
                 "dark_gem_crushed",
                 (eConfig, properties) -> new Item(properties)
         );
-        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getInstance(), 16000)));
+        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelRegistryEvents.BUILD.register((builder, context) -> builder.add(this.getInstance(), 16000)));
     }
 
 

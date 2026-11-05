@@ -46,8 +46,7 @@ public final class CommonHooks {
     }
 
     public static ItemStack getCraftingRemainingItem(ItemStack stack) {
-        net.minecraft.world.item.ItemStackTemplate remainder = stack.getItem().getCraftingRemainder();
-        return remainder == null ? ItemStack.EMPTY : remainder.create();
+        return stack.getRecipeRemainder();
     }
 
     public static ItemStack getProjectile(LivingEntity entity, ItemStack projectileWeaponItem, ItemStack projectile) {

@@ -3,6 +3,7 @@ package org.cyclops.evilcraft.entity.monster;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.Identifier;
 import org.cyclops.evilcraft.fabric.event.EntityRenderersEvent;
 import org.cyclops.cyclopscore.config.extendedconfig.EntityClientConfig;
@@ -30,7 +31,7 @@ public class EntityPoisonousLibelleConfigClient extends EntityClientConfig<ModBa
     }
 
     @Override
-    public EntityRenderer<? super EntityPoisonousLibelle, ?> getRender(EntityRendererProvider.Context renderContext) {
+    public EntityRenderer<? super EntityPoisonousLibelle, ?> getRender(EntityRendererProvider.Context renderContext, ItemRenderer renderItem) {
         return new RenderPoisonousLibelle(renderContext, (EntityPoisonousLibelleConfig) getEntityConfig(), new ModelPoisonousLibelle(renderContext.bakeLayer(this.model)), 0.5F);
     }
 }

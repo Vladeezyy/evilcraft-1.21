@@ -63,10 +63,10 @@ public class BlockSanguinaryPedestal extends BlockWithEntity implements IBlockRa
     public InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult p_225533_6_) {
         IModHelpers.get().getBlockEntityHelpers().get(worldIn, pos, BlockEntitySanguinaryPedestal.class)
                 .ifPresent(tile -> {
-                    player.sendOverlayMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
+                    player.displayClientMessage(Component.literal(String.format(Locale.ROOT, "%,d", tile.getTank().getFluidAmount()))
                             .append(" / ")
                             .append(String.format(Locale.ROOT, "%,d", tile.getTank().getCapacity()))
-                            .append(" mB"));
+                            .append(" mB"), true);
                 });
         return super.useWithoutItem(state, worldIn, pos, player, p_225533_6_);
     }

@@ -16,7 +16,7 @@ import mezz.jei.api.recipe.types.IRecipeHolderType;
 import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -105,7 +105,7 @@ public class BloodInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<
         IRecipeSlotBuilder inputSlotFluid = builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 6, 6)
                 .setOverlay(tankOverlay, 0, 0)
                 .setFluidRenderer(JeiFluids.amount(getMaxTankSize(recipe)), true, ContainerScreenBloodInfuser.TANKWIDTH, ContainerScreenBloodInfuser.TANKHEIGHT);
-        recipe.getInputFluid().ifPresent(fluidTemplate -> inputSlotFluid.addFluidStack(fluidTemplate.create().getFluid(), JeiFluids.amount(fluidTemplate.create().getAmount()), fluidTemplate.create().getComponentsPatch()));
+        recipe.getInputFluid().ifPresent(fluidTemplate -> inputSlotFluid.addFluidStack(fluidTemplate.getFluid(), JeiFluids.amount(fluidTemplate.getAmount()), fluidTemplate.getComponentsPatch()));
 
         ItemStack promise = getPromise(recipe);
         if (promise != null) {
@@ -114,17 +114,17 @@ public class BloodInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<
         }
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 96, 28)
-                .add(recipe.getOutputItem().map(l -> Ingredient.of(l.typeHolder().value()), ItemStackFromIngredient::getIngredient));
+                .add(recipe.getOutputItem().map(l -> Ingredient.of(l.getItem()), ItemStackFromIngredient::getIngredient));
     }
 
     @Override
-    public void draw(RecipeHolder<RecipeBloodInfuser> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
+    public void draw(RecipeHolder<RecipeBloodInfuser> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         this.background.draw(guiGraphics);
         arrow.draw(guiGraphics, 65, 28);
 
         // Draw duration
         Font fontRenderer = Minecraft.getInstance().font;
         MutableComponent duration = JEIEvilCraftConfig.getDurationSecondsTextComponent(recipe.value().getDuration());
-        guiGraphics.text(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, ARGB.opaque(0xFF808080), false);
+        guiGraphics.drawString(fontRenderer, duration, (background.getWidth() - fontRenderer.width(duration)) / 2 + 12, 50, ARGB.opaque(0xFF808080), false);
     }
 }

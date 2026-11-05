@@ -12,10 +12,12 @@ import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.MaterialSet;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
@@ -31,17 +33,17 @@ public abstract class RenderBlockEntityChestBase<T extends BlockEntity & LidBloc
 
     private final ChestModel singleModel;
     private final boolean xmasTextures = ChestRenderer.xmasTextures();
-    protected final SpriteGetter sprites;
+    protected final MaterialSet materials;
 
     public RenderBlockEntityChestBase(BlockEntityRendererProvider.Context context) {
         this.singleModel = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
-        this.sprites = context.sprites();
+        this.materials = context.materials();
     }
 
     protected abstract Direction getDirection(S renderState);
 
-    protected SpriteId getSpriteId(S renderState) {
-        return Sheets.chooseSprite(renderState.chestMaterialType, ChestType.SINGLE);
+    protected Material getMaterial(S renderState) {
+        return Sheets.chooseMaterial(renderState.chestMaterialType, ChestType.SINGLE);
     }
 
     protected void handleRotation(S renderState, PoseStack matrixStack) {
@@ -65,8 +67,9 @@ public abstract class RenderBlockEntityChestBase<T extends BlockEntity & LidBloc
         poseStack.translate(-0.5D, -0.5D, -0.5D);
 
         float f1 = renderState.openNess;
-        SpriteId spriteId = this.getSpriteId(renderState);
-        submitNodeCollector.submitModel(this.singleModel, f1, poseStack, renderState.lightCoords, OverlayTexture.NO_OVERLAY, -1, spriteId, this.sprites, 0, renderState.breakProgress);
+        Material material = this.getMaterial(renderState);
+        TextureAtlasSprite textureAtlasSprite = this.materials.get(material);
+        submitNodeCollector.submitModel(this.singleModel, f1, poseStack, material.renderType(RenderTypes::entityCutout), renderState.lightCoords, OverlayTexture.NO_OVERLAY, -1, textureAtlasSprite, 0, renderState.breakProgress);
 
         poseStack.popPose();
     }

@@ -8,7 +8,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.cyclops.evilcraft.fabric.loot.IGlobalLootModifier;
@@ -24,24 +23,24 @@ import java.util.function.Supplier;
 public class LootModifierInjectItem extends LootModifier {
     public static final Supplier<MapCodec<LootModifierInjectItem>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.mapCodec(inst -> codecStart(inst).and(
             inst.group(
-                    ItemStackTemplate.CODEC.fieldOf("item").forGetter(LootModifierInjectItem::getItemStack),
+                    ItemStack.CODEC.fieldOf("item").forGetter(LootModifierInjectItem::getItemStack),
                     Codec.list(Codec.STRING).fieldOf("loot_tables").forGetter(LootModifierInjectItem::getLootTables),
                     Codec.INT.optionalFieldOf("maxStackSize", 1).forGetter(LootModifierInjectItem::getMaxStackSize)
             )
     ).apply(inst, LootModifierInjectItem::new)));
 
-    private final ItemStackTemplate itemStack;
+    private final ItemStack itemStack;
     private final List<String> lootTables;
     private final int maxStackSize;
 
-    public LootModifierInjectItem(LootItemCondition[] conditionsIn, int priority, ItemStackTemplate itemStack, List<String> lootTables, int maxStackSize) {
+    public LootModifierInjectItem(LootItemCondition[] conditionsIn, int priority, ItemStack itemStack, List<String> lootTables, int maxStackSize) {
         super(conditionsIn, priority);
         this.itemStack = itemStack;
         this.lootTables = lootTables;
         this.maxStackSize = maxStackSize;
     }
 
-    public ItemStackTemplate getItemStack() {
+    public ItemStack getItemStack() {
         return itemStack;
     }
 
@@ -56,7 +55,7 @@ public class LootModifierInjectItem extends LootModifier {
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         if (getLootTables().contains(org.cyclops.evilcraft.fabric.loot.GlobalLootModifiers.getQueriedLootTableId(context).toString())) {
-            ItemStack stack = getItemStack().create();
+            ItemStack stack = getItemStack().copy();
             stack.setCount(context.getRandom().nextInt(1, getMaxStackSize() + 1));
             generatedLoot.add(stack);
         }

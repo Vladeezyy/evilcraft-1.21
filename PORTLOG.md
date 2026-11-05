@@ -1,6 +1,25 @@
-# Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
+# Port log: EvilCraft Fabric 26.1.2 -> 1.21.11 (backport, WIP)
 
-Status (2026-11-05): **26.1.2 works on server and client in automatic tests; no human has played it, no release yet.**
+Status (2026-11-05): **1.21.11 works on server and client in automatic tests; no human has played it, no release yet.**
+- `compileJava`, `compileSceneJava` after `clean`: OK. GameTests of the original: 104/104 (`tools/gametest.sh`; the same 102 `@GameTest` of the mod as 26.1.2).
+- Client scene (`tools/scenetest.sh`, with JEI and Jade): 30 checks, 0 failed; screenshots looked at, one compared with 26.1.2.
+- Production server and client (`tools/prodtest.sh`): OK, 24 checks, no JEI there.
+- Stress (`tools/perf.sh`, Mac M-series, one world, 600 ticks per window, base + 72 working blocks and 24 mobs), two runs:
+  FPS 141 -> 109 and 116 -> 107 (-23%, -7%); MSPT 5.42 -> 5.48 and 9.00 -> 7.25. The base alone moves more than the difference: MSPT is noise,
+  FPS has no stable number. Base entities differ per run (256, 163). No 60-70 FPS cap here, unlike the 26.2 and 26.3 runs. A JFR share of the server thread is still to do.
+
+## How 1.21.11 was made (from mc/26.1.2 @4cd1bce)
+- Reverse three-way merge with the port passes on both sides (`tools/port/merge_upstream.py`, `merge_cc.py`): upstream "Update to MC 26.1.1" 293bcb9edf
+  and 80648d12b3, Cyclops Core 8fe42774a9, 2904b4a04e, 3daecc6cae. 199 + 26 files merged, 33 + 14 conflicts resolved by rule, then by hand.
+- Build: Loom 1.17.21 with Mojang names and `remapJar`, Java 21, Cyclops Core 1.25.5 from Modrinth, JEI 27.54, Jade 21.1.6.
+- Checked after the merge: methods that exist on 26.1.2 and not here. One real loss found by a GameTest: `getResource` of the creative blood drop.
+- Open here: `SlotSingleIngredient` is a copy from Cyclops Core 26.x; `setVengeanceSwarmContent` in the box config comes from upstream's 1.21.11 state.
+
+The rest of this file is the log of the 26.1.2 port, which this branch is based on.
+
+## Port log: EvilCraft Fabric 1.21.1 -> 26.1.2
+
+Status of 26.1.2 (2026-11-05): **26.1.2 works on server and client in automatic tests; no human has played it, no release yet.**
 - `compileJava`, `jar`: OK. GameTests of the original: 106/106 (`tools/gametest.sh`).
 - Client scene (`tools/scenetest.sh`, with JEI and Jade): all checks pass; screenshots looked at and compared with `docs/images`.
 - Production server and production client (`tools/prodtest.sh`): OK, 24 checks, no JEI there.

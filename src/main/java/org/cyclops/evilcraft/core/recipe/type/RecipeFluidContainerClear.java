@@ -1,7 +1,9 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -18,7 +20,7 @@ public class RecipeFluidContainerClear extends CustomRecipe {
     private final Ingredient inputIngredient;
 
     public RecipeFluidContainerClear(Ingredient inputIngredient) {
-        super();
+        super(CraftingBookCategory.MISC);
         this.inputIngredient = inputIngredient;
     }
 
@@ -28,11 +30,11 @@ public class RecipeFluidContainerClear extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid).isEmpty();
+        return !assemble(grid, world.registryAccess()).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid) {
+    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
         ItemStack result = ItemStack.EMPTY;
         for (int i = 0; i < grid.size(); i++) {
             ItemStack element = grid.getItem(i);

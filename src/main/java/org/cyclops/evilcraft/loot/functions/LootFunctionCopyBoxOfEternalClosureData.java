@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -22,6 +23,7 @@ public class LootFunctionCopyBoxOfEternalClosureData extends LootItemConditional
     public static final MapCodec<LootFunctionCopyBoxOfEternalClosureData> CODEC = RecordCodecBuilder.mapCodec(
             builder -> commonFields(builder).apply(builder, LootFunctionCopyBoxOfEternalClosureData::new)
     );
+    public static final LootItemFunctionType TYPE = new LootItemFunctionType(LootFunctionCopyBoxOfEternalClosureData.CODEC);
 
     protected LootFunctionCopyBoxOfEternalClosureData(List<LootItemCondition> conditionsIn) {
         super(conditionsIn);
@@ -50,7 +52,7 @@ public class LootFunctionCopyBoxOfEternalClosureData extends LootItemConditional
     }
 
     @Override
-    public MapCodec<? extends LootItemConditionalFunction> codec() {
-        return CODEC;
+    public LootItemFunctionType getType() {
+        return TYPE;
     }
 }

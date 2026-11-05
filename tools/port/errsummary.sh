@@ -1,7 +1,7 @@
 #!/bin/sh
 # Compile mc/26.1.2 and print a summary of the errors (each error once; javac's log appears twice in the Gradle output).
-S=$(dirname "$0")
-cd /Users/vladeezy/Desktop/evilcraft-26.1.2 || exit 1
+S=${S:-$(pwd)/build}
+cd "$(git rev-parse --show-toplevel)" || exit 1
 JAVA_HOME=$HOME/.gradle/jdks/eclipse_adoptium-25-aarch64-os_x.2/jdk-25.0.4.1+1/Contents/Home sh ./gradlew compileJava --console=plain > "$S/build.log" 2>&1
 python3 -I - "$S/build.log" "$S/errs.txt" <<'PY'
 import collections, re, sys

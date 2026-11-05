@@ -1,17 +1,17 @@
 package org.cyclops.evilcraft.client.render.model;
 
 import org.cyclops.evilcraft.fabric.client.model.ColoredQuads;
+
 import com.mojang.math.OctahedralGroup;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.TextureSlots;
 import net.minecraft.client.renderer.item.*;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -19,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import org.cyclops.evilcraft.fabric.cyclopscore.helper.ModelHelpers;
 import org.cyclops.evilcraft.Reference;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 
 import java.util.List;
 
@@ -51,7 +50,7 @@ public record ItemModelEntangledChalice(ModelEntangledChaliceBaked model, ModelR
         }
 
         @Override
-        public ItemModel bake(BakingContext bakingContext, org.joml.Matrix4fc matrix4fc) {
+        public ItemModel bake(BakingContext bakingContext) {
             ModelBaker baker = bakingContext.blockModelBaker();
             ResolvedModel resolvedModel = baker.getModel(chalice);
             TextureSlots textureslots = resolvedModel.getTopTextureSlots();

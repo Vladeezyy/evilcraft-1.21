@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.cyclops.evilcraft.fabric.capabilities.Capabilities;
@@ -26,6 +27,7 @@ public class LootFunctionCopyTankData extends LootItemConditionalFunction {
     public static final MapCodec<LootFunctionCopyTankData> CODEC = RecordCodecBuilder.mapCodec(
             builder -> commonFields(builder).apply(builder, LootFunctionCopyTankData::new)
     );
+    public static final LootItemFunctionType TYPE = new LootItemFunctionType(LootFunctionCopyTankData.CODEC);
 
     protected LootFunctionCopyTankData(List<LootItemCondition> conditionsIn) {
         super(conditionsIn);
@@ -55,7 +57,7 @@ public class LootFunctionCopyTankData extends LootItemConditionalFunction {
     }
 
     @Override
-    public MapCodec<? extends LootItemConditionalFunction> codec() {
-        return CODEC;
+    public LootItemFunctionType getType() {
+        return TYPE;
     }
 }

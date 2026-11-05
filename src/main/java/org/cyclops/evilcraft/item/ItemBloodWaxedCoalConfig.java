@@ -19,7 +19,7 @@ public class ItemBloodWaxedCoalConfig extends ItemConfigCommon<IModBase> {
             "blood_waxed_coal",
                 (eConfig, properties) -> new Item(properties)
         );
-        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getInstance(), 3200)));
+        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelRegistryEvents.BUILD.register((builder, context) -> builder.add(this.getInstance(), 3200)));
     }
 
 

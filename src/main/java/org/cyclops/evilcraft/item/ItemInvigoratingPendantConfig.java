@@ -46,7 +46,7 @@ public class ItemInvigoratingPendantConfig extends ItemConfigCommon<IModBase> {
     }
 
     @Override
-    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
+    public Collection<ItemStack> getDefaultCreativeTabEntries() {
         // Register items dynamically into tab, because when this is called, capabilities are not initialized yet.
         return Collections.emptyList();
     }

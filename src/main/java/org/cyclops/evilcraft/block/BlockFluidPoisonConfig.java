@@ -32,7 +32,7 @@ public class BlockFluidPoisonConfig extends BlockConfigCommon<IModBase> {
     }
 
     @Override
-    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
+    public Collection<ItemStack> getDefaultCreativeTabEntries() {
         return Collections.emptyList();
     }
 

@@ -20,7 +20,7 @@ public class BlockReinforcedUndeadPlankConfig extends BlockConfigCommon<IModBase
                         .strength(5.0F)
                         .sound(SoundType.WOOD)
                         .noOcclusion()
-                        .isValidSpawn((_, _, _, _) -> false)),
+                        .isValidSpawn((a, b, c, d) -> false)),
                 getDefaultItemConstructor(EvilCraft._instance)
         );
     }

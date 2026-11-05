@@ -1,7 +1,6 @@
 package org.cyclops.evilcraft.client.render.blockentity;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.core.BlockPos;
 import org.cyclops.cyclopscore.client.render.blockentity.ItemStackBlockEntityRendererBase;
@@ -17,7 +16,7 @@ public class RenderItemStackBlockEntityBloodChest extends ItemStackBlockEntityRe
         super(() -> new BlockEntityBloodChest(BlockPos.ZERO, RegistryEntries.BLOCK_BLOOD_CHEST.get().defaultBlockState()));
     }
 
-    public static record Unbaked() implements SpecialModelRenderer.Unbaked<Void> {
+    public static record Unbaked() implements SpecialModelRenderer.Unbaked {
         public static final MapCodec<RenderItemStackBlockEntityBloodChest.Unbaked> MAP_CODEC = MapCodec.unit(RenderItemStackBlockEntityBloodChest.Unbaked::new);
 
         @Override
@@ -26,7 +25,7 @@ public class RenderItemStackBlockEntityBloodChest extends ItemStackBlockEntityRe
         }
 
         @Override
-        public NoDataSpecialModelRenderer bake(BakingContext bakingContext) {
+        public SpecialModelRenderer<?> bake(BakingContext bakingContext) {
             return new RenderItemStackBlockEntityBloodChest();
         }
     }

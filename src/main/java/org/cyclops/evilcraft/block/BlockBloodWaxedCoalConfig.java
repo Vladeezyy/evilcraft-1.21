@@ -38,7 +38,7 @@ public class BlockBloodWaxedCoalConfig extends BlockConfigCommon<IModBase> {
                 },
                 getDefaultItemConstructor(EvilCraft._instance)
         );
-        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelValueEvents.BUILD.register((builder, context) -> builder.add(this.getItemInstance(), 32000)));
+        ModLifecycle.afterRegistries(() -> net.fabricmc.fabric.api.registry.FuelRegistryEvents.BUILD.register((builder, context) -> builder.add(this.getItemInstance(), 32000)));
     }
 
 }

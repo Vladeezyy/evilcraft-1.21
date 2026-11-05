@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.fabric.transfer;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
 
@@ -13,6 +13,6 @@ public final class WorldlyContainerWrapper {
     }
 
     public static ResourceHandler<ItemResource> of(WorldlyContainer container, Direction side) {
-        return StorageResourceHandler.ofItem(ContainerStorage.of(container, side));
+        return StorageResourceHandler.ofItem(InventoryStorage.of(container, side));
     }
 }

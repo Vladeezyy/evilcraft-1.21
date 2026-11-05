@@ -5,13 +5,14 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.EnderDragonRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,7 +38,7 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
 
     private static final Identifier beamTexture =
             Identifier.fromNamespaceAndPath(Reference.MOD_ID, Reference.TEXTURE_PATH_ENTITIES + "beam.png");
-    private static final RenderType renderTypeBeam = RenderTypes.entityCutout(beamTexture);
+    private static final RenderType renderTypeBeam = RenderTypes.entitySmoothCutout(beamTexture);
 
     public RenderBlockEntityBoxOfEternalClosure(BlockEntityRendererProvider.Context rendererDispatcherIn) {
         super(rendererDispatcherIn);
@@ -71,9 +72,6 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
             renderState.target = targetSpirit.position();
             renderState.eyeHeight = targetSpirit.getEyeHeight();
         }
-        if (blockEntity.getLevel() != null) {
-            renderState.blockState = blockEntity.getLevel().getBlockState(blockEntity.getBlockPos());
-        }
     }
 
     @Override
@@ -105,9 +103,7 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
                 ? renderState.blockState.setValue(org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.FACING, Direction.NORTH)
                 : org.cyclops.evilcraft.RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get().defaultBlockState().setValue(org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.FACING, Direction.NORTH);
         ModelBoxOfEternalClosureBaked model = (ModelBoxOfEternalClosureBaked) IModHelpers.get().getRenderHelpers().getBakedModel(blockState);
-        java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> boxParts = new java.util.ArrayList<>();
-        model.getBoxModel().collectParts(net.minecraft.util.RandomSource.create(), boxParts);
-        submitNodeCollector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), boxParts, net.minecraft.client.renderer.block.BlockModelRenderState.EMPTY_TINTS, renderState.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        submitNodeCollector.submitCustomGeometry(poseStack, Sheets.solidBlockSheet(), (pose, vertexConsumer) -> ModelBlockRenderer.renderModel(pose, vertexConsumer, model.getBoxModel(), 1.0F, 1.0F, 1.0F, renderState.lightCoords, OverlayTexture.NO_OVERLAY));
 
         // Render lid
         float angle = renderState.previousLidAngle
@@ -119,9 +115,7 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
         poseStack.translate(0.25F, 0.375F, 0F);
         poseStack.mulPose(Axis.ZP.rotationDegrees(angle));
         poseStack.translate(-0.25F, -0.375F, 0F);
-        java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> lidParts = new java.util.ArrayList<>();
-        model.getBoxLidModel().collectParts(net.minecraft.util.RandomSource.create(), lidParts);
-        submitNodeCollector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), lidParts, net.minecraft.client.renderer.block.BlockModelRenderState.EMPTY_TINTS, renderState.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        submitNodeCollector.submitCustomGeometry(poseStack, Sheets.solidBlockSheet(), (pose, vertexConsumer) -> ModelBlockRenderer.renderModel(pose, vertexConsumer, model.getBoxLidModel(), 1.0F, 1.0F, 1.0F, renderState.lightCoords, OverlayTexture.NO_OVERLAY));
         poseStack.popPose();
 
         // Render box inside
@@ -172,7 +166,6 @@ public class RenderBlockEntityBoxOfEternalClosure extends RendererBlockEntityEnd
         public boolean hasTarget;
         public Vec3 target;
         public float eyeHeight;
-        public net.minecraft.world.level.block.state.BlockState blockState;
     }
 
 }

@@ -13,7 +13,7 @@ public class RecipeSerializerBloodExtractorCombinationConfig extends RecipeConfi
     public RecipeSerializerBloodExtractorCombinationConfig() {
         super(EvilCraft._instance,
                 "crafting_special_bloodextractor_combination",
-                eConfig -> RecipeSerializerBloodExtractorCombination.INSTANCE);
+                eConfig -> new RecipeSerializerBloodExtractorCombination());
     }
 
 }

@@ -54,7 +54,7 @@ public class ItemBiomeExtractConfig extends ItemConfigCommon<IModBase> {
     }
 
     @Override
-    public Collection<java.util.function.Supplier<ItemStack>> getDefaultCreativeTabEntries() {
+    public Collection<ItemStack> getDefaultCreativeTabEntries() {
         // Register tab entries later, when the world is available
         return Collections.emptyList();
     }

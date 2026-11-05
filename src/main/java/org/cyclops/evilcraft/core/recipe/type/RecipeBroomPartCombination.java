@@ -1,9 +1,14 @@
 package org.cyclops.evilcraft.core.recipe.type;
 
+
+
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
@@ -32,13 +37,13 @@ import java.util.Set;
  */
 public class RecipeBroomPartCombination extends CustomRecipe {
 
-    public RecipeBroomPartCombination() {
-        super();
+    public RecipeBroomPartCombination(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override
     public boolean matches(CraftingInput grid, Level world) {
-        return !assemble(grid).isEmpty();
+        return !assemble(grid, world.registryAccess()).isEmpty();
     }
 
     public ItemStack getResultItem() {
@@ -50,8 +55,7 @@ public class RecipeBroomPartCombination extends CustomRecipe {
         NonNullList<ItemStack> aitemstack = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
         for (int i = 0; i < aitemstack.size(); ++i) {
             ItemStack itemstack = inventory.getItem(i);
-            net.minecraft.world.item.ItemStackTemplate remainder = itemstack.getCraftingRemainder();
-            aitemstack.set(i, remainder != null ? remainder.create() : ItemStack.EMPTY);
+            aitemstack.set(i, itemstack.getRecipeRemainder());
         }
 
         Pair<ItemStack, List<ItemStack>> result = getResult(inventory);
@@ -170,7 +174,7 @@ public class RecipeBroomPartCombination extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput grid) {
+    public ItemStack assemble(CraftingInput grid, HolderLookup.Provider registryAccess) {
         Pair<ItemStack, List<ItemStack>> result = getResult(grid);
         if(result == null) {
             return ItemStack.EMPTY;
