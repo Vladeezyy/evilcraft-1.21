@@ -55,3 +55,6 @@ accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerMemoryT
 accessible field net/minecraft/world/item/crafting/RecipeManager recipes Lnet/minecraft/world/item/crafting/RecipeMap;
 accessible method net/minecraft/world/entity/npc/villager/Villager readAdditionalSaveData (Lnet/minecraft/world/level/storage/ValueInput;)V
 accessible method net/minecraft/world/entity/npc/villager/Villager addAdditionalSaveData (Lnet/minecraft/world/level/storage/ValueOutput;)V
+# The eternal water bucket remains itself (it has no holder before its constructor ran)
+accessible field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/ItemStackTemplate;
+mutable field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/ItemStackTemplate;

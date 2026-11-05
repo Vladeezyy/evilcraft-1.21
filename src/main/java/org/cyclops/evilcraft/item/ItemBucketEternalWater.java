@@ -36,7 +36,10 @@ import org.cyclops.evilcraft.RegistryEntries;
  */
 public class ItemBucketEternalWater extends BucketItem implements IItemUseFirst {
     public ItemBucketEternalWater(Properties properties) {
-        super(Fluids.WATER, properties.craftRemainder(new ItemStackTemplate(RegistryEntries.ITEM_ETERNAL_WATER, 1, DataComponentPatch.EMPTY)));
+        super(Fluids.WATER, properties);
+        // The bucket remains itself: a template needs a bound holder, and DeferredHolder is not a Holder since 26.2
+        org.cyclops.evilcraft.fabric.event.ModLifecycle.afterRegistries(() ->
+                this.craftingRemainingItem = new ItemStackTemplate(this.builtInRegistryHolder(), 1, DataComponentPatch.EMPTY));
     }
 
     @Override

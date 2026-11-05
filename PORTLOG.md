@@ -1,4 +1,16 @@
-# Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
+# Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 -> 26.2 (WIP)
+
+Status of this branch, 26.2 (2026-11-05): **works on server and client in automatic tests; nobody has played it, no release.**
+- Built on mc/26.1.2 (1.2.109). Upstream's `master-26.2` is older than the LTS branch (1.2.98, last commit 2026-09-11, 36 LTS commits behind), so only its
+  migration was merged: `tools/port/merge_upstream.py` from the merge base to `master-26.2`, with the port passes run on both sides. The newer features stay.
+  In conflicts take the LTS values, not 26.2's (a test aim of 25F instead of LTS's 15F failed a GameTest).
+- GameTests 104/104 (Cyclops Core's build for 26.2 lacks 2 tests of its own that 26.1.2 has), client scene 30 checks OK, production server and client OK.
+- Stress: MSPT 5.72 -> 5.21 (noise). FPS 61 -> 66 says nothing: near the refresh rate, with other work on the machine (load 5-7). **Measure FPS again.**
+- `DeferredHolder` is no longer a Holder (sealed since 26.2): it is an `ItemLike`, with overloads on `FluidStack` and `FluidResource`, others `getHolder()`. `getHolder()`
+  needs the entry registered: the eternal water bucket, its own remainder, sets it after the registries.
+- Cyclops Core for Fabric 26.2 is 1.30.0-1143, older than 26.1.2's 1.31.4. Its `getFluidVertexBufferColor` fails on untinted fluids: `IModHelpersNeoForge` has its own.
+
+Below: the log of 26.1.2.
 
 Status (2026-11-05): **26.1.2 works on server and client in automatic tests; no human has played it, no release yet.**
 - `compileJava`, `jar`: OK. GameTests of the original: 106/106 (`tools/gametest.sh`).

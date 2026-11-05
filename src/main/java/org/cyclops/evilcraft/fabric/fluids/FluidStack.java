@@ -86,6 +86,10 @@ public final class FluidStack {
         this(fluid, amount, DataComponentPatch.EMPTY);
     }
 
+    public FluidStack(org.cyclops.evilcraft.fabric.registries.DeferredHolder<Fluid, ? extends Fluid> fluid, int amount) {
+        this(fluid.get(), amount);
+    }
+
     public FluidStack(Fluid fluid, int amount) {
         this(fluid.builtInRegistryHolder(), amount, DataComponentPatch.EMPTY);
     }

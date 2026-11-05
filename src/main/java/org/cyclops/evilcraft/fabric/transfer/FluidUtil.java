@@ -80,6 +80,13 @@ public final class FluidUtil {
         return handler != null && interactWithFluidHandler(player, hand, pos, handler);
     }
 
+    /**
+     * @param transaction Ignored here: the move is committed at once, also in NeoForge's callers that pass null.
+     */
+    public static boolean interactWithFluidHandler(Player player, InteractionHand hand, Level level, BlockPos pos, @Nullable Direction side, @Nullable TransactionContext transaction) {
+        return interactWithFluidHandler(player, hand, level, pos, side);
+    }
+
     public static boolean interactWithFluidHandler(Player player, InteractionHand hand, @Nullable BlockPos pos, ResourceHandler<FluidResource> handler) {
         ItemAccess access = ItemAccess.forPlayerInteraction(player, hand).oneByOne();
         ResourceHandler<FluidResource> handHandler = access.getCapability(Capabilities.Fluid.ITEM);

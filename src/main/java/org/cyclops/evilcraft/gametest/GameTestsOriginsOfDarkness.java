@@ -7,13 +7,14 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import org.cyclops.evilcraft.fabric.event.PlayerInteractEvent;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
@@ -50,7 +51,7 @@ public class GameTestsOriginsOfDarkness {
         helper.setBlock(POS.below().offset( 1, 0,  1), Blocks.STONE);
 
         // Spawn a pig inside the enclosure
-        Pig pig = helper.spawnWithNoFreeWill(EntityType.PIG, POS);
+        Pig pig = helper.spawnWithNoFreeWill(EntityTypes.PIG, POS);
 
         // Simulate feeding the pig a darkened apple by firing the player interact event.
         // With paling (amplifier 4 = 5 dmg/hit) and 10-tick invulnerability, the pig (10 HP) dies at ~tick 11.
@@ -86,7 +87,7 @@ public class GameTestsOriginsOfDarkness {
 
         // Verify the pig has died and the book was converted into an Origins of Darkness
         helper.succeedWhen(() -> {
-            helper.assertEntityNotPresent(EntityType.PIG);
+            helper.assertEntityNotPresent(EntityTypes.PIG);
             helper.assertItemEntityNotPresent(Items.BOOK);
             helper.assertItemEntityPresent(RegistryEntries.ITEM_ORIGINS_OF_DARKNESS.get());
         });

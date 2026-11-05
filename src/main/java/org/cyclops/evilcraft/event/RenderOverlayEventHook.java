@@ -61,7 +61,7 @@ public class RenderOverlayEventHook {
             // Render item
             event.getGuiGraphics().item(broomStack, x + 3, y + 3);
             event.getGuiGraphics().itemDecorations(
-                    Minecraft.getInstance().gui.getFont(), broomStack, x + 3, y + 3, "");
+                    Minecraft.getInstance().gui.hud.getFont(), broomStack, x + 3, y + 3, "");
         }
     }
 
@@ -109,7 +109,7 @@ public class RenderOverlayEventHook {
     public static boolean shouldRenderOverlays() {
         Minecraft minecraft = Minecraft.getInstance();
         // Respect the F1 GUI toggle and hide overlays in spectator mode.
-        return minecraft.player != null && !minecraft.options.hideGui && !minecraft.player.isSpectator();
+        return minecraft.player != null && !minecraft.gui.hud.isHidden() && !minecraft.player.isSpectator();
     }
 
     public static enum OverlayPosition {

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.gametest;
 
+import net.minecraft.world.entity.EntityTypes;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -197,7 +198,7 @@ public class GameTestsPurifier {
     }
 
     private static int countDroppedItems(GameTestHelper helper, Item item) {
-        return helper.getEntities(EntityType.ITEM, POS, 3).stream()
+        return helper.getEntities(EntityTypes.ITEM, POS, 3).stream()
                 .filter(e -> e.getItem().is(item))
                 .mapToInt(e -> e.getItem().getCount())
                 .sum();

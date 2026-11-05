@@ -3,13 +3,14 @@ package org.cyclops.evilcraft;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * @author rubensworks
@@ -33,7 +34,7 @@ public class ExtendedDamageSources {
 
     public static DamageSource spikedDamage(ServerLevel level, BlockPos pos) {
         FakePlayer entity = FakePlayer.get(level);
-        entity.setPos(pos.getCenter());
+        entity.setPos(Vec3.atCenterOf(pos));
         return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DAMAGE_TYPE_SPIKED), entity);
     }
 

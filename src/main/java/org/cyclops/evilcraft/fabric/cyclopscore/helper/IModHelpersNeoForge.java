@@ -149,14 +149,19 @@ public final class IModHelpersNeoForge {
         }
 
         public Triple<Float, Float, Float> getFluidVertexBufferColor(FluidStack fluid) {
-            return IModHelpersFabric.get().getRenderHelpers().getFluidVertexBufferColor(fluid.toVariant());
+            // Not Cyclops Core's: its Fabric build for 26.2 fails on fluids without a tint source
+            var tint = net.minecraft.client.Minecraft.getInstance().getModelManager().getFluidStateModelSet()
+                    .get(fluid.getFluid().defaultFluidState()).tintSource();
+            int color = tint == null ? 0xFFFFFF : tint.color(fluid.getFluid().defaultFluidState().createLegacyBlock());
+            return IModHelpersFabric.get().getBaseHelpers().intToRGB(color);
         }
 
         /**
          * @return The color in ABGR, see {@link org.cyclops.evilcraft.fabric.client.model.ColoredQuads#withColor}.
          */
         public int getFluidBakedQuadColor(FluidStack fluid) {
-            return IModHelpersFabric.get().getRenderHelpers().getFluidBakedQuadColor(fluid.toVariant());
+            Triple<Float, Float, Float> color = getFluidVertexBufferColor(fluid);
+            return IModHelpersFabric.get().getBaseHelpers().RGBAToInt((int) (color.getRight() * 255), (int) (color.getMiddle() * 255), (int) (color.getLeft() * 255), 255);
         }
     }
 }

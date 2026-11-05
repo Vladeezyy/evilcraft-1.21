@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.entity.monster;
 
+import net.minecraft.world.entity.EntityTypes;
 import org.cyclops.evilcraft.fabric.event.LivingDeathEvent;
 import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
@@ -510,6 +511,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         try {
             if (entityType != RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get()) {
                 Entity entity = entityType.create(level(), EntitySpawnReason.LOAD);
+                entity.setId(1); // A dummy id to make rendering work
                 if (canSustain((LivingEntity) entity)) {
                     return innerEntity = (Mob) entity;
                 }
@@ -529,7 +531,7 @@ public class EntityVengeanceSpirit extends EntityNoMob {
         if (innerEntity instanceof Player) {
             setPlayerId(((Player) innerEntity).getGameProfile().id().toString());
             setPlayerName(((Player) innerEntity).getGameProfile().name());
-            this.data.setInnerEntityType(EntityType.ZOMBIE);
+            this.data.setInnerEntityType(EntityTypes.ZOMBIE);
         } else {
             this.data.setInnerEntityType(innerEntity.getType());
         }

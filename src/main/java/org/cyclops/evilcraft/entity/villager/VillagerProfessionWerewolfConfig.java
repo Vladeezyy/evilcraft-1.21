@@ -38,8 +38,8 @@ public class VillagerProfessionWerewolfConfig extends VillagerConfigCommon<IModB
                     }
                     return new VillagerProfession(
                             Component.translatable("entity." + Reference.MOD_ID + ".villager." + eConfig.getNamedId()),
-                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
-                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN),
+                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN.getKey()),
+                            (poiType) -> poiType.is(RegistryEntries.POI_WEREWOLVIAN.getKey()),
                             ImmutableSet.of(),
                             ImmutableSet.of(),
                             SoundEvents.VILLAGER_WORK_BUTCHER,

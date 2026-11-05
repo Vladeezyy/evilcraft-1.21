@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.scene;
 
+import net.minecraft.world.entity.EntityTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.client.Minecraft;
@@ -46,6 +47,12 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class PerfScene {
 
+    private static void hideGui(Minecraft mc, boolean hidden) {
+        if (mc.gui.hud.isHidden() != hidden) {
+            mc.gui.hud.toggle();
+        }
+    }
+
     private static final Logger LOGGER = LogManager.getLogger("evilcraft-perf");
     private static final String WORLD = "ec_perf";
     private static final int WINDOW = 600;
@@ -82,13 +89,13 @@ public final class PerfScene {
 
     private static void onTick() {
         Minecraft mc = Minecraft.getInstance();
-        if (!opened && mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
+        if (!opened && mc.gui.screen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
             mc.options.onboardAccessibility = false;
             mc.options.save();
-            mc.setScreen(new TitleScreen());
+            mc.gui.setScreen(new TitleScreen());
             return;
         }
-        if (!opened && (mc.getOverlay() != null || !(mc.screen instanceof TitleScreen))) {
+        if (!opened && (mc.gui.overlay() != null || !(mc.gui.screen() instanceof TitleScreen))) {
             return;
         }
         if (!opened) {
@@ -107,10 +114,10 @@ public final class PerfScene {
         mc.options.pauseOnLostFocus = false;
         // Vanilla drops to 30 FPS after a minute without input, which would fall right in the second window
         mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
-        mc.options.hideGui = true;
-        mc.getToastManager().clear();
-        if (mc.screen instanceof PauseScreen) {
-            mc.setScreen(null);
+        hideGui(mc, true);
+        mc.gui.toastManager().clear();
+        if (mc.gui.screen() instanceof PauseScreen) {
+            mc.gui.setScreen(null);
         }
         tick++;
         if (window != null && tick % 20 == 0) {
@@ -220,7 +227,7 @@ public final class PerfScene {
         }
         // 40 cows in the south half
         for (int i = 0; i < 40; i++) {
-            Entity cow = EntityType.COW.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            Entity cow = EntityTypes.COW.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             cow.snapTo(stage.getX() - 12 + (i % 10) * 2.5, stage.getY() + 1, stage.getZ() + 4 + (i / 10) * 2.5, 0, 0);
             level.addFreshEntity(cow);
         }

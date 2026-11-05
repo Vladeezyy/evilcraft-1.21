@@ -98,7 +98,7 @@ public class BlockDarkTank extends BlockWithEntity implements IBlockTank, IDynam
 
     @Override
     protected InteractionResult useItemOn(ItemStack pStack, BlockState pState, Level worldIn, BlockPos pos, Player player, InteractionHand hand, BlockHitResult pHitResult) {
-        if (FluidUtil.interactWithFluidHandler(player, hand, worldIn, pos, Direction.UP)) {
+        if (FluidUtil.interactWithFluidHandler(player, hand, worldIn, pos, Direction.UP, null)) {
             return InteractionResult.SUCCESS;
         } else if (!player.isCrouching()) {
             IModHelpers.get().getBlockEntityHelpers().get(worldIn, pos, BlockEntityDarkTank.class)

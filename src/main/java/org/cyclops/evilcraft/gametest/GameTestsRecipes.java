@@ -4,13 +4,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.CrafterBlockEntity;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
 import org.cyclops.evilcraft.fabric.fluids.SimpleFluidContent;
+import net.minecraft.world.phys.Vec3;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -23,7 +24,7 @@ public class GameTestsRecipes {
     public static final BlockPos POS = BlockPos.ZERO.offset(2, 1, 2);
 
     protected static ItemStack findItem(GameTestHelper helper, Item item) {
-        ItemStack itemStack = helper.findEntities(EntityType.ITEM, POS.getBottomCenter(), 10).stream()
+        ItemStack itemStack = helper.findEntities(EntityTypes.ITEM, Vec3.atBottomCenterOf(POS), 10).stream()
                 .filter(i -> i.getItem().getItem() == item)
                 .findFirst()
                 .map(i -> i.getItem())

@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,7 @@ public class GameTestsItemEmpowering {
         helper.setBlock(POS.below(), Blocks.STONE);
 
         // Drop the item like it would be dropped in-world, via the item's custom entity
-        Vec3 pos = helper.absolutePos(POS).getBottomCenter();
+        Vec3 pos = Vec3.atBottomCenterOf(helper.absolutePos(POS));
         ItemEntity original = new ItemEntity(helper.getLevel(), pos.x(), pos.y(), pos.z(),
                 new ItemStack(RegistryEntries.ITEM_INVERTED_POTENTIA, count));
         EntityItemEmpowerable entity = new EntityItemEmpowerable(helper.getLevel(), original);
@@ -34,8 +34,8 @@ public class GameTestsItemEmpowering {
     }
 
     protected void strikeLightning(GameTestHelper helper) {
-        LightningBolt lightning = EntityType.LIGHTNING_BOLT.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
-        lightning.snapTo(helper.absolutePos(POS).getBottomCenter());
+        LightningBolt lightning = EntityTypes.LIGHTNING_BOLT.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+        lightning.snapTo(Vec3.atBottomCenterOf(helper.absolutePos(POS)));
         helper.getLevel().addFreshEntity(lightning);
     }
 

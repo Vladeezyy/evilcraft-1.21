@@ -26,10 +26,7 @@ public class ItemCreativeBloodDropConfig extends ItemConfigCommon<IModBase> {
         super(
                 EvilCraft._instance,
             "creative_blood_drop",
-                (eConfig, properties) -> new ItemCreativeBloodDrop(properties
-                        // TODO: not needed?
-                        // .component(RegistryEntries.COMPONENT_FLUID_CONTENT.get(), SimpleFluidContent.copyOf(new FluidStack(org.cyclops.evilcraft.RegistryEntries.FLUID_BLOOD, Integer.MAX_VALUE)))
-                )
+                (eConfig, properties) -> new ItemCreativeBloodDrop(properties)
         );
         RegisterCapabilitiesEvent.addListener(this::registerCapability);
         BuildCreativeModeTabContentsEvent.addListener(this::fillCreativeTab);

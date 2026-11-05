@@ -70,6 +70,12 @@ import java.util.function.Consumer;
  */
 public final class DevScene {
 
+    private static void hideGui(Minecraft mc, boolean hidden) {
+        if (mc.gui.hud.isHidden() != hidden) {
+            mc.gui.hud.toggle();
+        }
+    }
+
     private static final Logger LOGGER = LogManager.getLogger("evilcraft-scene");
     private static final String LANG = System.getProperty("evilcraft.scene.lang", "en_us");
     private static final String WORLD = "ec_scene";
@@ -81,7 +87,7 @@ public final class DevScene {
 
     static {
         at(40, mc -> server(mc, DevScene::setup));
-        at(45, mc -> mc.options.hideGui = true);
+        at(45, mc -> hideGui(mc, true));
         at(60, mc -> server(mc, DevScene::buildStage));
         at(70, mc -> server(mc, DevScene::fillTanks));
         at(160, mc -> server(mc, p -> look(p, stage.offset(0, 1, 0), 15)));
@@ -107,22 +113,22 @@ public final class DevScene {
         at(360, mc -> shot(mc, "mobs"));
         // Creative tab
         at(365, mc -> {
-            mc.options.hideGui = false;
-            mc.getToastManager().clear();
-            mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true));
+            hideGui(mc, false);
+            mc.gui.toastManager().clear();
+            mc.gui.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true));
         });
         at(375, mc -> selectTab(mc, EvilCraft._instance.getDefaultCreativeTab()));
         at(395, mc -> shot(mc, "creative_tab"));
-        at(400, mc -> mc.setScreen(null));
+        at(400, mc -> mc.gui.setScreen(null));
         // Blood infuser screen
         at(405, mc -> server(mc, DevScene::openInfuser));
-        at(430, mc -> { check("blood infuser screen opens", mc.screen != null, mc.screen); shot(mc, "gui_blood_infuser"); });
-        at(435, mc -> { if (mc.screen != null) mc.player.closeContainer(); });
+        at(430, mc -> { check("blood infuser screen opens", mc.gui.screen() != null, mc.gui.screen()); shot(mc, "gui_blood_infuser"); });
+        at(435, mc -> { if (mc.gui.screen() != null) mc.player.closeContainer(); });
         // Info book
         at(440, mc -> server(mc, p -> p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(RegistryEntries.ITEM_ORIGINS_OF_DARKNESS.get()))));
         at(450, mc -> mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND));
-        at(480, mc -> { check("info book opens", mc.screen != null, mc.screen); shot(mc, "book"); });
-        at(485, mc -> { if (mc.screen != null) mc.player.closeContainer(); mc.options.hideGui = true; });
+        at(480, mc -> { check("info book opens", mc.gui.screen() != null, mc.gui.screen()); shot(mc, "book"); });
+        at(485, mc -> { if (mc.gui.screen() != null) mc.player.closeContainer(); hideGui(mc, true); });
         // Functional checks
         at(490, mc -> server(mc, DevScene::checkTransfer));
         at(495, mc -> server(mc, DevScene::prepareInfusion));
@@ -131,21 +137,21 @@ public final class DevScene {
         at(810, mc -> server(mc, p -> look(p, stage.offset(0, 1, 0), 15)));
         at(840, mc -> shot(mc, "blocks_after"));
         // Dynamic item models: filled tank and chalice (fluid and gem colors), display stand with a type, filled box, broom
-        at(842, mc -> { mc.options.hideGui = false; server(mc, DevScene::dynamicItems); });
+        at(842, mc -> { hideGui(mc, false); server(mc, DevScene::dynamicItems); });
         at(848, mc -> shot(mc, "items_dynamic"));
         // EvilCraft-Compat: JEI recipe categories and the Jade tooltip (only with JEI and Jade, as in runScene)
         if (FabricLoader.getInstance().isModLoaded("jei")) {
             at(850, mc -> SceneCompat.checkJei());
-            at(855, mc -> { mc.options.hideGui = false; SceneCompat.showJei("blood_infuser"); });
+            at(855, mc -> { hideGui(mc, false); SceneCompat.showJei("blood_infuser"); });
             at(880, mc -> shot(mc, "jei_blood_infuser"));
             at(885, mc -> SceneCompat.showJei("environmental_accumulator"));
             at(910, mc -> shot(mc, "jei_environmental_accumulator"));
             at(915, mc -> SceneCompat.showJei("spirit_furnace"));
             at(940, mc -> shot(mc, "jei_spirit_furnace"));
-            at(945, mc -> mc.setScreen(null));
+            at(945, mc -> mc.gui.setScreen(null));
         }
         if (FabricLoader.getInstance().isModLoaded("jade")) {
-            at(950, mc -> { mc.options.hideGui = false; server(mc, p -> look(p, stage.offset(2, 1, 0), 30, 2.5)); });
+            at(950, mc -> { hideGui(mc, false); server(mc, p -> look(p, stage.offset(2, 1, 0), 30, 2.5)); });
             at(990, mc -> shot(mc, "jade_box_of_eternal_closure"));
         }
         at(1000, mc -> {
@@ -163,16 +169,16 @@ public final class DevScene {
 
     public static void onTick() {
         Minecraft mc = Minecraft.getInstance();
-        if (!opened && mc.screen instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
+        if (!opened && mc.gui.screen() instanceof net.minecraft.client.gui.screens.AccessibilityOnboardingScreen) {
             mc.options.onboardAccessibility = false;
             mc.options.save();
-            mc.setScreen(new TitleScreen());
+            mc.gui.setScreen(new TitleScreen());
             return;
         }
-        if (!opened && mc.getOverlay() != null) {
+        if (!opened && mc.gui.overlay() != null) {
             return;
         }
-        if (!opened && mc.screen instanceof TitleScreen) {
+        if (!opened && mc.gui.screen() instanceof TitleScreen) {
             if (!mc.options.languageCode.equals(LANG)) {
                 mc.options.languageCode = LANG;
                 mc.getLanguageManager().setSelected(LANG);
@@ -183,7 +189,7 @@ public final class DevScene {
             opened = true;
             GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
             if (mc.getLevelSource().levelExists(WORLD)) {
-                mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
+                mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.gui.setScreen(new TitleScreen()));
             } else {
                 LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
                 mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
@@ -195,9 +201,9 @@ public final class DevScene {
         }
         mc.options.pauseOnLostFocus = false;
         mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
-        mc.getToastManager().clear();
-        if (mc.screen instanceof PauseScreen) {
-            mc.setScreen(null);
+        mc.gui.toastManager().clear();
+        if (mc.gui.screen() instanceof PauseScreen) {
+            mc.gui.setScreen(null);
         }
         tick++;
         for (Pair<Integer, Consumer<Minecraft>> step : STEPS) {
@@ -233,11 +239,11 @@ public final class DevScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, c -> LOGGER.info("[scene] " + c.getString()));
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.gameRenderer.mainRenderTarget(), 1, c -> LOGGER.info("[scene] " + c.getString()));
     }
 
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
-        if (mc.screen instanceof CreativeModeInventoryScreen screen) {
+        if (mc.gui.screen() instanceof CreativeModeInventoryScreen screen) {
             ((FabricCreativeModeInventoryScreen) screen).setSelectedTab(tab);
         }
     }

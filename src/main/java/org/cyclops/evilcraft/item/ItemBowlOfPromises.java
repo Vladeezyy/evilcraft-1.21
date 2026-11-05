@@ -15,7 +15,7 @@ public class ItemBowlOfPromises extends Item {
     private final Type type;
 
     public ItemBowlOfPromises(Properties properties, Type type) {
-        super(type.isActive() ? properties.craftRemainder(new ItemStackTemplate(RegistryEntries.ITEM_BOWL_OF_PROMISES_EMPTY, 1, DataComponentPatch.EMPTY)) : properties);
+        super(type.isActive() ? properties.craftRemainder(new ItemStackTemplate(RegistryEntries.ITEM_BOWL_OF_PROMISES_EMPTY.getHolder(), 1, DataComponentPatch.EMPTY)) : properties);
         this.type = type;
     }
 

@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.gametest;
 
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -19,7 +20,7 @@ public class GameTestsWerewolfVillager {
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 1200, environment = "evilcraft:werewolf_villager_day")
     public void testWerewolfVillagerFromPoi(GameTestHelper helper) {
         helper.setBlock(POS, RegistryEntries.BLOCK_PURIFIER.value());
-        Villager villager = helper.spawn(EntityType.VILLAGER, POS.east().east());
+        Villager villager = helper.spawn(EntityTypes.VILLAGER, POS.east().east());
 
         helper.succeedWhen(() -> {
             helper.assertValueEqual(villager.getVillagerData().profession().value(), RegistryEntries.VILLAGER_PROFESSION_WEREWOLF.get(), Component.literal("Villager has no werewolf profession"));
@@ -30,7 +31,7 @@ public class GameTestsWerewolfVillager {
 
     @GameTest(template = TEMPLATE_EMPTY, timeoutTicks = 100, environment = "evilcraft:werewolf_villager_night")
     public void testWerewolfVillagerTransformAtFullMoon(GameTestHelper helper) {
-        Villager villager = helper.spawn(EntityType.VILLAGER, POS);
+        Villager villager = helper.spawn(EntityTypes.VILLAGER, POS);
         EntityWerewolf.initializeWerewolfVillagerData(villager);
 
         helper.succeedWhen(() -> helper.assertEntityPresent(RegistryEntries.ENTITY_WEREWOLF.get()));

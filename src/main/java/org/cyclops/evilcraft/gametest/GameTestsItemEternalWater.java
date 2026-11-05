@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import org.cyclops.evilcraft.fabric.fluids.FluidStack;
+import net.minecraft.world.phys.Vec3;
 import org.cyclops.cyclopscore.gametest.GameTest;
 import org.cyclops.evilcraft.Reference;
 import org.cyclops.evilcraft.RegistryEntries;
@@ -29,7 +30,7 @@ public class GameTestsItemEternalWater {
     public void testItemEternalWaterPlaceWorld(GameTestHelper helper) {
         // Give bucket to player
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-        player.setPos(helper.absolutePos(POS).getCenter());
+        player.setPos(Vec3.atCenterOf(helper.absolutePos(POS)));
         player.setXRot(90);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_ETERNAL_WATER);
         player.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
@@ -63,7 +64,7 @@ public class GameTestsItemEternalWater {
     public void testItemEternalWaterPickupWorld(GameTestHelper helper) {
         // Give bucket to player
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
-        player.setPos(helper.absolutePos(POS).getCenter());
+        player.setPos(Vec3.atCenterOf(helper.absolutePos(POS)));
         player.setXRot(90);
         ItemStack itemStack = new ItemStack(RegistryEntries.ITEM_ETERNAL_WATER);
         player.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
@@ -106,7 +107,7 @@ public class GameTestsItemEternalWater {
         helper.setBlock(POS, RegistryEntries.BLOCK_DARK_TANK.get());
 
         // Right click with bucket as player
-        InteractionResult result = ((org.cyclops.evilcraft.fabric.extensions.IItemUseFirst) itemStack.getItem()).onItemUseFirst(itemStack, new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
+        InteractionResult result = ((org.cyclops.evilcraft.fabric.extensions.IItemUseFirst) itemStack.getItem()).onItemUseFirst(itemStack, new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(POS)), Direction.NORTH, helper.absolutePos(POS), false)));
 
         helper.succeedWhen(() -> {
             // Check result
@@ -133,7 +134,7 @@ public class GameTestsItemEternalWater {
         helper.setBlock(POS, Blocks.CAULDRON);
 
         // Right click with bucket as player
-        InteractionResult result = itemStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
+        InteractionResult result = itemStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(POS)), Direction.NORTH, helper.absolutePos(POS), false)));
 
         helper.succeedWhen(() -> {
             // Check result
@@ -160,7 +161,7 @@ public class GameTestsItemEternalWater {
         helper.setBlock(POS, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 1));
 
         // Right click with bucket as player
-        InteractionResult result = itemStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(helper.absolutePos(POS).getCenter(), Direction.NORTH, helper.absolutePos(POS), false)));
+        InteractionResult result = itemStack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(Vec3.atCenterOf(helper.absolutePos(POS)), Direction.NORTH, helper.absolutePos(POS), false)));
 
         helper.succeedWhen(() -> {
             // Check result

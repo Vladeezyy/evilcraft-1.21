@@ -33,7 +33,7 @@ public class ItemDarkenedApple extends Item {
                         .alwaysEdible()
                         .build())
                 .component(DataComponents.CONSUMABLE, Consumable.builder()
-                        .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(RegistryEntries.POTION_PALING, POTION_DURATION * 20, POTION_AMPLIFIER)))
+                        .onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(RegistryEntries.POTION_PALING.getHolder(), POTION_DURATION * 20, POTION_AMPLIFIER)))
                         .build()));
         PlayerInteractEvent.EntityInteract.addListener(this::onInteract);
     }
@@ -46,7 +46,7 @@ public class ItemDarkenedApple extends Item {
     public void onInteract(PlayerInteractEvent.EntityInteract event) {
         Entity entity = event.getTarget();
         if (event.getItemStack().getItem() == this && entity instanceof Animal animal) {
-            animal.addEffect(new MobEffectInstance(RegistryEntries.POTION_PALING, POTION_DURATION * 20, POTION_AMPLIFIER));
+            animal.addEffect(new MobEffectInstance(RegistryEntries.POTION_PALING.getHolder(), POTION_DURATION * 20, POTION_AMPLIFIER));
             event.getItemStack().shrink(1);
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.CONSUME);

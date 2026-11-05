@@ -1,5 +1,6 @@
 package org.cyclops.evilcraft.world.gen.feature;
 
+import net.minecraft.world.entity.EntityTypes;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -26,8 +27,8 @@ public class WorldFeatureEvilDungeon extends MonsterRoomFeature {
 
     // The mobs of vanilla's monster rooms
     private static final net.minecraft.world.entity.EntityType<?>[] MONSTER_ROOM_MOBS = new net.minecraft.world.entity.EntityType<?>[]{
-            net.minecraft.world.entity.EntityType.SKELETON, net.minecraft.world.entity.EntityType.ZOMBIE,
-            net.minecraft.world.entity.EntityType.ZOMBIE, net.minecraft.world.entity.EntityType.SPIDER};
+            net.minecraft.world.entity.EntityTypes.SKELETON, net.minecraft.world.entity.EntityTypes.ZOMBIE,
+            net.minecraft.world.entity.EntityTypes.ZOMBIE, net.minecraft.world.entity.EntityTypes.SPIDER};
 
     private static final int RADIUS_X = 3;
     private static final int RADIUS_X_RAND = 4;

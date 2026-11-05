@@ -45,6 +45,10 @@ public final class FluidResource implements Resource {
         return of(FluidVariant.of(fluid, patch));
     }
 
+    public static FluidResource of(org.cyclops.evilcraft.fabric.registries.DeferredHolder<Fluid, ? extends Fluid> fluid) {
+        return of(fluid.get());
+    }
+
     public static FluidResource of(Holder<Fluid> fluid) {
         return of(fluid.value());
     }

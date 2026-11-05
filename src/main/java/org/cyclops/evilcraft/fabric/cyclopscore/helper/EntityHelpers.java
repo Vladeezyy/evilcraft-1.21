@@ -70,7 +70,7 @@ public class EntityHelpers {
      * @return the entity that was spawned.
      */
     public static Optional<Entity> spawnEntity(Level world, @Nullable Identifier entityName, double x, double y, double z, EntitySpawnReason spawnReason) {
-        return EntityType.byString(entityName.toString()).map((type) -> {
+        return net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(net.minecraft.resources.Identifier.parse(entityName.toString())).map((type) -> {
             Entity entity = type.create(world, spawnReason);
             entity.setPos(x, y, z);
             world.addFreshEntity(entity);
