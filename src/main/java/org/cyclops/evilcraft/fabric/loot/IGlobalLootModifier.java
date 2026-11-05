@@ -14,4 +14,8 @@ public interface IGlobalLootModifier {
     ObjectArrayList<ItemStack> apply(ObjectArrayList<ItemStack> generatedLoot, LootContext context);
 
     MapCodec<? extends IGlobalLootModifier> codec();
+
+    default int priority() {
+        return 1000;
+    }
 }

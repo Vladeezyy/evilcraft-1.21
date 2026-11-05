@@ -13,10 +13,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
@@ -93,11 +93,11 @@ public final class PerfScene {
         }
         if (!opened) {
             opened = true;
-            GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 1600, 900);
+            GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
             // Uncapped frames, or the FPS of both windows is the display's refresh rate
             mc.options.enableVsync().set(false);
             mc.options.framerateLimit().set(260);
-            LevelSettings settings = new LevelSettings(WORLD, GameType.SURVIVAL, false, Difficulty.NORMAL, true, new GameRules(), WorldDataConfiguration.DEFAULT);
+            LevelSettings settings = new LevelSettings(WORLD, GameType.SURVIVAL, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
             mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
             return;
         }
@@ -105,8 +105,10 @@ public final class PerfScene {
             return;
         }
         mc.options.pauseOnLostFocus = false;
+        // Vanilla drops to 30 FPS after a minute without input, which would fall right in the second window
+        mc.options.inactivityFpsLimit().set(net.minecraft.client.InactivityFpsLimit.MINIMIZED);
         mc.options.hideGui = true;
-        mc.getToasts().clear();
+        mc.getToastManager().clear();
         if (mc.screen instanceof PauseScreen) {
             mc.setScreen(null);
         }
@@ -150,10 +152,10 @@ public final class PerfScene {
         // On the server thread: ServerLevel.getBlockEntity is null on other threads
         server(mc, player -> {
             int entities = 0;
-            for (Entity ignored : player.serverLevel().getAllEntities()) {
+            for (Entity ignored : player.level().getAllEntities()) {
                 entities++;
             }
-            LOGGER.info(String.format(Locale.ROOT, "[perf] %s: %d entities, %d block entities of the mod", name, entities, modBlockEntities(player.serverLevel())));
+            LOGGER.info(String.format(Locale.ROOT, "[perf] %s: %d entities, %d block entities of the mod", name, entities, modBlockEntities(player.level())));
         });
         if (name.equals("vanilla")) {
             vanillaMspt = mspt;
@@ -187,17 +189,18 @@ public final class PerfScene {
     }
 
     private static void setup(ServerPlayer player) {
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         // Survival rules, but a fixed day and no natural spawns: the same load in both windows
         player.setGameMode(GameType.SPECTATOR);
-        server.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
-        server.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
-        server.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
-        player.serverLevel().setDayTime(6000);
-        player.serverLevel().setWeatherParameters(6000, 0, false, false);
+        server.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+        server.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+        server.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+        // The day time and the weather are clocks since 26.1, the commands set them
+        player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "time set 6000");
+        player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "weather clear");
         stage = new BlockPos(player.getBlockX(), 120, player.getBlockZ());
         // Above the middle of the stage, looking down at it
-        player.teleportTo(player.serverLevel(), stage.getX() + 0.5, stage.getY() + 14, stage.getZ() - 14, 0, 40);
+        player.teleportTo(player.level(), stage.getX() + 0.5, stage.getY() + 14, stage.getZ() - 14, java.util.Set.of(), 0, 40, true);
     }
 
     private static void set(ServerLevel level, BlockPos pos, Block block) {
@@ -205,7 +208,7 @@ public final class PerfScene {
     }
 
     private static void buildVanilla(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         for (int x = -16; x <= 16; x++) {
             for (int z = -16; z <= 16; z++) {
                 set(level, stage.offset(x, 0, z), Blocks.SMOOTH_STONE);
@@ -217,14 +220,14 @@ public final class PerfScene {
         }
         // 40 cows in the south half
         for (int i = 0; i < 40; i++) {
-            Entity cow = EntityType.COW.create(level);
-            cow.moveTo(stage.getX() - 12 + (i % 10) * 2.5, stage.getY() + 1, stage.getZ() + 4 + (i / 10) * 2.5, 0, 0);
+            Entity cow = EntityType.COW.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+            cow.snapTo(stage.getX() - 12 + (i % 10) * 2.5, stage.getY() + 1, stage.getZ() + 4 + (i / 10) * 2.5, 0, 0);
             level.addFreshEntity(cow);
         }
     }
 
     private static void buildEvilCraft(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         // North half: 16 blood infusers, each with a dark tank of blood above, infusing dark gems
         for (int i = 0; i < 16; i++) {
             BlockPos pos = stage.offset(-12 + (i % 8) * 3, 1, -12 + (i / 8) * 3);
@@ -263,7 +266,7 @@ public final class PerfScene {
                 RegistryEntries.ENTITY_NETHERFISH.get(), RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get()};
         for (int i = 0; i < 32; i++) {
             BlockPos pos = stage.offset(-12 + (i % 8) * 3, 1, 8 + (i / 8) * 2);
-            types[i % types.length].spawn(level, pos, MobSpawnType.COMMAND);
+            types[i % types.length].spawn(level, pos, EntitySpawnReason.COMMAND);
         }
     }
 }

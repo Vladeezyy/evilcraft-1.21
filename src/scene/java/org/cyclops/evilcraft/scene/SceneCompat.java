@@ -1,6 +1,6 @@
 package org.cyclops.evilcraft.scene;
 
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cyclops.evilcraftcompat.modcompat.jei.bloodinfuser.BloodInfuserRecipeCategory;
@@ -18,7 +18,7 @@ final class SceneCompat {
 
     private static final Logger LOGGER = LogManager.getLogger("evilcraft-scene");
 
-    private static final List<RecipeType<?>> TYPES = List.of(BloodInfuserRecipeCategory.TYPE, EnvironmentalAccumulatorRecipeCategory.TYPE,
+    private static final List<IRecipeType<?>> TYPES = List.of(BloodInfuserRecipeCategory.TYPE, EnvironmentalAccumulatorRecipeCategory.TYPE,
             SanguinaryEnvironmentalAccumulatorRecipeCategory.TYPE, SpiritReanimatorRecipeCategory.TYPE, SpiritFurnaceRecipeCategory.TYPE);
 
     private SceneCompat() {
@@ -30,7 +30,7 @@ final class SceneCompat {
             return;
         }
         // The Spirit Furnace recipes come from the server (loot tables), the others from the client's recipes
-        for (RecipeType<?> type : TYPES) {
+        for (IRecipeType<?> type : TYPES) {
             long count = SceneJei.count(type);
             LOGGER.info("[scene] JEI " + type.getUid() + ": " + count + " recipes");
             DevScene.check("JEI shows recipes of " + type.getUid(), count > 0, count);

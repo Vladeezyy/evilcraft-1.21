@@ -36,13 +36,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Loads the loot modifiers listed in data/neoforge/loot_modifiers/global_loot_modifiers.json (as NeoForge does) and
+ * Loads the loot modifiers in data/<namespace>/loot_modifiers (as NeoForge does) and
  * applies them to generated loot.
  */
 public final class GlobalLootModifiers {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Identifier LIST = Identifier.fromNamespaceAndPath("neoforge", "loot_modifiers/global_loot_modifiers.json");
     private static final Map<Identifier, MapCodec<? extends IGlobalLootModifier>> CODECS = Maps.newHashMap();
     public static final Codec<IGlobalLootModifier> CODEC = Identifier.CODEC.dispatch(
             modifier -> codecId(modifier.codec()),
@@ -104,35 +103,20 @@ public final class GlobalLootModifiers {
         ILootTableModifyEvent.EVENT.register(GlobalLootModifiers::apply);
     }
 
+    /**
+     * All files in the loot_modifiers folder of each namespace, as NeoForge 26.x does (the list file of 1.21.1 is gone).
+     */
     private static Map<Identifier, JsonElement> readModifiers(ResourceManager resourceManager) {
-        List<Identifier> entries = Lists.newArrayList();
-        for (Resource resource : resourceManager.getResourceStack(LIST)) {
-            try (Reader reader = resource.openAsReader()) {
-                JsonObject list = JsonParser.parseReader(reader).getAsJsonObject();
-                if (list.has("replace") && list.get("replace").getAsBoolean()) {
-                    entries.clear();
-                }
-                for (JsonElement entry : list.getAsJsonArray("entries")) {
-                    Identifier id = Identifier.parse(entry.getAsString());
-                    if (!entries.contains(id)) {
-                        entries.add(id);
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("Could not read loot modifier list {} of pack {}", LIST, resource.sourcePackId(), e);
-            }
-        }
         Map<Identifier, JsonElement> result = new LinkedHashMap<>();
-        for (Identifier id : entries) {
-            Identifier file = id.withPath(path -> "loot_modifiers/" + path + ".json");
-            resourceManager.getResource(file).ifPresentOrElse(resource -> {
-                try (Reader reader = resource.openAsReader()) {
-                    result.put(id, JsonParser.parseReader(reader));
-                } catch (Exception e) {
-                    LOGGER.error("Could not read loot modifier {}", id, e);
-                }
-            }, () -> LOGGER.warn("Missing loot modifier {}", id));
-        }
+        resourceManager.listResources("loot_modifiers", file -> file.getPath().endsWith(".json")).forEach((file, resource) -> {
+            String path = file.getPath();
+            Identifier id = file.withPath(path.substring("loot_modifiers/".length(), path.length() - ".json".length()));
+            try (Reader reader = resource.openAsReader()) {
+                result.put(id, JsonParser.parseReader(reader));
+            } catch (Exception e) {
+                LOGGER.error("Could not read loot modifier {}", id, e);
+            }
+        });
         return result;
     }
 
@@ -148,6 +132,8 @@ public final class GlobalLootModifiers {
                         .ifPresent(parsed::add);
             }
         });
+        // Higher priorities first, as on NeoForge
+        parsed.sort(java.util.Comparator.comparingInt(modifier -> -modifier.priority()));
         modifiers = parsed;
         Map<LootTable, Identifier> ids = new IdentityHashMap<>();
         server.reloadableRegistries().lookup().lookupOrThrow(Registries.LOOT_TABLE).listElements()

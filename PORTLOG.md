@@ -1,10 +1,12 @@
 # Port log: EvilCraft Fabric 1.21.1 -> 26.1.2 (WIP)
 
-Status (2026-11-05): **the mod builds, the server side works, the client has never run.**
-- `compileJava` and `jar`: OK. All 106 GameTests of the original pass (`tools/gametest.sh`), no recipe parse errors.
-- Production server: starts (`SERVER_ONLY=1 tools/prodtest.sh`).
-- **Not done:** no client run yet, so models, renderers, GUIs and JEI are untested. `src/scene` does not compile (118 errors,
-  still on the 1.21.1 API): it is the next step, as it is how the client gets tested. No stress test yet. No release.
+Status (2026-11-05): **26.1.2 works on server and client in automatic tests; no human has played it, no release yet.**
+- `compileJava`, `jar`: OK. GameTests of the original: 106/106 (`tools/gametest.sh`).
+- Client scene (`tools/scenetest.sh`, with JEI and Jade): all checks pass; screenshots looked at and compared with `docs/images`.
+- Production server and production client (`tools/prodtest.sh`): OK, 24 checks, no JEI there.
+- Stress (`tools/perf.sh`, Mac M-series, one world, 600 ticks per window, base 158-261 entities; base + 72 working blocks of the mod
+  and 24 mobs), two runs: FPS 108 -> 91 and 108 -> 96 (-16%, -11%); MSPT 9.87 -> 11.55 and 14.65 -> 11.16, so the base alone moves by
+  more than the difference: noise. 1.21.1 was -9% FPS, +0.29 MSPT on a quieter machine. A JFR share of the server thread is still to do.
 
 ## How this branch was made
 - `vendor/26.1.2` (local branch): upstream CyclopsMC/EvilCraft `master-26-lts` @ 94d5b596 (1.2.109) on top of the
@@ -96,8 +98,11 @@ Status (2026-11-05): **the mod builds, the server side works, the client has nev
      through `PatchedDataComponentMap.restorePatch`), hoppers on `ResourceHandlerStorage`, buckets through the
      `FluidStorage.ITEM` fallback, `FluidStacksResourceHandler` saving (`stacks` key; 1.21.1 port worlds wrote `Fluid`).
 4. Done: fabric.mod.json and mixins on Java 25, access widener entries checked against the jar, mixins fixed by running.
-5. Tests. Done: GameTests 106/106, production server.
-   - Next: port `src/scene` (118 errors), then scene, production client, stress with FPS and MSPT against vanilla.
+5. Tests. Done: GameTests, scene, production server and client, stress.
+   - Still by hand or to add to the scene: broom flight and overlay, entangled chalice links between players, display stand with a type,
+     a world from the 1.21.1 port (tank contents: new key `stacks`, old `Fluid`).
+   - JEI's item list covers the info book: the book is an AbstractContainerScreen, upstream too; hide it with a gui handler if it bothers.
+   - `130 duplicate items were found in 'EvilCraft' creative tab`: logged by JEI's list factory, the tab itself shows each item once.
    - Warnings to look at: `The broom modifier evilcraft:witherer (hungerer, kamikaze, withershield) has no valid items` in the
      info book; `duplicate API provider` for the chalice and creative blood drop (`DamageIndicatedItemFluidContainer` and their
      configs both register; Fabric keeps the first, the config's, which is the right one).

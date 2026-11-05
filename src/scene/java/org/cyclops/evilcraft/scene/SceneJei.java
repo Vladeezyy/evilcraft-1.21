@@ -1,9 +1,9 @@
 package org.cyclops.evilcraft.scene;
 
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ public class SceneJei implements IModPlugin {
     static IJeiRuntime runtime;
 
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath("evilcraft_scene", "jei");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath("evilcraft_scene", "jei");
     }
 
     @Override
@@ -24,11 +24,11 @@ public class SceneJei implements IModPlugin {
         runtime = jeiRuntime;
     }
 
-    static long count(RecipeType<?> type) {
+    static long count(IRecipeType<?> type) {
         return runtime.getRecipeManager().createRecipeLookup(type).get().count();
     }
 
-    static void show(RecipeType<?> type) {
+    static void show(IRecipeType<?> type) {
         runtime.getRecipesGui().showTypes(List.of(type));
     }
 }

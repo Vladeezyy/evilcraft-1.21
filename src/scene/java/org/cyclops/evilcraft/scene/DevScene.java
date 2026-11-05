@@ -2,7 +2,7 @@ package org.cyclops.evilcraft.scene;
 
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.fabric.api.client.itemgroup.v1.FabricCreativeInventoryScreen;
+import net.fabricmc.fabric.api.client.creativetab.v1.FabricCreativeModeInventoryScreen;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
@@ -20,7 +20,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,7 +32,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
@@ -95,7 +95,7 @@ public final class DevScene {
         at(290, mc -> shot(mc, "nature"));
         // Vengeance spirits are only visible with spectral glasses
         at(295, mc -> server(mc, p -> {
-            p.getInventory().setItem(8, new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("evilcraft", "spectral_glasses"))));
+            p.getInventory().setItem(8, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("evilcraft", "spectral_glasses"))));
             mobs(p);
         }));
         at(300, mc -> server(mc, p -> look(p, stage.offset(0, 1, -6), 15, 4.5)));
@@ -108,7 +108,7 @@ public final class DevScene {
         // Creative tab
         at(365, mc -> {
             mc.options.hideGui = false;
-            mc.getToasts().clear();
+            mc.getToastManager().clear();
             mc.setScreen(new CreativeModeInventoryScreen(mc.player, mc.player.connection.enabledFeatures(), true));
         });
         at(375, mc -> selectTab(mc, EvilCraft._instance.getDefaultCreativeTab()));
@@ -130,6 +130,9 @@ public final class DevScene {
         at(805, mc -> server(mc, DevScene::checkData));
         at(810, mc -> server(mc, p -> look(p, stage.offset(0, 1, 0), 15)));
         at(840, mc -> shot(mc, "blocks_after"));
+        // Dynamic item models: filled tank and chalice (fluid and gem colors), display stand with a type, filled box, broom
+        at(842, mc -> { mc.options.hideGui = false; server(mc, DevScene::dynamicItems); });
+        at(848, mc -> shot(mc, "items_dynamic"));
         // EvilCraft-Compat: JEI recipe categories and the Jade tooltip (only with JEI and Jade, as in runScene)
         if (FabricLoader.getInstance().isModLoaded("jei")) {
             at(850, mc -> SceneCompat.checkJei());
@@ -178,11 +181,11 @@ public final class DevScene {
                 return;
             }
             opened = true;
-            GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 1600, 900);
+            GLFW.glfwSetWindowSize(mc.getWindow().handle(), 1600, 900);
             if (mc.getLevelSource().levelExists(WORLD)) {
                 mc.createWorldOpenFlows().openWorld(WORLD, () -> mc.setScreen(new TitleScreen()));
             } else {
-                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, false, Difficulty.NORMAL, true, new GameRules(), WorldDataConfiguration.DEFAULT);
+                LevelSettings settings = new LevelSettings(WORLD, GameType.CREATIVE, new LevelSettings.DifficultySettings(Difficulty.NORMAL, false, false), true, WorldDataConfiguration.DEFAULT);
                 mc.createWorldOpenFlows().createFreshLevel(WORLD, settings, new WorldOptions(1234L, false, false), WorldPresets::createNormalWorldDimensions, new TitleScreen());
             }
             return;
@@ -192,7 +195,7 @@ public final class DevScene {
         }
         mc.options.pauseOnLostFocus = false;
         mc.getTutorial().setStep(net.minecraft.client.tutorial.TutorialSteps.NONE);
-        mc.getToasts().clear();
+        mc.getToastManager().clear();
         if (mc.screen instanceof PauseScreen) {
             mc.setScreen(null);
         }
@@ -230,33 +233,24 @@ public final class DevScene {
     }
 
     private static void shot(Minecraft mc, String name) {
-        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), c -> LOGGER.info("[scene] " + c.getString()));
+        Screenshot.grab(mc.gameDirectory, "scene_" + name + ".png", mc.getMainRenderTarget(), 1, c -> LOGGER.info("[scene] " + c.getString()));
     }
 
     private static void selectTab(Minecraft mc, CreativeModeTab tab) {
         if (mc.screen instanceof CreativeModeInventoryScreen screen) {
-            FabricCreativeInventoryScreen fabricScreen = (FabricCreativeInventoryScreen) screen;
-            fabricScreen.switchToPage(fabricScreen.getPage(tab));
-            try {
-                var select = java.util.Arrays.stream(CreativeModeInventoryScreen.class.getDeclaredMethods())
-                        .filter(m -> m.getReturnType() == void.class && java.util.Arrays.equals(m.getParameterTypes(), new Class<?>[]{CreativeModeTab.class}))
-                        .findFirst().orElseThrow(NoSuchMethodException::new);
-                select.setAccessible(true);
-                select.invoke(screen, tab);
-            } catch (ReflectiveOperationException e) {
-                LOGGER.error("[scene] cannot select the creative tab", e);
-            }
+            ((FabricCreativeModeInventoryScreen) screen).setSelectedTab(tab);
         }
     }
 
     private static void setup(ServerPlayer player) {
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         player.setGameMode(GameType.CREATIVE);
-        server.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
-        server.getGameRules().getRule(GameRules.RULE_DAYLIGHT).set(false, server);
-        server.getGameRules().getRule(GameRules.RULE_WEATHER_CYCLE).set(false, server);
-        player.serverLevel().setDayTime(6000);
-        player.serverLevel().setWeatherParameters(6000, 0, false, false);
+        server.getGameRules().set(GameRules.SPAWN_MOBS, false, server);
+        server.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+        server.getGameRules().set(GameRules.ADVANCE_WEATHER, false, server);
+        // The day time and the weather are clocks since 26.1, the commands set them
+        player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "time set 6000");
+        player.level().getServer().getCommands().performPrefixedCommand(player.level().getServer().createCommandSourceStack().withSuppressedOutput(), "weather clear");
         stage = new BlockPos(player.getBlockX(), 120, player.getBlockZ() + 6);
     }
 
@@ -266,7 +260,7 @@ public final class DevScene {
 
     private static void look(ServerPlayer player, BlockPos target, float pitch, double distance) {
         Vec3 eye = Vec3.atCenterOf(target).add(0, 1.5, -distance);
-        player.teleportTo(player.serverLevel(), eye.x, eye.y - player.getEyeHeight(), eye.z, 0, pitch);
+        player.teleportTo(player.level(), eye.x, eye.y - player.getEyeHeight(), eye.z, java.util.Set.of(), 0, pitch, true);
     }
 
     private static void set(ServerLevel level, BlockPos pos, Block block) {
@@ -274,7 +268,7 @@ public final class DevScene {
     }
 
     private static void buildStage(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         for (int x = -8; x <= 8; x++) {
             for (int z = -16; z <= 12; z++) {
                 set(level, stage.offset(x, 0, z), Blocks.SMOOTH_STONE);
@@ -323,7 +317,7 @@ public final class DevScene {
         set(level, nature.offset(1, 1, 0), RegistryEntries.BLOCK_BLOOD.get());
         set(level, nature.offset(2, 1, 0), RegistryEntries.BLOCK_POISON.get());
         set(level, nature.offset(3, 1, 0), RegistryEntries.BLOCK_POISON.get());
-        set(level, nature.offset(6, 1, 0), BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("evilcraft", "dark_ore")));
+        set(level, nature.offset(6, 1, 0), BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath("evilcraft", "dark_ore")));
     }
 
     private static long insert(Storage<FluidVariant> storage, FluidVariant fluid, long amount) {
@@ -343,7 +337,7 @@ public final class DevScene {
     }
 
     private static void fillTanks(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos tank = stage.offset(-5, 1, 0);
         Storage<FluidVariant> storage = FluidStorage.SIDED.find(level, tank, Direction.UP);
         check("dark tank has a Fabric fluid storage", storage != null, null);
@@ -366,14 +360,14 @@ public final class DevScene {
     }
 
     private static void mobs(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos pen = stage.offset(0, 1, -6);
         EntityType<?>[] types = {RegistryEntries.ENTITY_WEREWOLF.get(), RegistryEntries.ENTITY_POISONOUS_LIBELLE.get(),
                 RegistryEntries.ENTITY_VENGEANCE_SPIRIT.get(), RegistryEntries.ENTITY_NETHERFISH.get(), RegistryEntries.ENTITY_CONTROLLED_ZOMBIE.get()};
         for (int i = 0; i < types.length; i++) {
-            Entity entity = types[i].create(level);
+            Entity entity = types[i].create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
             if (entity != null) {
-                entity.moveTo(pen.getX() + 0.5 - 3.2 + i * 1.6, pen.getY(), pen.getZ() + 0.5, 180, 0);
+                entity.snapTo(pen.getX() + 0.5 - 3.2 + i * 1.6, pen.getY(), pen.getZ() + 0.5, 180, 0);
                 level.addFreshEntity(entity);
             }
             check(types[i].getDescriptionId() + " spawns", entity != null, null);
@@ -385,19 +379,43 @@ public final class DevScene {
         }
     }
 
+    private static void dynamicItems(ServerPlayer player) {
+        ItemStack tank = new ItemStack(RegistryEntries.ITEM_DARK_TANK.get());
+        org.cyclops.evilcraft.fabric.transfer.ItemAccess access = org.cyclops.evilcraft.fabric.transfer.ItemAccess.forStack(tank);
+        var handler = access.getCapability(org.cyclops.evilcraft.fabric.capabilities.Capabilities.Fluid.ITEM);
+        check("the dark tank item has a fluid handler", handler != null, null);
+        if (handler != null) {
+            try (var transaction = org.cyclops.evilcraft.fabric.transfer.Transaction.openRoot()) {
+                int inserted = handler.insert(org.cyclops.evilcraft.fabric.transfer.FluidResource.of(RegistryEntries.FLUID_BLOOD.get()), 8000, transaction);
+                transaction.commit();
+                check("blood goes into the dark tank item", inserted > 0, inserted);
+            }
+        }
+        ItemStack chalice = new ItemStack(RegistryEntries.BLOCK_ENTANGLED_CHALICE.get().asItem());
+        ItemStack stand = new ItemStack(RegistryEntries.BLOCK_DISPLAY_STAND.get().asItem());
+        ItemStack[] items = {tank, new ItemStack(RegistryEntries.ITEM_DARK_TANK.get()), chalice, stand,
+                org.cyclops.evilcraft.block.BlockBoxOfEternalClosure.boxOfEternalClosureFilled.create(),
+                new ItemStack(RegistryEntries.BLOCK_BOX_OF_ETERNAL_CLOSURE.get().asItem()),
+                new ItemStack(RegistryEntries.ITEM_BROOM.get()), new ItemStack(RegistryEntries.BLOCK_BLOOD_CHEST.get().asItem())};
+        for (int i = 0; i < items.length; i++) {
+            player.getInventory().setItem(i, items[i]);
+        }
+        player.getInventory().setSelectedSlot(8);
+    }
+
     private static void openInfuser(ServerPlayer player) {
         BlockPos pos = stage.offset(-4, 1, 0);
-        if (player.serverLevel().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
+        if (player.level().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_INFUSE, new ItemStack(Items.MOSSY_COBBLESTONE, 8));
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_CONTAINER, new ItemStack(RegistryEntries.ITEM_BUCKET_BLOOD.get()));
             player.openMenu(infuser);
         } else {
-            check("blood infuser block entity exists", false, player.serverLevel().getBlockEntity(pos));
+            check("blood infuser block entity exists", false, player.level().getBlockEntity(pos));
         }
     }
 
     private static void checkTransfer(ServerPlayer player) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.level();
         BlockPos tank = stage.offset(-5, 1, 0);
         if (level.getBlockEntity(tank) instanceof BlockEntityDarkTank darkTank) {
             check("dark tank holds 8000 mB of blood", darkTank.getTank().getFluidAmount() == 8000
@@ -435,10 +453,10 @@ public final class DevScene {
 
     private static void prepareInfusion(ServerPlayer player) {
         BlockPos pos = stage.offset(-4, 1, 0);
-        if (player.serverLevel().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
+        if (player.level().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_INFUSE, new ItemStack(Items.MOSSY_COBBLESTONE, 1));
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_CONTAINER, ItemStack.EMPTY);
-            Storage<FluidVariant> storage = FluidStorage.SIDED.find(player.serverLevel(), pos, Direction.UP);
+            Storage<FluidVariant> storage = FluidStorage.SIDED.find(player.level(), pos, Direction.UP);
             long inserted = storage == null ? 0 : insert(storage, FluidVariant.of(RegistryEntries.FLUID_BLOOD.get()), FluidConstants.BUCKET);
             check("blood goes into the blood infuser", inserted == FluidConstants.BUCKET || infuser.getTank().getFluidAmount() > 0, inserted);
         }
@@ -446,29 +464,29 @@ public final class DevScene {
 
     private static void checkInfusion(ServerPlayer player) {
         BlockPos pos = stage.offset(-4, 1, 0);
-        if (player.serverLevel().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
+        if (player.level().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
             ItemStack result = infuser.getInventory().getItem(BlockEntityBloodInfuser.SLOT_INFUSE_RESULT);
             check("the blood infuser makes bloody cobblestone", result.is(RegistryEntries.BLOCK_BLOODY_COBBLESTONE.get().asItem()), result);
         }
     }
 
     private static void checkData(ServerPlayer player) {
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.level().getServer();
         // Recipes with Fabric's components ingredient and load conditions
         check("recipe with a components ingredient is loaded",
-                server.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("evilcraft", "crafting/weather_container_rain")).isPresent(), null);
+                server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath("evilcraft", "crafting/weather_container_rain"))).isPresent(), null);
         check("broom part recipe for a missing metal is not loaded",
-                server.getRecipeManager().byKey(ResourceLocation.fromNamespaceAndPath("evilcraft", "crafting/broom_part_cap_metal_cobalt")).isEmpty(), null);
+                server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath("evilcraft", "crafting/broom_part_cap_metal_cobalt"))).isEmpty(), null);
         // Biome modifiers: dark ore in the plains
-        Biome plains = server.registryAccess().registryOrThrow(Registries.BIOME).get(Biomes.PLAINS);
-        ResourceKey<PlacedFeature> darkOre = ResourceKey.create(Registries.PLACED_FEATURE, ResourceLocation.fromNamespaceAndPath("evilcraft", "ore_dark"));
+        Biome plains = server.registryAccess().lookupOrThrow(Registries.BIOME).getValue(Biomes.PLAINS);
+        ResourceKey<PlacedFeature> darkOre = ResourceKey.create(Registries.PLACED_FEATURE, Identifier.fromNamespaceAndPath("evilcraft", "ore_dark"));
         boolean hasOre = plains.getGenerationSettings().features().get(GenerationStep.Decoration.UNDERGROUND_ORES.ordinal())
                 .stream().anyMatch(holder -> holder.is(darkOre));
         check("dark ore generates in the plains", hasOre, null);
         // Loot modifiers: condensed blood in dungeon chests
         int condensed = 0;
         for (int i = 0; i < 60; i++) {
-            LootParams params = new LootParams.Builder(player.serverLevel())
+            LootParams params = new LootParams.Builder(player.level())
                     .withParameter(LootContextParams.ORIGIN, player.position())
                     .create(LootContextParamSets.CHEST);
             for (ItemStack stack : server.reloadableRegistries().getLootTable(BuiltInLootTables.SIMPLE_DUNGEON).getRandomItems(params)) {

@@ -41,6 +41,11 @@ public abstract class LootModifier implements IGlobalLootModifier {
     }
 
     @Override
+    public int priority() {
+        return priority;
+    }
+
+    @Override
     public final ObjectArrayList<ItemStack> apply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         return combinedConditions.test(context) ? doApply(generatedLoot, context) : generatedLoot;
     }
