@@ -1,0 +1,40 @@
+<h1>EvilCraft (Unofficial Fabric Port)</h1>
+<p><strong>Dark magic, blood and vengeful spirits. EvilCraft on Fabric for Minecraft 1.21.1, 1.21.11, 26.1.2, 26.2 and 26.3, with all of its content.</strong></p>
+<h2>📜 Original mod</h2>
+<p>This is an unofficial port of <strong><a href="https://www.curseforge.com/minecraft/mc-mods/evilcraft">EvilCraft</a></strong> by <strong>rubensworks</strong> (kroeser) and the CyclopsMC contributors (<a href="https://github.com/CyclopsMC/EvilCraft">source</a>) from NeoForge to <strong>Fabric</strong>. The original is open source under <strong>MIT</strong> (its README: code and images under Creative Commons Attribution 4.0); the JEI and Jade integrations come from its <strong>EvilCraft-Compat</strong> (MIT), which the original bundles into its jar. Source of this port: <a href="https://github.com/Vladeezyy/evilcraft-1.21">github.com/Vladeezyy/evilcraft-1.21</a>, LGPL-3.0, with the licenses and credits of the original kept. All the content, art, texts and ideas are theirs; please report bugs of this port to <a href="https://github.com/Vladeezyy/evilcraft-1.21/issues">this port's issues</a>, not to the original authors.</p>
+<h3>How this port differs from the original</h3>
+<ul>
+<li><strong>Fabric</strong> instead of NeoForge. Same content, recipes, loot and numbers. Based on EvilCraft 1.2.109 for 1.21.11 and 26.x, and on 1.2.99 for 1.21.1.</li>
+<li><strong>Fluids use Fabric's Transfer API:</strong> Dark Tanks, the Blood Infuser and the other blood machines connect to the pipes and tanks of other Fabric mods.</li>
+<li><strong>JEI and Jade</strong> (optional): the recipes of the Blood Infuser, the Environmental Accumulators, the Spirit Reanimator and the Spirit Furnace (its mob drops come from the server, which does not need JEI); Jade shows the contents of the Box of Eternal Closure and the parts of a broom.</li>
+<li><strong>Translations:</strong> English, Russian, Ukrainian, German, Spanish and Brazilian Portuguese are complete; the other translations of the original are kept.</li>
+<li><strong>Fixes</strong> over the original 1.21.1: blood put into tanks by the mod itself is saved with the chunk; villagers take the Werewolf profession; a hopper under a halted Spirit Furnace restarts it.</li>
+<li><strong>Tested:</strong> the GameTests of the original (104–106 per version) on every build, a client test scene (blocks, fluids, machines, mobs, the book, fluid transfer, JEI and Jade), the release jar on a dedicated server.</li>
+</ul>
+<h2>🩸 About the mod</h2>
+<p>EvilCraft brings dark magic to Minecraft: collect blood, harness the power of spirits and the weather, and fight the creatures of the night.</p>
+<ul>
+<li><strong>Blood</strong>: a fluid that drops from the mobs you kill, stored in Dark Tanks, Blood Chests and Entangled Chalices (linked over any distance), and used by most machines</li>
+<li><strong>Machines</strong>: the Blood Infuser, the Spirit Furnace, the Spirit Reanimator, the Environmental Accumulator (weather in a bottle), the Sanguinary Environmental Accumulator, the Purifier, the Colossal Blood Chest and more</li>
+<li><strong>Creatures</strong>: Werewolves, Vengeance Spirits (catch them in a Box of Eternal Closure), Poisonous Libelles, Netherfish, Controlled Zombies</li>
+<li><strong>Tools and items</strong>: brooms you build from parts, the Vengeance Ring, the Mace of Distortion, the Necromancer's Staff, the Kineticator, Weather Containers, Blood Extractors, Lightning Grenades, ...</li>
+<li><strong>The world</strong>: Dark Ore, undead trees, blood and poison, the Spirit Portal and the Gemstone of Doom</li>
+<li><strong>Origins of Darkness</strong>: the in-game book that explains it all</li>
+</ul>
+<h2>📦 Installation</h2>
+<p>Needed on both the client and the server. Download the file for your Minecraft version: a file for one version does not load on another.</p>
+<ul>
+<li><strong>26.3</strong>: Fabric Loader 0.19.5+, Java 25, <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api">Fabric API</a> 0.164.0+, <a href="https://www.curseforge.com/minecraft/mc-mods/cyclops-core">Cyclops Core</a> for Fabric 1.30.0-1212+, <a href="https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port">Forge Config API Port</a> 26.3.1+</li>
+<li><strong>26.2</strong>: Fabric Loader 0.19.5+, Java 25, Fabric API 0.161.0+, Cyclops Core for Fabric 1.30.0-1143+, Forge Config API Port 26.2.1+</li>
+<li><strong>26.1.2</strong>: Fabric Loader 0.19.5+, Java 25, Fabric API 0.155.3+, Cyclops Core for Fabric 1.31.4+, Forge Config API Port 26.1.5+</li>
+<li><strong>1.21.11</strong>: Fabric Loader 0.19.5+, Java 21, Fabric API 0.141.6+, Cyclops Core for Fabric 1.25.5+, Forge Config API Port 21.11.1+</li>
+<li><strong>1.21.1</strong>: Fabric Loader 0.16.14+, Java 21, Fabric API 0.116.17+, Cyclops Core for Fabric 1.30.0+, Forge Config API Port 21.1.6+</li>
+<li>Optional, on the client: <a href="https://www.curseforge.com/minecraft/mc-mods/jei">JEI</a> (with MezzConfig) and <a href="https://www.curseforge.com/minecraft/mc-mods/jade">Jade</a></li>
+</ul>
+<p>Settings: <code>config/evilcraft-common.toml</code>, <code>config/evilcraft-client.toml</code>.</p>
+<h2>⚠️ Known issues</h2>
+<ul>
+<li>1.21.11 and 26.x are new: checked by automated tests, not yet by long play. Please report anything odd.</li>
+<li>26.3: the werewolf mansion in villages was not checked in game yet.</li>
+</ul>
+<p>Source, changelog and older files: <a href="https://github.com/Vladeezyy/evilcraft-1.21">github.com/Vladeezyy/evilcraft-1.21</a>.</p>
