@@ -280,7 +280,7 @@
   "entity.evilcraft.vengeance_spirit": "Espírito da Vingança",
   "entity.evilcraft.controlled_zombie": "Zumbi Controlado",
   "entity.evilcraft.broom_entity": "Vassoura",
-  "entity.evilcraft.villager.werewolf": "Lobisomem-Aldeão",
+  "entity.minecraft.villager.evilcraft.werewolf": "Lobisomem-Aldeão",
   "enchantment.evilcraft.breaking": "Maldição da Quebra",
   "enchantment.evilcraft.breaking.desc": "Suas ferramentas quebram mais rápido",
   "enchantment.evilcraft.life_stealing": "Roubo de Vida",
@@ -532,6 +532,7 @@
   "info_book.evilcraft.second_age.evolved_blood_machinery.purifier.text1": "Após os infelizes efeitos colaterais do &1Baú de Sangue&0, decidi projetar uma nova máquina que é capaz de remover esses efeitos negativos de suas ferramentas. Simplesmente colocando uma ferramenta com um efeito negativo dentro deste bloco junto com pelo menos um balde de &4Sangue&0 removerá este efeito do item.",
   "info_book.evilcraft.second_age.evolved_blood_machinery.purifier.text2": "Um benefício não intencional desta máquina é que, ao enchê-la completamente com &4Sangue&0 e colocar um item encantado junto com um &1Blook&0 (que é apenas um &1Livro&0 infundido com &1Sangue&0), moverá um encantamento aleatório do item para o livro, ao custo de três &1Baldes de Sangue&0.",
   "info_book.evilcraft.second_age.evolved_blood_machinery.purifier.text3": "Recentemente, notei que esta máquina também permite remover &1Efeitos de Poção&0 de criaturas vivas sentadas dentro dela, enchendo o &1Purificador&0 completamente com &4Sangue&0 e dando a ele uma &1Garrafa Vazia&0. Após alguns segundos, o efeito será contido dentro da garrafa e a criatura será libertada dele.",
+  "info_book.evilcraft.second_age.evolved_blood_machinery.purifier.text4": "Por fim, o &1Purificador&0 é capaz de desfazer a corrupção das cabeças de mobs causada pelo &1Infusor de Sangue&0. Se você o encher completamente de &4Sangue&0 e colocar dentro dele um &1Crânio de Esqueleto Wither&0, uma &1Cabeça de Creeper&0 ou uma &1Cabeça de Zumbi&0, essa cabeça voltará à etapa anterior da sua progressão.",
   "info_book.evilcraft.second_age.evolved_blood_machinery.entangled_chalice": "Cálice Entrelaçado",
   "info_book.evilcraft.second_age.evolved_blood_machinery.entangled_chalice.text1": "Quando você tem tanta experiência quanto eu em infundir itens com &4Sangue&0, você notará que, ao aprimorar uma lágrima do temível &1Ghast&0, resultará em um tipo muito especial de lágrima. Parece compartilhar todas as propriedades quando dividida ao meio. Isso me deu a ideia de construir &lCálices Entrelaçados&r com esta lágrima, com o objetivo de compartilhar o conteúdo fluido do cálice com todos os outros cálices que são construídos a partir da mesma lágrima.",
   "info_book.evilcraft.second_age.evolved_blood_machinery.entangled_chalice.text2": "Normalmente, você obterá dois cálices compartilhando conteúdo da receita de criação, mas ao substituir o &4Lingote de Ouro&0 central na receita por um cálice existente, ele expandirá a rede de lágrimas para incluir outro cálice.",
@@ -626,5 +627,6 @@
   "info_book.evilcraft.second_age.after_death.garmonbozia": "Garmonbozia",
   "info_book.evilcraft.second_age.after_death.garmonbozia.text1": "E se fosse possível imbuir os pensamentos e emoções mais sombrios neste mundo? Isso poderia provar ser uma fonte imensa de poder inimaginável. Com a descoberta da vingança, escuridão e sangue, acho que posso ter os elementos essenciais.",
   "info_book.evilcraft.second_age.after_death.garmonbozia.text2": "A combinação desses elementos resultou em uma estranha energia espiritual. É tão de outro mundo, que não tem seu próprio material, e é por isso que é observada como uma espécie de creme de milho.",
-  "info_book.evilcraft.second_age.after_death.garmonbozia.text3": "Meus súditos dizem que fui longe demais… tolos."
+  "info_book.evilcraft.second_age.after_death.garmonbozia.text3": "Meus súditos dizem que fui longe demais… tolos.",
+  "entity.evilcraft.villager.werewolf": "Lobisomem-Aldeão"
 }
