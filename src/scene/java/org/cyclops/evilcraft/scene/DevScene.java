@@ -408,7 +408,25 @@ public final class DevScene {
         if (player.level().getBlockEntity(pos) instanceof BlockEntityBloodInfuser infuser) {
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_INFUSE, new ItemStack(Items.MOSSY_COBBLESTONE, 8));
             infuser.getInventory().setItem(BlockEntityBloodInfuser.SLOT_CONTAINER, new ItemStack(RegistryEntries.ITEM_BUCKET_BLOOD.get()));
-            player.openMenu(infuser);
+            // As a player's click (IBlockGui opens it with extra data), not player.openMenu: on Fabric a plain menu type
+            // refused that ("Non-extended menu evilcraft:blood_infuser must not be opened with an ExtendedMenuProvider")
+            net.minecraft.world.phys.BlockHitResult hit = new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+            try {
+                net.minecraft.world.InteractionResult result = infuser.getBlockState().useWithoutItem(player.level(), player, hit);
+                check("blood infuser opens by a click", result.consumesAction() && player.containerMenu != player.inventoryMenu, result);
+            } catch (RuntimeException e) {
+                check("blood infuser opens by a click", false, e);
+            }
+            // every menu of the mod is opened with extra data (blocks through IBlockGui, items through ItemGui), so none
+            // may be a plain MenuType (Fabric's extended menu type is a subclass)
+            List<String> plain = new ArrayList<>();
+            for (var type : BuiltInRegistries.MENU) {
+                var id = BuiltInRegistries.MENU.getKey(type);
+                if (id.getNamespace().equals("evilcraft") && type.getClass() == net.minecraft.world.inventory.MenuType.class) {
+                    plain.add(id.toString());
+                }
+            }
+            check("every menu of the mod is an extended menu type", plain.isEmpty(), plain);
         } else {
             check("blood infuser block entity exists", false, player.level().getBlockEntity(pos));
         }
