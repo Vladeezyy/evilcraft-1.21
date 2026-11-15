@@ -50,7 +50,7 @@ creatures of the night.
   <img src="docs/images/jade_box_of_eternal_closure.jpg" width="49%" alt="Jade tooltip of the Box of Eternal Closure">
 </p>
 
-The base is upstream EvilCraft **1.2.109**. Upstream's `master-26.2` is older than its LTS branch, so only its 26.2 migration is merged on top of 1.2.109 (`master-26-lts`); the newer features stay. The mod version is 1.2.109.
+The base is upstream EvilCraft **1.2.109**. Upstream's `master-26.2` is older than its LTS branch, so only its 26.2 migration is merged on top of 1.2.109 (`master-26-lts`); the newer features stay. The mod version is 1.2.109.1.
 
 
 ## 📦 Requirements
@@ -147,7 +147,7 @@ EvilCraft приносит в Minecraft тёмную магию: собирай�
 <details>
 <summary><b>🔧 О порте</b></summary>
 
-- За основу взят EvilCraft **1.2.109** оригинала. Ветка `master-26.2` оригинала старше LTS-ветки, поэтому поверх 1.2.109 (`master-26-lts`) влита только её миграция на 26.2; новые возможности остаются. Версия мода 1.2.109.
+- За основу взят EvilCraft **1.2.109** оригинала. Ветка `master-26.2` оригинала старше LTS-ветки, поэтому поверх 1.2.109 (`master-26-lts`) влита только её миграция на 26.2; новые возможности остаются. Версия мода 1.2.109.1.
 - Содержимое, рецепты, добыча и числа — как в оригинале.
 - Жидкости работают через transfer API Fabric: Тёмные резервуары, Кровавый инфузор и другие машины соединяются с
   трубами и баками других Fabric-модов.
